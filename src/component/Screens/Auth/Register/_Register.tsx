@@ -56,7 +56,7 @@ const _Register = () => {
         </div>
       </div>
 
-      <div className={styles.right}>
+      <div className={`flex-start ${styles.right}`}>
         <div className={styles.card}>
           <div className={styles.head}>
             <h1 className={styles.head__title}>{TEXTS.AUTH_REGISTER_HEADING}</h1>

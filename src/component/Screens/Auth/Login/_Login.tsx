@@ -71,7 +71,7 @@ const _Login = () => {
         </div>
       </div>
 
-      <div className={`flex-center ${styles.right}`}>
+      <div className={`flex-start ${styles.right}`}>
         <div className={styles.card}>
           <div className={styles.head}>
             <h1 className={styles.head__title}>{TEXTS.AUTH_LOGIN_HEADING}</h1>
