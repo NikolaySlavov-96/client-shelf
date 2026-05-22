@@ -147,8 +147,7 @@ const _Login = () => {
             />
           </form>
 
-          {/*TODO: Nikolay -> First fix issue with DB */}
-          {/*<div className={styles.divider}>
+          <div className={styles.divider}>
             <span className={styles.divider__text}>
               {TEXTS.AUTH_OR_DIVIDER}
             </span>
@@ -162,7 +161,7 @@ const _Login = () => {
             aria-busy={isMagicLoading}
           >
             {isMagicLoading ? TEXTS.COMMON_LOADING : TEXTS.AUTH_EMAIL_LINK}
-          </button>*/}
+          </button>
 
           <p className={styles.footer}>
             {TEXTS.AUTH_TERMS}{" "}
