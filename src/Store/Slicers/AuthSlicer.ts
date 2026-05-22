@@ -24,7 +24,7 @@ export interface IAuthSlicer {
   onSubmitRegister: (data: { email: string; password: string; year: string }) => Promise<unknown>;
   verifyAccountWithToken: (token: string | undefined) => Promise<void>;
   requestMagicLink: (email: string) => Promise<unknown>;
-  verifyMagicLink: (token: string | undefined) => Promise<boolean>;
+  verifyMagicLink: (token: string | undefined) => Promise<{ ok: boolean; message?: string }>;
 
   profile: IProfile | null;
   fetchProfile: () => Promise<void>;
@@ -35,7 +35,12 @@ export interface IAuthSlicer {
 
 type TFullStore = IAuthSlicer & ICommonSlicer & ISupportSlicer & IModalSlicer & IProductSlicer;
 
-const authService = AuthService();
+// AuthService sits inside a module-load circular dependency
+// (AuthService -> _api -> _API -> useStoreZ -> AuthSlicer). Calling it at
+// module-eval time can hit the import while its binding is still in the
+// temporal dead zone, so resolve it lazily on first use instead.
+let _authService: ReturnType<typeof AuthService> | null = null;
+const getAuthService = () => (_authService ??= AuthService());
 
 const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, get) => ({
   email: '',
@@ -49,7 +54,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
   onSubmitLogin: async ({ email, password }: { email: string; password: string }) => {
     try {
       const { connectId } = get();
-      const result = await authService.login({ email, password, connectId });
+      const result = await getAuthService().login({ email, password, connectId });
       if (result.messageCode === ServerError.SUCCESSFULLY_LOGIN.messageCode) {
         const { userInfo } = result;
         set({
@@ -72,7 +77,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
     try {
       const { resetRooms, resetMessages, setWelcomeMessage, refreshToken } = get();
       // Best-effort: end the refresh session on the server so the token can't be reused.
-      authService.logout({ refreshToken }).catch(() => undefined);
+      getAuthService().logout({ refreshToken }).catch(() => undefined);
       set({
         email: '',
         token: '',
@@ -94,7 +99,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
 
   onSubmitRegister: async ({ email, password, year }: { email: string; password: string; year: string }) => {
     try {
-      const result = await authService.register({ email, password, year });
+      const result = await getAuthService().register({ email, password, year });
       return result;
     } catch (err) {
       return err;
@@ -104,7 +109,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
   verifyAccountWithToken: async (token) => {
     if (!token) return;
     try {
-      await authService.verifyToken({ token });
+      await getAuthService().verifyToken({ token });
     } catch (_err) {
       // silent
     }
@@ -112,16 +117,16 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
 
   requestMagicLink: async (email: string) => {
     try {
-      return await authService.requestMagicLink({ email });
+      return await getAuthService().requestMagicLink({ email });
     } catch (err) {
       return err;
     }
   },
 
   verifyMagicLink: async (token) => {
-    if (!token) return false;
+    if (!token) return { ok: false };
     try {
-      const result = await authService.verifyMagicLink(token);
+      const result = await getAuthService().verifyMagicLink(token);
       if (result.messageCode === ServerError.SUCCESSFULLY_LOGIN.messageCode) {
         const { userInfo } = result;
         set({
@@ -133,18 +138,20 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
           isAuthenticated: !!userInfo.accessToken,
           isVerifyUser: userInfo.isVerify,
         });
-        return true;
+        return { ok: true };
       }
-      return false;
-    } catch (_err) {
-      return false;
+      // Surface the server's reason (e.g. "account is not verified") to the caller.
+      return { ok: false, message: result?.message };
+    } catch (err) {
+      // _API throws the parsed error body on a non-2xx response.
+      return { ok: false, message: (err as { message?: string })?.message };
     }
   },
 
   profile: null,
   fetchProfile: async () => {
     try {
-      const result = await authService.getProfile();
+      const result = await getAuthService().getProfile();
       set({ profile: result });
     } catch (_err) {
       // silent — profile is non-critical
@@ -153,7 +160,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
 
   updateProfile: async (data) => {
     try {
-      const result = await authService.updateProfile(data);
+      const result = await getAuthService().updateProfile(data);
       set({ profile: result });
       return true;
     } catch (_err) {

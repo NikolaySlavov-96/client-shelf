@@ -13,6 +13,6 @@ export { HOST } from './_connectionData';
 
 export { E_FORM_NAMES, E_FORM_FIELDS } from './_form';
 export { TEXTS } from './texts';
-export { EStatusId, getStatusStyle } from './statusMap';
+export { EStatusId, getStatusStyle, getStatusLabel } from './statusMap';
 export type { IStatusStyle } from './statusMap';
 export { COVER_GRADIENTS, getCoverGradient, SEARCH_COVER_GRADIENTS, getSearchCoverGradient, BOOK_SPINES, NOT_FOUND_SPINES } from './_coverGradients';

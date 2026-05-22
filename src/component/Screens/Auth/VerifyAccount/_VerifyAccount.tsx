@@ -1,7 +1,7 @@
 import { memo, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import Button from '../../../atoms/Button/Button';
+import { Button } from '../../../atoms';
 
 import { useStoreZ } from '../../../../hooks';
 import { ROUT_NAMES, TEXTS } from '../../../../constants';

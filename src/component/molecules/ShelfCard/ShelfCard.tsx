@@ -1,15 +1,15 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback } from "react";
 
-import Badge from '../../atoms/Badge/Badge';
+import { BookCover, Badge } from "../../atoms";
 
-import { ToastWithButton, Toast } from '../../../Toasts';
-import { ESwalIcon } from '../../../Types/Swal';
+import { ToastWithButton, Toast } from "../../../Toasts";
+import { ESwalIcon } from "../../../Types/Swal";
 
-import { TEXTS } from '../../../constants';
+import { TEXTS } from "../../../constants";
 
-import { cx } from '../../../Utils';
+import { cx } from "../../../Utils";
 
-import styles from './ShelfCard.module.css';
+import styles from "./ShelfCard.module.css";
 
 interface IShelfCardProps {
   productId: number;
@@ -18,7 +18,6 @@ interface IShelfCardProps {
   statusId: number;
   fileUrl?: string;
   fileSrc?: string;
-  coverGradient?: string;
   onRemove?: (productId: number) => void;
   className?: string;
 }
@@ -30,12 +29,9 @@ function ShelfCard({
   statusId,
   fileUrl,
   fileSrc,
-  coverGradient,
   onRemove,
   className,
 }: IShelfCardProps) {
-  const coverStyle = fileUrl ? undefined : { background: coverGradient };
-
   const handleRemove = useCallback(async () => {
     if (!onRemove) return;
     const result = await ToastWithButton({
@@ -56,14 +52,13 @@ function ShelfCard({
 
   return (
     <article className={cx(styles.card, className)}>
-      <div className={styles.cover} style={coverStyle}>
-        {fileUrl ? (
-          <img src={fileUrl} alt={fileSrc ?? productTitle} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        ) : null}
-        <div className={styles.cover__inner}>
-          <div className={styles.cover__title}>{productTitle}</div>
-        </div>
-      </div>
+      <BookCover
+        productId={productId}
+        productTitle={productTitle}
+        fileUrl={fileUrl}
+        fileSrc={fileSrc}
+        variant="shelf"
+      />
 
       <div className={styles.body}>
         <p className={styles.author}>{authorName}</p>
@@ -71,7 +66,7 @@ function ShelfCard({
           <Badge statusId={statusId} badgeStyle="light" />
           {onRemove ? (
             <button
-              className={styles['remove-btn']}
+              className={styles["remove-btn"]}
               type="button"
               onClick={handleRemove}
               aria-label={`${TEXTS.PROFILE_REMOVE}: ${productTitle}`}

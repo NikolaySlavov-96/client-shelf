@@ -1,11 +1,9 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Avatar from "../../../../component/atoms/Avatar/Avatar";
-import Button from "../../../../component/atoms/Button/Button";
-import ShelfTabs from "../../../../component/molecules/ShelfTabs/ShelfTabs";
-import ProgressBar from "../../../../component/molecules/ProgressBar/ProgressBar";
-import ShelfGrid from "../../../../component/organisms/ShelfGrid/ShelfGrid";
+import { Button, Avatar } from "../../../atoms";
+import { ShelfTabs, ProgressBar } from "../../../../component/molecules";
+import { ShelfGrid } from "../../../../component/organisms";
 import { Pagination } from "../../../molecules";
 
 import { useStoreZ } from "../../../../hooks";

@@ -2,7 +2,7 @@ import { memo, useCallback, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import AuthTabs from '../../../molecules/AuthTabs/AuthTabs';
-import Button from '../../../atoms/Button/Button';
+import { Button } from '../../../atoms';
 
 import { Toast } from '../../../../Toasts';
 import { ESwalIcon } from '../../../../Types/Swal';

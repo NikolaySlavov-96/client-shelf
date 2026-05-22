@@ -1,12 +1,9 @@
 import { memo, useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Badge from "../../../../component/atoms/Badge/Badge";
-import Button from "../../../../component/atoms/Button/Button";
-import StarRating from "../../../../component/atoms/StarRating/StarRating";
-
+import { Badge, Button, StarRating, BookCover } from "../../../atoms";
 import { useStatuses, useStoreZ } from "../../../../hooks";
-import { ROUT_NAMES, TEXTS, getCoverGradient } from "../../../../constants";
+import { ROUT_NAMES, TEXTS, getStatusLabel } from "../../../../constants";
 
 import styles from "./_DetailsForProduct.module.css";
 
@@ -70,8 +67,6 @@ const _DetailsForProduct = () => {
     }
   }, [id, email, fetchProductState]);
 
-  const coverGradient = getCoverGradient(productById?.productId ?? 0);
-
   return (
     <main className={styles.wrap}>
       <button className={styles.back} onClick={handleBack} type="button">
@@ -82,27 +77,17 @@ const _DetailsForProduct = () => {
         <div className={styles.loading}>{TEXTS.COMMON_LOADING}</div>
       ) : (
         <div className={styles.grid}>
-          <div
-            className={`flex-center ${styles.cover}`}
-            style={{ background: coverGradient }}
+          <BookCover
+            productId={productById?.productId ?? 0}
+            productTitle={productById?.productTitle ?? ""}
+            fileUrl={productById?.fileUrl}
+            fileSrc={productById?.fileSrc}
+            variant="detail"
           >
-            {productById?.fileUrl ? (
-              <img
-                className={styles.cover__img}
-                src={productById.fileUrl}
-                alt={productById.fileSrc ?? productById.productTitle}
-              />
-            ) : (
-              <span className={styles.cover__placeholder}>
-                {productById?.productTitle}
-              </span>
-            )}
             {currentStatusId ? (
-              <div className={styles.cover__badge}>
-                <Badge statusId={currentStatusId} badgeStyle="solid" />
-              </div>
+              <Badge statusId={currentStatusId} badgeStyle="solid" />
             ) : null}
-          </div>
+          </BookCover>
 
           <div className={styles.info}>
             <p className={styles.info__genre}>
@@ -164,9 +149,7 @@ const _DetailsForProduct = () => {
                     {statuses.map((s) => (
                       <Button
                         key={s.id}
-                        label={
-                          s.symbol ? `${s.symbol} ${s.stateName}` : s.stateName
-                        }
+                        label={getStatusLabel(s)}
                         variant={
                           currentStatusId === s.id ? "primary" : "outline"
                         }

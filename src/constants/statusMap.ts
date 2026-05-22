@@ -31,3 +31,10 @@ const NEUTRAL_STYLE: IStatusStyle = {
 };
 
 export const getStatusStyle = (id: number): IStatusStyle => STATUS_STYLE[id] ?? NEUTRAL_STYLE;
+
+/**
+ * The user-facing label for a status: its symbol prefixed to the name when one
+ * exists, otherwise just the name. Both come from the API — see useStatuses.
+ */
+export const getStatusLabel = (status: { stateName: string; symbol?: string }): string =>
+  status.symbol ? `${status.symbol} ${status.stateName}` : status.stateName;

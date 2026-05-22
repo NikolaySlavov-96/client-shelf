@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Button from '../../atoms/Button/Button';
+import { Button } from '../../atoms';
 
 import { ROUT_NAMES, TEXTS, NOT_FOUND_SPINES } from '../../../constants';
 

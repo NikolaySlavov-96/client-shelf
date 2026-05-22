@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 
-import Button from '../../atoms/Button/Button';
+import { Button } from '../../atoms';
 
 import { InformationToast } from '../../../Toasts';
 import { ESwalIcon } from '../../../Types/Swal';

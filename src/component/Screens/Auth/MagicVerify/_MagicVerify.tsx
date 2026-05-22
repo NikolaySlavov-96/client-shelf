@@ -1,8 +1,10 @@
 import { memo, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import Button from '../../../atoms/Button/Button';
+import { Button } from '../../../atoms';
 
+import { Toast } from '../../../../Toasts';
+import { ESwalIcon } from '../../../../Types/Swal';
 import { useStoreZ } from '../../../../hooks';
 import { ROUT_NAMES, TEXTS } from '../../../../constants';
 
@@ -21,10 +23,14 @@ const _MagicVerify = () => {
       return;
     }
     (async () => {
-      const ok = await verifyMagicLink(token);
+      const { ok, message } = await verifyMagicLink(token);
       setState(ok ? 'success' : 'error');
       if (ok) {
         navigate(ROUT_NAMES.HOME);
+      } else {
+        // Show the real reason from the server (e.g. "account is not verified")
+        // instead of failing silently behind the generic page title.
+        Toast({ title: message ?? TEXTS.AUTH_MAGIC_ERROR, typeIcon: ESwalIcon.ERROR });
       }
     })();
   }, [token, verifyMagicLink, navigate]);

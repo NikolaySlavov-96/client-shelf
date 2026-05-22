@@ -13,7 +13,7 @@ const PaginationButton: FC<IPaginationButtonProps> = (props) => {
     const { onSubmit, content } = props;
 
     return (
-        <Button styles={style["page"]} onClick={onSubmit} content={content} />
+        <Button variant="outline" size="sm" className={style["page"]} onClick={onSubmit}>{content}</Button>
     )
 };
 
@@ -55,7 +55,7 @@ const _Pagination: FC<IPaginationProps> = (props) => {
                     <PaginationButton content={onePageBefore} onSubmit={() => onSubmit(onePageBefore)} />
                 )
             }
-            <p className={`${style["current__page"]} ${style["page"]}`} >{page}</p>
+            <p className={`${style["current__page"]} ${style["page"]} ${style["pageSize"]}`} >{page}</p>
             {
                 count >= onePageAhead && (
                     <PaginationButton content={onePageAhead} onSubmit={() => onSubmit(onePageAhead)} />

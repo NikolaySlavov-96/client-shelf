@@ -2,7 +2,7 @@ import { memo } from 'react';
 
 import ShelfCard from '../../molecules/ShelfCard/ShelfCard';
 
-import { TEXTS, getCoverGradient } from '../../../constants';
+import { TEXTS } from '../../../constants';
 import { IProductWithState, IProductEmailType } from '../../../Store/Slicers/ProductSlicer.interface';
 
 import { cx } from '../../../Utils';
@@ -39,7 +39,6 @@ function ShelfGrid({ books, onRemove, className }: IShelfGridProps) {
           statusId={getStatusId(book)}
           fileUrl={book.fileUrl}
           fileSrc={book.fileSrc}
-          coverGradient={getCoverGradient(book.productId)}
           onRemove={onRemove}
         />
       ))}

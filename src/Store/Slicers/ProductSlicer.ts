@@ -2,6 +2,18 @@ import { StateCreator } from "zustand";
 
 import { ProductService as productService, FileService as fileService } from "../../services";
 
+import { Toast } from "../../Toasts";
+import { ESwalIcon } from "../../Types/Swal";
+import { TEXTS } from "../../constants";
+
+// Surface a failed action's reason to the user. _API throws the parsed error
+// body, so an authorization failure (e.g. 403 "account is not verified") carries
+// a `message` we can show instead of failing silently in the console.
+const showActionError = (err: unknown) => {
+    const message = (err as { message?: string })?.message;
+    Toast({ title: message ?? TEXTS.TOAST_GENERIC_ERROR, typeIcon: ESwalIcon.ERROR });
+};
+
 import {
     IProductEmailType,
     IProduct,
@@ -180,10 +192,6 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             return;
         }
 
-        // Snapshots for rollback if the request fails.
-        const previousProducts = products;
-        const previousCounts = statusCounts;
-
         // In a filtered section (anything other than "All"), a book whose new status no longer
         // matches the filter leaves the current list; in "All" it stays and just recolours.
         const leavesCurrentSection =
@@ -195,20 +203,19 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
         const nextCount = leavesCurrentSection ? Math.max(0, products.count - 1) : products.count;
 
-        // Optimistic: reflect the move immediately, no refetch.
-        set({
-            isAddingProductState: true,
-            products: { count: nextCount, rows: nextRows },
-            statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
-            productState: { stateId: nextStatusId },
-        });
-
+        set({ isAddingProductState: true });
         try {
             await productService.addStatusOnProduct({ productId: id, statusId: state });
+            // Commit to the store only after the server confirms — on failure
+            // nothing was changed, so there is nothing to roll back.
+            set({
+                products: { count: nextCount, rows: nextRows },
+                statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
+                productState: { stateId: nextStatusId },
+            });
         } catch (err) {
             console.log('addingProductState error --->: ', err);
-            // Roll back the optimistic move.
-            set({ products: previousProducts, statusCounts: previousCounts });
+            showActionError(err);
         } finally {
             set({ isAddingProductState: false });
         }
@@ -235,6 +242,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             set({ productRating: result });
         } catch (err) {
             console.log('rateProduct error --->: ', err);
+            showActionError(err);
             set({ productRating: previous });
         }
     },
@@ -279,6 +287,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             get().fetchStatusCounts();
         } catch (err) {
             console.log('removeProductState error --->: ', err);
+            showActionError(err);
             // rollback on failure
             set({ productCollection: { count: productCollection.count, rows: previousRows } });
         }
@@ -299,7 +308,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             set({ isProductAdded: true });
         } catch (err) {
             console.log('addProductWithImage --->: ', err);
-            // set(erroMessage)
+            showActionError(err);
         } finally {
             set({ isLoadingProductAddition: false });
         }
