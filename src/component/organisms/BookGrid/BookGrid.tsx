@@ -7,14 +7,14 @@ import { cx } from '../../../Utils';
 import { TEXTS } from '../../../constants';
 import { IProduct } from '../../../Store/Slicers/ProductSlicer.interface';
 
-import styles from './BookGrid.module.css';
+import type { TViewType } from '../../../Types/Components';
 
-type TBookGridLayout = 'grid' | 'list';
+import styles from './BookGrid.module.css';
 
 interface IBookGridProps {
   books: IProduct[];
   isAuthenticated?: boolean;
-  layout?: TBookGridLayout;
+  layout?: TViewType;
   onStatusChange?: (productId: number, statusId: number) => void;
   className?: string;
 }

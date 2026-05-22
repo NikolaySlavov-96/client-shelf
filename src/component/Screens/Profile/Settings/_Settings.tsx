@@ -21,6 +21,10 @@ import styles from "./_Settings.module.css";
 
 const MAX_DISPLAY_NAME = 60;
 
+// Avatar upload is temporarily disabled in the UI. Flip to `true` to restore it
+// (the API also guards this endpoint to privileged accounts).
+const AVATAR_UPLOAD_ENABLED = false;
+
 const _Settings = () => {
   const navigate = useNavigate();
 
@@ -146,10 +150,14 @@ const _Settings = () => {
               type="file"
               accept="image/*"
               onChange={handleAvatarChange}
-              disabled={isUploading}
+              disabled={!AVATAR_UPLOAD_ENABLED || isUploading}
               aria-label={TEXTS.SETTINGS_AVATAR_UPLOAD}
             />
-            {isUploading ? (
+            {!AVATAR_UPLOAD_ENABLED ? (
+              <span className={styles.hint}>
+                {TEXTS.SETTINGS_AVATAR_DISABLED}
+              </span>
+            ) : isUploading ? (
               <span className={styles.hint}>
                 {TEXTS.SETTINGS_AVATAR_UPLOADING}
               </span>

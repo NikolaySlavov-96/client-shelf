@@ -83,6 +83,7 @@ export const TEXTS = {
   SETTINGS_LABEL_AVATAR: "Avatar image",
   SETTINGS_AVATAR_UPLOAD: "Upload avatar",
   SETTINGS_AVATAR_UPLOADING: "Uploading...",
+  SETTINGS_AVATAR_DISABLED: "Avatar uploads are temporarily unavailable.",
   SETTINGS_LABEL_NOTIFY: "Email notifications",
   SETTINGS_NOTIFY_HINT: "Receive product updates by email",
   SETTINGS_SAVE: "Save changes",

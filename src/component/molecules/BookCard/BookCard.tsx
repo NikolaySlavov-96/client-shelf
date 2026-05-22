@@ -1,16 +1,16 @@
-import { memo, useCallback, type MouseEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { memo, useCallback, type MouseEvent } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { cx } from '../../../Utils';
+import { cx } from "../../../Utils";
 
-import { BookCover, Button } from '../../atoms';
+import { BookCover, Button } from "../../atoms";
 
-import { useStatuses } from '../../../hooks';
-import { ROUT_NAMES, TEXTS, getStatusLabel } from '../../../constants';
+import { useStatuses } from "../../../hooks";
+import { ROUT_NAMES, TEXTS, getStatusLabel } from "../../../constants";
 
-import styles from './BookCard.module.css';
+import type { TViewType } from "../../../Types/Components";
 
-type TBookCardLayout = 'grid' | 'list';
+import styles from "./BookCard.module.css";
 
 interface IBookCardProps {
   productId: number;
@@ -20,7 +20,7 @@ interface IBookCardProps {
   fileUrl?: string;
   fileSrc?: string;
   statusId?: number;
-  layout?: TBookCardLayout;
+  layout?: TViewType;
   isAuthenticated?: boolean;
   onStatusChange?: (productId: number, statusId: number) => void;
   className?: string;
@@ -33,7 +33,7 @@ function BookCard({
   fileUrl,
   fileSrc,
   statusId,
-  layout = 'grid',
+  layout = "grid",
   isAuthenticated = false,
   onStatusChange,
   className,
@@ -50,13 +50,22 @@ function BookCard({
       e.stopPropagation();
       onStatusChange?.(productId, sid);
     },
-    [onStatusChange, productId]
+    [onStatusChange, productId],
   );
 
-  const cardClass = cx(styles.card, layout === 'list' ? styles['card--list'] : '', className);
+  const isList = layout === "list";
+  const cardClass = cx(
+    styles.card,
+    isList ? styles["card--list"] : "",
+    className,
+  );
 
   return (
-    <article className={cardClass} onClick={handleCardClick} aria-label={productTitle}>
+    <article
+      className={cardClass}
+      onClick={handleCardClick}
+      aria-label={productTitle}
+    >
       <BookCover
         productId={productId}
         productTitle={productTitle}
@@ -65,8 +74,8 @@ function BookCard({
         variant={layout}
       />
 
-      <div className={cx(styles.meta, layout === 'list' ? 'flex-col' : '')}>
-        {layout === 'list' ? <p className={styles.meta__title}>{productTitle}</p> : null}
+      <div className={cx(styles.meta, isList ? "flex-col" : "")}>
+        {isList ? <p className={styles.meta__title}>{productTitle}</p> : null}
         <p className={styles.meta__author}>{authorName}</p>
         {isAuthenticated ? (
           <div className={styles.meta__actions}>
@@ -75,7 +84,7 @@ function BookCard({
                 key={s.id}
                 label={getStatusLabel(s)}
                 size="sm"
-                variant={statusId === s.id ? 'primary' : 'outline'}
+                variant={statusId === s.id ? "primary" : "outline"}
                 onClick={(e) => handleStatusClick(e, s.id)}
                 aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
                 aria-pressed={statusId === s.id}

@@ -21,7 +21,7 @@
 
 .meta__title {
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: var(--font-weight-bold);
   color: var(--ink);
   margin-bottom: var(--spacing-4);
 }

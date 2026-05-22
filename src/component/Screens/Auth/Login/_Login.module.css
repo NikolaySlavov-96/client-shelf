@@ -22,7 +22,7 @@
   right: calc(-1 * var(--spacing-60));
   width: var(--login-deco-lg);
   height: var(--login-deco-lg);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--deco-accent-2);
 }
 
@@ -33,7 +33,7 @@
   left: calc(-1 * var(--spacing-40));
   width: var(--login-deco-md);
   height: var(--login-deco-md);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   background: var(--deco-accent);
 }
 
