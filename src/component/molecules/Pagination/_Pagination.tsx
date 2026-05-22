@@ -1,4 +1,4 @@
-import { Dispatch, FC, memo, SetStateAction, useCallback } from 'react';
+import { FC, memo, useCallback } from 'react';
 
 import { Button } from '../../atoms';
 
@@ -20,7 +20,7 @@ const PaginationButton: FC<IPaginationButtonProps> = (props) => {
 
 interface IPaginationProps {
     count: number;
-    onSubmit: Dispatch<SetStateAction<number>>;
+    onSubmit: (page: number) => void;
     page: number;
 }
 

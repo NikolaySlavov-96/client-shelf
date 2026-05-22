@@ -3,6 +3,8 @@ const _SEARCH_NAME = {
     LIMIT: 'limit',
     PAGE: 'page',
     CONTENT: 'content',
+    VIEW: 'view',
+    STATUS: 'status',
 };
 
 export default _SEARCH_NAME;

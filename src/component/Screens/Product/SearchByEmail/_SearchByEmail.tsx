@@ -1,23 +1,44 @@
-import { memo, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { memo, useCallback, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 import ShelfGrid from '../../../../component/organisms/ShelfGrid/ShelfGrid';
 import { Pagination } from '../../../molecules';
 
 import { useStoreZ } from '../../../../hooks';
-import { TEXTS } from '../../../../constants';
+import { TEXTS, SEARCH_NAME } from '../../../../constants';
 
 import styles from './_SearchByEmail.module.css';
 
 const _SearchByEmail = () => {
   const { email } = useParams<{ email: string }>();
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Page lives in the URL so a shared search link reopens the same page.
+  const pageParam = Number(searchParams.get(SEARCH_NAME.PAGE));
+  const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
+  const setPage = useCallback((next: number) => {
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      if (next <= 1) {
+        params.delete(SEARCH_NAME.PAGE);
+      } else {
+        params.set(SEARCH_NAME.PAGE, String(next));
+      }
+      return params;
+    });
+  }, [setSearchParams]);
 
   const { isLoadingProductByEmails, pageLimit, productByEmail, fetchProductsForEmail } = useStoreZ();
 
   // Reset to the first page whenever the searched email changes
   useEffect(() => {
-    setPage(1);
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      params.delete(SEARCH_NAME.PAGE);
+      return params;
+    }, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email]);
 
   useEffect(() => {

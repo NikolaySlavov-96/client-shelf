@@ -66,6 +66,7 @@ function BookCard({
       />
 
       <div className={cx(styles.meta, layout === 'list' ? 'flex-col' : '')}>
+        {layout === 'list' ? <p className={styles.meta__title}>{productTitle}</p> : null}
         <p className={styles.meta__author}>{authorName}</p>
         {isAuthenticated ? (
           <div className={styles.meta__actions}>

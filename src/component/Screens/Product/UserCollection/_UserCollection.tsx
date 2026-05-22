@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { Button, Avatar } from "../../../atoms";
 import { ShelfTabs, ProgressBar } from "../../../../component/molecules";
@@ -7,7 +7,7 @@ import { ShelfGrid } from "../../../../component/organisms";
 import { Pagination } from "../../../molecules";
 
 import { useStoreZ } from "../../../../hooks";
-import { ROUT_NAMES, TEXTS } from "../../../../constants";
+import { ROUT_NAMES, TEXTS, SEARCH_NAME } from "../../../../constants";
 import { EStatusId } from "../../../../constants/statusMap";
 
 import styles from "./_UserCollection.module.css";
@@ -19,8 +19,40 @@ const DEFAULT_GOAL = 12;
 
 const _UserCollection = () => {
   const navigate = useNavigate();
-  const [activeStatusId, setActiveStatusId] = useState<number>(ALL_STATUS_ID);
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const statusParam = Number(searchParams.get(SEARCH_NAME.STATUS));
+  const activeStatusId =
+    Number.isInteger(statusParam) && statusParam > 0
+      ? statusParam
+      : ALL_STATUS_ID;
+  const pageParam = Number(searchParams.get(SEARCH_NAME.PAGE));
+  const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
+  const updateParams = useCallback(
+    (mutate: (params: URLSearchParams) => void) => {
+      setSearchParams((prev) => {
+        const params = new URLSearchParams(prev);
+        mutate(params);
+        return params;
+      });
+    },
+    [setSearchParams],
+  );
+
+  const setPage = useCallback(
+    (next: number) => {
+      updateParams((p) => {
+        if (next <= 1) {
+          p.delete(SEARCH_NAME.PAGE);
+        } else {
+          p.set(SEARCH_NAME.PAGE, String(next));
+        }
+      });
+    },
+    [updateParams],
+  );
+
   const [friendEmail, setFriendEmail] = useState("");
   const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [goalDraft, setGoalDraft] = useState("");
@@ -122,13 +154,22 @@ const _UserCollection = () => {
 
   const pageCount = Math.ceil(productCollection.count / pageLimit) || 0;
 
-  const handleTabSelect = useCallback((v: string) => {
-    const nextStatusId = Number(v);
-    if (Number.isFinite(nextStatusId)) {
-      setActiveStatusId(nextStatusId);
-      setPage(1);
-    }
-  }, []);
+  const handleTabSelect = useCallback(
+    (v: string) => {
+      const nextStatusId = Number(v);
+      if (Number.isFinite(nextStatusId)) {
+        updateParams((p) => {
+          if (nextStatusId === ALL_STATUS_ID) {
+            p.delete(SEARCH_NAME.STATUS);
+          } else {
+            p.set(SEARCH_NAME.STATUS, String(nextStatusId));
+          }
+          p.delete(SEARCH_NAME.PAGE); // switching tabs resets to the first page
+        });
+      }
+    },
+    [updateParams],
+  );
 
   const handleFriendView = useCallback(() => {
     if (friendEmail.trim()) {
