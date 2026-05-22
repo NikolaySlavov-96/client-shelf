@@ -1,18 +1,18 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import Avatar from '../../../../component/atoms/Avatar/Avatar';
-import Button from '../../../../component/atoms/Button/Button';
-import ShelfTabs from '../../../../component/molecules/ShelfTabs/ShelfTabs';
-import ProgressBar from '../../../../component/molecules/ProgressBar/ProgressBar';
-import ShelfGrid from '../../../../component/organisms/ShelfGrid/ShelfGrid';
-import { Pagination } from '../../../molecules';
+import Avatar from "../../../../component/atoms/Avatar/Avatar";
+import Button from "../../../../component/atoms/Button/Button";
+import ShelfTabs from "../../../../component/molecules/ShelfTabs/ShelfTabs";
+import ProgressBar from "../../../../component/molecules/ProgressBar/ProgressBar";
+import ShelfGrid from "../../../../component/organisms/ShelfGrid/ShelfGrid";
+import { Pagination } from "../../../molecules";
 
-import { useStoreZ } from '../../../../hooks';
-import { ROUT_NAMES, TEXTS } from '../../../../constants';
-import { EStatusId } from '../../../../constants/statusMap';
+import { useStoreZ } from "../../../../hooks";
+import { ROUT_NAMES, TEXTS } from "../../../../constants";
+import { EStatusId } from "../../../../constants/statusMap";
 
-import styles from './_UserCollection.module.css';
+import styles from "./_UserCollection.module.css";
 
 // statusId 0 is the synthetic "All" tab; every other tab comes from the DB-backed state list
 const ALL_STATUS_ID = 0;
@@ -23,9 +23,9 @@ const _UserCollection = () => {
   const navigate = useNavigate();
   const [activeStatusId, setActiveStatusId] = useState<number>(ALL_STATUS_ID);
   const [page, setPage] = useState(1);
-  const [friendEmail, setFriendEmail] = useState('');
+  const [friendEmail, setFriendEmail] = useState("");
   const [isEditingGoal, setIsEditingGoal] = useState(false);
-  const [goalDraft, setGoalDraft] = useState('');
+  const [goalDraft, setGoalDraft] = useState("");
 
   const {
     email,
@@ -43,8 +43,12 @@ const _UserCollection = () => {
     isLoadingProductCollection,
   } = useStoreZ();
 
-  const initials = (profile?.displayName || email) ? (profile?.displayName ?? email).slice(0, 2).toUpperCase() : '';
-  const username = profile?.displayName || (email ? email.split('@')[0] : TEXTS.NAV_GUEST);
+  const initials =
+    profile?.displayName || email
+      ? (profile?.displayName ?? email).slice(0, 2).toUpperCase()
+      : "";
+  const username =
+    profile?.displayName || (email ? email.split("@")[0] : TEXTS.NAV_GUEST);
   const readingGoal = profile?.readingGoal ?? DEFAULT_GOAL;
 
   // The available statuses are data: they come from the API, not the client
@@ -54,7 +58,12 @@ const _UserCollection = () => {
 
   // Server-side: re-fetch the current page whenever the tab or page changes
   useEffect(() => {
-    fetchProductCollection({ page, limit: pageLimit, type: activeStatusId, searchContent: '' });
+    fetchProductCollection({
+      page,
+      limit: pageLimit,
+      type: activeStatusId,
+      searchContent: "",
+    });
   }, [fetchProductCollection, page, pageLimit, activeStatusId]);
 
   // Accurate per-tab counts come from a lightweight aggregate endpoint
@@ -80,12 +89,13 @@ const _UserCollection = () => {
   }, [goalDraft, updateReadingGoal]);
 
   const countFor = useCallback(
-    (statusId: number) => statusCounts.find((c) => c.statusId === statusId)?.count ?? 0,
-    [statusCounts]
+    (statusId: number) =>
+      statusCounts.find((c) => c.statusId === statusId)?.count ?? 0,
+    [statusCounts],
   );
   const totalCount = useMemo(
     () => statusCounts.reduce((sum, c) => sum + c.count, 0),
-    [statusCounts]
+    [statusCounts],
   );
 
   // Tabs are built from whatever the API returns: no states → no tabs at all
@@ -95,7 +105,11 @@ const _UserCollection = () => {
     }
 
     return [
-      { value: String(ALL_STATUS_ID), label: TEXTS.SHELF_TAB_ALL, count: totalCount },
+      {
+        value: String(ALL_STATUS_ID),
+        label: TEXTS.SHELF_TAB_ALL,
+        count: totalCount,
+      },
       ...productStates.map((s) => ({
         value: String(s.id),
         label: s.symbol ? `${s.symbol} ${s.stateName}` : s.stateName,
@@ -120,14 +134,20 @@ const _UserCollection = () => {
 
   const handleFriendView = useCallback(() => {
     if (friendEmail.trim()) {
-      navigate(`${ROUT_NAMES.REVIEW_PRODUCTS_BY_EMAIL.replace(':email', '')}${encodeURIComponent(friendEmail.trim())}`);
+      navigate(
+        `${ROUT_NAMES.REVIEW_PRODUCTS_BY_EMAIL.replace(":email", "")}${encodeURIComponent(friendEmail.trim())}`,
+      );
     }
   }, [friendEmail, navigate]);
 
   return (
     <main className={styles.wrap}>
       <header className={styles.header}>
-        <Avatar initials={initials} src={profile?.avatarUrl ?? undefined} size="lg" />
+        <Avatar
+          initials={initials}
+          src={profile?.avatarUrl ?? undefined}
+          size="lg"
+        />
         <div className={styles.header__info}>
           <h1 className={styles.header__name}>{username}</h1>
           <p className={styles.header__email}>{email}</p>
@@ -142,11 +162,15 @@ const _UserCollection = () => {
             </div>
             <div className={styles.stat}>
               <span className={styles.stat__n}>{readingCount}</span>
-              <span className={styles.stat__l}>{TEXTS.PROFILE_STAT_READING}</span>
+              <span className={styles.stat__l}>
+                {TEXTS.PROFILE_STAT_READING}
+              </span>
             </div>
             <div className={styles.stat}>
               <span className={styles.stat__n}>{listenedCount}</span>
-              <span className={styles.stat__l}>{TEXTS.PROFILE_STAT_LISTENED}</span>
+              <span className={styles.stat__l}>
+                {TEXTS.PROFILE_STAT_LISTENED}
+              </span>
             </div>
           </div>
         </div>
@@ -180,13 +204,23 @@ const _UserCollection = () => {
               max={999}
               value={goalDraft}
               onChange={(e) => setGoalDraft(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' ? handleSaveGoal() : undefined}
+              onKeyDown={(e) =>
+                e.key === "Enter" ? handleSaveGoal() : undefined
+              }
               autoFocus
             />
-            <button className={styles.goalBtn} type="button" onClick={handleSaveGoal}>
+            <button
+              className={styles.goalBtn}
+              type="button"
+              onClick={handleSaveGoal}
+            >
               {TEXTS.PROFILE_GOAL_SAVE}
             </button>
-            <button className={styles.goalBtn} type="button" onClick={() => setIsEditingGoal(false)}>
+            <button
+              className={styles.goalBtn}
+              type="button"
+              onClick={() => setIsEditingGoal(false)}
+            >
               {TEXTS.PROFILE_GOAL_CANCEL}
             </button>
           </div>
@@ -213,11 +247,15 @@ const _UserCollection = () => {
           placeholder={TEXTS.PROFILE_FRIEND_PLACEHOLDER}
           value={friendEmail}
           onChange={(e) => setFriendEmail(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' ? handleFriendView() : undefined}
+          onKeyDown={(e) =>
+            e.key === "Enter" ? handleFriendView() : undefined
+          }
         />
-        <button className={styles.friendBar__btn} onClick={handleFriendView} type="button">
-          {TEXTS.PROFILE_FRIEND_BTN}
-        </button>
+        <Button
+          label={TEXTS.PROFILE_FRIEND_BTN}
+          onClick={handleFriendView}
+          ariaLabel={TEXTS.PROFILE_FRIEND_BTN}
+        />
       </div>
 
       <ShelfTabs
@@ -230,7 +268,10 @@ const _UserCollection = () => {
         <div className={styles.loading}>{TEXTS.COMMON_LOADING}</div>
       ) : (
         <>
-          <ShelfGrid books={productCollection.rows} onRemove={removeProductState} />
+          <ShelfGrid
+            books={productCollection.rows}
+            onRemove={removeProductState}
+          />
           <Pagination count={pageCount} page={page} onSubmit={setPage} />
         </>
       )}

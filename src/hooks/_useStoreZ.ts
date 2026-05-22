@@ -24,6 +24,7 @@ const _useStoreZ = create<TStoreState>()(
       partialize: (state) => ({
         email: state.email,
         token: state.token,
+        refreshToken: state.refreshToken,
         userId: state.userId,
         userRole: state.userRole,
         isAuthenticated: state.isAuthenticated,

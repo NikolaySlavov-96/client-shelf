@@ -1,9 +1,8 @@
 .container {
   background: var(--cream-2);
   border-radius: var(--radius-md);
-  padding: var(--spacing-16) var(--spacing-20);
+  padding: var(--spacing-4) var(--spacing-20);
   gap: var(--spacing-20);
-  margin-bottom: var(--spacing-28);
 }
 
 .label {
@@ -15,7 +14,7 @@
 
 .track {
   flex: 1;
-  height: var(--spacing-24);
+  height: var(--spacing-16);
   background: var(--cream-3);
   border-radius: var(--radius-xs);
   overflow: hidden;

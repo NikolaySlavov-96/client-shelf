@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Avatar from '../../../atoms/Avatar/Avatar';
@@ -76,6 +76,15 @@ const _Settings = () => {
     }
   }, [displayName, notifyByEmail, updateProfile]);
 
+  // Compare the form against the loaded profile, normalising the name the same
+  // way handleSubmit persists it (trimmed, empty -> null)
+  const isDirty = useMemo(() => {
+    if (!profile) return false;
+    const nextName = displayName.trim() || null;
+    const baselineName = profile.displayName?.trim() || null;
+    return nextName !== baselineName || notifyByEmail !== profile.notifyByEmail;
+  }, [profile, displayName, notifyByEmail]);
+
   const initials = (profile?.displayName || email || '').slice(0, 2).toUpperCase();
 
   return (
@@ -152,7 +161,7 @@ const _Settings = () => {
           size="md"
           type="submit"
           isLoading={isSaving}
-          isDisabled={!!nameError}
+          isDisabled={!!nameError || !isDirty}
         />
       </form>
     </main>

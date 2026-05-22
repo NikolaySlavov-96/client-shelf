@@ -1,19 +1,19 @@
-import { memo, useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { memo, useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import Badge from '../../../../component/atoms/Badge/Badge';
-import Button from '../../../../component/atoms/Button/Button';
-import StarRating from '../../../../component/atoms/StarRating/StarRating';
+import Badge from "../../../../component/atoms/Badge/Badge";
+import Button from "../../../../component/atoms/Button/Button";
+import StarRating from "../../../../component/atoms/StarRating/StarRating";
 
-import { useStatuses, useStoreZ } from '../../../../hooks';
-import { ROUT_NAMES, TEXTS, getCoverGradient } from '../../../../constants';
+import { useStatuses, useStoreZ } from "../../../../hooks";
+import { ROUT_NAMES, TEXTS, getCoverGradient } from "../../../../constants";
 
-import styles from './_DetailsForProduct.module.css';
+import styles from "./_DetailsForProduct.module.css";
 
 const _DetailsForProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [shareEmail, setShareEmail] = useState('');
+  const [shareEmail, setShareEmail] = useState("");
 
   const { statuses } = useStatuses();
 
@@ -35,29 +35,37 @@ const _DetailsForProduct = () => {
 
   const handleBack = useCallback(() => navigate(-1), [navigate]);
 
-  const handleStatusChange = useCallback((statusId: number) => {
-    if (id) addingProductState(id, String(statusId));
-  }, [id, addingProductState]);
+  const handleStatusChange = useCallback(
+    (statusId: number) => {
+      if (id) addingProductState(id, String(statusId));
+    },
+    [id, addingProductState],
+  );
 
-  const handleRate = useCallback((rating: number) => {
-    if (id) rateProduct(id, rating);
-  }, [id, rateProduct]);
+  const handleRate = useCallback(
+    (rating: number) => {
+      if (id) rateProduct(id, rating);
+    },
+    [id, rateProduct],
+  );
 
   const handleShareSubmit = useCallback(() => {
     const trimmed = shareEmail.trim();
     if (!trimmed) return;
-    navigate(`${ROUT_NAMES.REVIEW_PRODUCTS_BY_EMAIL.replace(':email', '')}${encodeURIComponent(trimmed)}`);
+    navigate(
+      `${ROUT_NAMES.REVIEW_PRODUCTS_BY_EMAIL.replace(":email", "")}${encodeURIComponent(trimmed)}`,
+    );
   }, [shareEmail, navigate]);
 
   useEffect(() => {
-    if (id && id !== '0') {
+    if (id && id !== "0") {
       fetchProductById(id);
       fetchProductRating(id);
     }
   }, [id, fetchProductById, fetchProductRating]);
 
   useEffect(() => {
-    if (email && id && id !== '0') {
+    if (email && id && id !== "0") {
       fetchProductState(id);
     }
   }, [id, email, fetchProductState]);
@@ -74,7 +82,10 @@ const _DetailsForProduct = () => {
         <div className={styles.loading}>{TEXTS.COMMON_LOADING}</div>
       ) : (
         <div className={styles.grid}>
-          <div className={`flex-center ${styles.cover}`} style={{ background: coverGradient }}>
+          <div
+            className={`flex-center ${styles.cover}`}
+            style={{ background: coverGradient }}
+          >
             {productById?.fileUrl ? (
               <img
                 className={styles.cover__img}
@@ -82,7 +93,9 @@ const _DetailsForProduct = () => {
                 alt={productById.fileSrc ?? productById.productTitle}
               />
             ) : (
-              <span className={styles.cover__placeholder}>{productById?.productTitle}</span>
+              <span className={styles.cover__placeholder}>
+                {productById?.productTitle}
+              </span>
             )}
             {currentStatusId ? (
               <div className={styles.cover__badge}>
@@ -92,36 +105,49 @@ const _DetailsForProduct = () => {
           </div>
 
           <div className={styles.info}>
-            <p className={styles.info__genre}>{productById?.authorGenre ?? TEXTS.COMMON_PLACEHOLDER_VALUE}</p>
+            <p className={styles.info__genre}>
+              {productById?.authorGenre ?? TEXTS.COMMON_PLACEHOLDER_VALUE}
+            </p>
             <h1 className={styles.info__title}>{productById?.productTitle}</h1>
             <p className={styles.info__author}>{productById?.authorName}</p>
 
             <div className={styles.stats}>
               <div className={`flex-col ${styles.stat}`}>
-                <span className={styles.stat__value}>{productById?.pages ?? TEXTS.COMMON_PLACEHOLDER_VALUE}</span>
+                <span className={styles.stat__value}>
+                  {productById?.pages ?? TEXTS.COMMON_PLACEHOLDER_VALUE}
+                </span>
                 <span className={styles.stat__label}>{TEXTS.DETAIL_PAGES}</span>
               </div>
               <div className={`flex-col ${styles.stat}`}>
-                <span className={styles.stat__value}>{productById?.publishedYear ?? TEXTS.COMMON_PLACEHOLDER_VALUE}</span>
+                <span className={styles.stat__value}>
+                  {productById?.publishedYear ?? TEXTS.COMMON_PLACEHOLDER_VALUE}
+                </span>
                 <span className={styles.stat__label}>{TEXTS.DETAIL_YEAR}</span>
               </div>
               <div className={`flex-col ${styles.stat}`}>
                 <span className={styles.stat__value}>
-                  <StarRating value={Math.round(productRating.average)} ariaLabel={TEXTS.DETAIL_RATING} />
+                  <StarRating
+                    value={Math.round(productRating.average)}
+                    ariaLabel={TEXTS.DETAIL_RATING}
+                  />
                 </span>
                 <span className={styles.stat__label}>
                   {TEXTS.DETAIL_RATING}
-                  {productRating.count > 0 ? ` (${productRating.count})` : ''}
+                  {productRating.count > 0 ? ` (${productRating.count})` : ""}
                 </span>
               </div>
             </div>
 
-            <p className={styles.desc}>{productById?.description ?? TEXTS.DETAIL_DESC_PLACEHOLDER}</p>
+            <p className={styles.desc}>
+              {productById?.description ?? TEXTS.DETAIL_DESC_PLACEHOLDER}
+            </p>
 
             {isAuthenticated ? (
               <>
                 <div className={styles.actions}>
-                  <p className={styles.actions__label}>{TEXTS.DETAIL_YOUR_RATING}</p>
+                  <p className={styles.actions__label}>
+                    {TEXTS.DETAIL_YOUR_RATING}
+                  </p>
                   <StarRating
                     value={productRating.userRating}
                     interactive
@@ -131,13 +157,19 @@ const _DetailsForProduct = () => {
                 </div>
 
                 <div className={styles.actions}>
-                  <p className={styles.actions__label}>{TEXTS.DETAIL_ADD_TO_SHELF}</p>
+                  <p className={styles.actions__label}>
+                    {TEXTS.DETAIL_ADD_TO_SHELF}
+                  </p>
                   <div className={styles.actions__btns}>
                     {statuses.map((s) => (
                       <Button
                         key={s.id}
-                        label={s.symbol ? `${s.symbol} ${s.stateName}` : s.stateName}
-                        variant={currentStatusId === s.id ? 'primary' : 'outline'}
+                        label={
+                          s.symbol ? `${s.symbol} ${s.stateName}` : s.stateName
+                        }
+                        variant={
+                          currentStatusId === s.id ? "primary" : "outline"
+                        }
                         size="md"
                         onClick={() => handleStatusChange(s.id)}
                         ariaLabel={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
@@ -147,7 +179,9 @@ const _DetailsForProduct = () => {
                 </div>
 
                 <div className={styles.share}>
-                  <p className={styles.share__label}>{TEXTS.DETAIL_SHARE_LABEL}</p>
+                  <p className={styles.share__label}>
+                    {TEXTS.DETAIL_SHARE_LABEL}
+                  </p>
                   <div className={styles.share__row}>
                     <input
                       className={styles.share__input}
@@ -155,7 +189,9 @@ const _DetailsForProduct = () => {
                       placeholder={TEXTS.DETAIL_SHARE_PLACEHOLDER}
                       value={shareEmail}
                       onChange={(e) => setShareEmail(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' ? handleShareSubmit() : undefined}
+                      onKeyDown={(e) =>
+                        e.key === "Enter" ? handleShareSubmit() : undefined
+                      }
                       aria-label={TEXTS.DETAIL_SHARE_LABEL}
                     />
                     <button

@@ -24,6 +24,7 @@ export interface IAuthUserInfo {
     email: string;
     isVerify: boolean;
     accessToken: string;
+    refreshToken: string;
     role: 'user' | 'support';
 }
 
@@ -34,8 +35,9 @@ export interface ILoginResponse {
 }
 
 export interface ILogOutRequest {
-    connectId: string;
-    token: string;
+    connectId?: string;
+    token?: string;
+    refreshToken?: string;
 }
 
 export interface ILogOutResponse { }

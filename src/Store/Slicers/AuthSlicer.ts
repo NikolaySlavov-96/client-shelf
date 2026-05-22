@@ -13,6 +13,7 @@ import { IProductSlicer } from './ProductSlicer';
 export interface IAuthSlicer {
   email: string;
   token: string;
+  refreshToken: string;
   userId: string;
   userRole: 'user' | 'support';
   isAuthenticated: boolean;
@@ -39,6 +40,7 @@ const authService = AuthService();
 const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, get) => ({
   email: '',
   token: '',
+  refreshToken: '',
   userId: '',
   userRole: 'user',
   isAuthenticated: false,
@@ -53,6 +55,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
         set({
           email: userInfo.email,
           token: userInfo.accessToken,
+          refreshToken: userInfo.refreshToken,
           userId: String(userInfo.id ?? userInfo._id),
           userRole: userInfo.role,
           isAuthenticated: !!userInfo.accessToken,
@@ -67,10 +70,13 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
 
   onSubmitLogout: async () => {
     try {
-      const { resetRooms, resetMessages, setWelcomeMessage } = get();
+      const { resetRooms, resetMessages, setWelcomeMessage, refreshToken } = get();
+      // Best-effort: end the refresh session on the server so the token can't be reused.
+      authService.logout({ refreshToken }).catch(() => undefined);
       set({
         email: '',
         token: '',
+        refreshToken: '',
         userId: '',
         userRole: 'user',
         isAuthenticated: false,
@@ -121,6 +127,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
         set({
           email: userInfo.email,
           token: userInfo.accessToken,
+          refreshToken: userInfo.refreshToken,
           userId: String(userInfo.id ?? userInfo._id),
           userRole: userInfo.role,
           isAuthenticated: !!userInfo.accessToken,
