@@ -96,7 +96,7 @@ const Socket = () => {
     }, [setRooms]);
 
     useEffect(() => {
-        if (userAddressData.hasOwnProperty('IPv4')) {
+        if (Object.prototype.hasOwnProperty.call(userAddressData, 'IPv4')) {
             SocketService.sendData(ESendEvents.USER_CONNECT, userAddressData);
         }
     }, [userAddressData]);
