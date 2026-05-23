@@ -1,5 +1,7 @@
 import { memo } from 'react';
 
+import { List } from '~/component/atoms';
+
 import { TEXTS } from '~/constants';
 
 import { cx } from '~/Utils';
@@ -21,10 +23,14 @@ const TABS: { value: TAuthTab; label: string }[] = [
 
 function AuthTabs({ activeTab, onSwitch, className }: IAuthTabsProps) {
     return (
-        <div className={cx(styles.tabs, className)} role="tablist" aria-label="Authentication">
-            {TABS.map((tab) => (
+        <List
+            data={TABS}
+            keyExtractor={(tab) => tab.value}
+            style={cx(styles.tabs, className)}
+            role="tablist"
+            aria-label="Authentication"
+            renderItem={({ item: tab }) => (
                 <button
-                    key={tab.value}
                     role="tab"
                     aria-selected={activeTab === tab.value}
                     className={cx(styles.tab, activeTab === tab.value ? styles['tab--active'] : '')}
@@ -32,8 +38,8 @@ function AuthTabs({ activeTab, onSwitch, className }: IAuthTabsProps) {
                 >
                     {tab.label}
                 </button>
-            ))}
-        </div>
+            )}
+        />
     );
 }
 

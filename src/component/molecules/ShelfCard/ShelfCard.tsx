@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 
-import { Badge, BookCover, Button } from '~/component/atoms';
+import { Badge, BookCover, Button, List } from '~/component/atoms';
 
 import { getStatusLabel, TEXTS } from '~/constants';
 
@@ -89,10 +89,12 @@ function ShelfCard({
                     ) : null}
                 </div>
                 {onStatusChange ? (
-                    <div className={styles.actions}>
-                        {statuses.map((s) => (
+                    <List
+                        data={statuses}
+                        keyExtractor={(s) => String(s.id)}
+                        style={styles.actions}
+                        renderItem={({ item: s }) => (
                             <Button
-                                key={s.id}
                                 label={getStatusLabel(s)}
                                 size="sm"
                                 variant={statusId === s.id ? 'primary' : 'outline'}
@@ -100,8 +102,8 @@ function ShelfCard({
                                 aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
                                 aria-pressed={statusId === s.id}
                             />
-                        ))}
-                    </div>
+                        )}
+                    />
                 ) : null}
             </div>
         </article>

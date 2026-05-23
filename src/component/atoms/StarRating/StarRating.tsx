@@ -1,5 +1,7 @@
 import { type KeyboardEvent, memo, useState } from 'react';
 
+import List from '~/component/atoms/List/_List';
+
 import { cx } from '~/Utils';
 
 import styles from './StarRating.module.css';
@@ -36,15 +38,15 @@ function StarRating({ value, interactive = false, onRate, ariaLabel = 'Rating', 
     };
 
     return (
-        <div
-            className={cx(styles.stars, className)}
+        <List
+            data={STARS}
+            keyExtractor={(star) => String(star)}
+            style={cx(styles.stars, className)}
             role={interactive ? 'radiogroup' : 'img'}
             aria-label={interactive ? ariaLabel : `${ariaLabel}: ${value} of 5`}
-        >
-            {STARS.map((star) =>
+            renderItem={({ item: star }) =>
                 interactive ? (
                     <button
-                        key={star}
                         type="button"
                         className={cx(styles.star, star <= active ? styles['star--on'] : '')}
                         onClick={() => handleSelect(star)}
@@ -59,15 +61,14 @@ function StarRating({ value, interactive = false, onRate, ariaLabel = 'Rating', 
                     </button>
                 ) : (
                     <span
-                        key={star}
                         className={cx(styles.star, styles['star--static'], star <= active ? styles['star--on'] : '')}
                         aria-hidden="true"
                     >
                         ★
                     </span>
-                ),
-            )}
-        </div>
+                )
+            }
+        />
     );
 }
 

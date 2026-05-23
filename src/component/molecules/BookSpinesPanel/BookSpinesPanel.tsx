@@ -1,5 +1,7 @@
 import { type FC, memo } from 'react';
 
+import { List } from '~/component/atoms';
+
 import { BOOK_SPINES, TEXTS } from '~/constants';
 
 import styles from './BookSpinesPanel.module.css';
@@ -14,11 +16,14 @@ const BookSpinesPanel: FC<IBookSpinesPanelProps> = ({ tagline, quote = TEXTS.AUT
         <div className={styles.panel}>
             <div className={styles.tagline}>{tagline}</div>
             <div>
-                <div className={styles.spines}>
-                    {BOOK_SPINES.map((s, i) => (
-                        <div key={i} className={styles.spine} style={{ background: s.color, height: s.height }} />
-                    ))}
-                </div>
+                <List
+                    data={BOOK_SPINES}
+                    keyExtractor={(_, i) => String(i)}
+                    style={styles.spines}
+                    renderItem={({ item: s }) => (
+                        <div className={styles.spine} style={{ background: s.color, height: s.height }} />
+                    )}
+                />
                 <p className={styles.quote}>{quote}</p>
             </div>
         </div>

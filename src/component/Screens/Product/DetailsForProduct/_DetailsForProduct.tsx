@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Badge, BookCover, Button, StarRating } from '~/component/atoms';
+import { Badge, BookCover, Button, List, StarRating } from '~/component/atoms';
 
 import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
 
@@ -96,18 +96,21 @@ const DetailsForProduct = () => {
                         <h1 className={styles.info__title}>{productById?.productTitle}</h1>
                         <p className={styles.info__author}>{productById?.authorName}</p>
 
-                        <div className={styles.stats}>
-                            {getProductDetailStats({
+                        <List
+                            data={getProductDetailStats({
                                 pages: productById?.pages,
                                 publishedYear: productById?.publishedYear,
                                 rating: productRating,
-                            }).map((stat) => (
-                                <div className={`flex-col ${styles.stat}`} key={stat.id}>
+                            })}
+                            keyExtractor={(stat) => stat.id}
+                            style={styles.stats}
+                            renderItem={({ item: stat }) => (
+                                <div className={`flex-col ${styles.stat}`}>
                                     <span className={styles.stat__value}>{stat.value}</span>
                                     <span className={styles.stat__label}>{stat.label}</span>
                                 </div>
-                            ))}
-                        </div>
+                            )}
+                        />
 
                         <p className={styles.desc}>{productById?.description ?? TEXTS.DETAIL_DESC_PLACEHOLDER}</p>
 
@@ -125,18 +128,20 @@ const DetailsForProduct = () => {
 
                                 <div className={styles.actions}>
                                     <p className={styles.actions__label}>{TEXTS.DETAIL_ADD_TO_SHELF}</p>
-                                    <div className={styles.actions__btns}>
-                                        {statuses.map((s) => (
+                                    <List
+                                        data={statuses}
+                                        keyExtractor={(s) => String(s.id)}
+                                        style={styles.actions__btns}
+                                        renderItem={({ item: s }) => (
                                             <Button
-                                                key={s.id}
                                                 label={getStatusLabel(s)}
                                                 variant={currentStatusId === s.id ? 'primary' : 'outline'}
                                                 size="md"
                                                 onClick={() => handleStatusChange(s.id)}
                                                 ariaLabel={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
                                             />
-                                        ))}
-                                    </div>
+                                        )}
+                                    />
                                 </div>
 
                                 <div className={styles.share}>

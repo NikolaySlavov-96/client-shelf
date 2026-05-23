@@ -1,5 +1,6 @@
 import { memo } from 'react';
 
+import { List } from '~/component/atoms';
 import ShelfCard from '~/component/molecules/ShelfCard/ShelfCard';
 
 import { TEXTS } from '~/constants';
@@ -25,16 +26,17 @@ interface IShelfGridProps {
     className?: string;
 }
 
-function ShelfGrid({ books, onRemove, onStatusChange, className }: IShelfGridProps) {
-    if (books.length === 0) {
-        return <p className={styles.empty}>{TEXTS.PROFILE_EMPTY_SHELF}</p>;
-    }
+const ShelfEmpty = () => <p className={styles.empty}>{TEXTS.PROFILE_EMPTY_SHELF}</p>;
 
+function ShelfGrid({ books, onRemove, onStatusChange, className }: IShelfGridProps) {
     return (
-        <div className={cx(styles.container, className)}>
-            {books.map((book) => (
+        <List
+            data={books}
+            keyExtractor={(book) => String(book.productId)}
+            style={cx(styles.container, className)}
+            EmptyComponent={ShelfEmpty}
+            renderItem={({ item: book }) => (
                 <ShelfCard
-                    key={book.productId}
                     productId={book.productId}
                     productTitle={book.productTitle}
                     authorName={book.authorName}
@@ -44,8 +46,8 @@ function ShelfGrid({ books, onRemove, onStatusChange, className }: IShelfGridPro
                     onRemove={onRemove}
                     onStatusChange={onStatusChange}
                 />
-            ))}
-        </div>
+            )}
+        />
     );
 }
 

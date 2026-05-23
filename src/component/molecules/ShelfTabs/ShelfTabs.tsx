@@ -1,5 +1,7 @@
 import { memo } from 'react';
 
+import { List } from '~/component/atoms';
+
 import { cx } from '~/Utils';
 
 import styles from './ShelfTabs.module.css';
@@ -19,10 +21,14 @@ interface IShelfTabsProps {
 
 function ShelfTabs({ tabs, activeValue, onSelect, className }: IShelfTabsProps) {
     return (
-        <div className={cx(styles.container, className)} role="tablist" aria-label="Shelf categories">
-            {tabs.map((tab) => (
+        <List
+            data={tabs}
+            keyExtractor={(tab) => tab.value}
+            style={cx(styles.container, className)}
+            role="tablist"
+            aria-label="Shelf categories"
+            renderItem={({ item: tab }) => (
                 <button
-                    key={tab.value}
                     role="tab"
                     aria-selected={activeValue === tab.value}
                     className={cx(styles.tab, activeValue === tab.value ? styles['tab--active'] : '')}
@@ -31,8 +37,8 @@ function ShelfTabs({ tabs, activeValue, onSelect, className }: IShelfTabsProps) 
                     {tab.label}
                     <span className={styles.tab__count}>{tab.count}</span>
                 </button>
-            ))}
-        </div>
+            )}
+        />
     );
 }
 

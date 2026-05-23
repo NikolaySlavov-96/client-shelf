@@ -1,5 +1,7 @@
 import { memo } from 'react';
 
+import { List } from '~/component/atoms';
+
 import { cx } from '~/Utils';
 
 import styles from './FilterPills.module.css';
@@ -18,18 +20,22 @@ interface IFilterPillsProps {
 
 function FilterPills({ options, activeValue, onSelect, className }: IFilterPillsProps) {
     return (
-        <div className={cx(styles.container, className)} role="group" aria-label="Filter options">
-            {options.map((opt) => (
+        <List
+            data={options}
+            keyExtractor={(opt) => opt.value}
+            style={cx(styles.container, className)}
+            role="group"
+            aria-label="Filter options"
+            renderItem={({ item: opt }) => (
                 <button
-                    key={opt.value}
                     className={cx(styles.pill, activeValue === opt.value ? styles['pill--active'] : '')}
                     onClick={() => onSelect(opt.value)}
                     aria-pressed={activeValue === opt.value}
                 >
                     {opt.label}
                 </button>
-            ))}
-        </div>
+            )}
+        />
     );
 }
 

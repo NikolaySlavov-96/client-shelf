@@ -1,6 +1,8 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { List } from '~/component/atoms';
+
 import { getSearchCoverGradient, MODAL_NAMES, ROUT_NAMES, TEXTS } from '~/constants';
 
 import { useStoreZ } from '~/hooks';
@@ -103,10 +105,11 @@ function SearchModal() {
                     {filtered.length > 0 ? (
                         <>
                             <div className={styles.sectionLabel}>{sectionLabel}</div>
-                            {filtered.map((book) => {
-                                return (
+                            <List
+                                data={filtered}
+                                keyExtractor={(book) => String(book.productId)}
+                                renderItem={({ item: book }) => (
                                     <button
-                                        key={book.productId}
                                         className={`flex-align ${styles.resultItem}`}
                                         role="option"
                                         aria-selected={false}
@@ -124,8 +127,8 @@ function SearchModal() {
                                         </span>
                                         <span className={styles.addLabel}>{TEXTS.SEARCH_ADD}</span>
                                     </button>
-                                );
-                            })}
+                                )}
+                            />
                         </>
                     ) : (
                         <p className={styles.empty}>{TEXTS.SEARCH_EMPTY}</p>

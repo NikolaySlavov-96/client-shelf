@@ -1,7 +1,7 @@
 import { memo, type MouseEvent, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { BookCover, Button } from '~/component/atoms';
+import { BookCover, Button, List } from '~/component/atoms';
 
 import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
 
@@ -70,10 +70,12 @@ function BookCard({
                 {isList ? <p className={styles.meta__title}>{productTitle}</p> : null}
                 <p className={styles.meta__author}>{authorName}</p>
                 {isAuthenticated ? (
-                    <div className={styles.meta__actions}>
-                        {statuses.map((s) => (
+                    <List
+                        data={statuses}
+                        keyExtractor={(s) => String(s.id)}
+                        style={styles.meta__actions}
+                        renderItem={({ item: s }) => (
                             <Button
-                                key={s.id}
                                 label={getStatusLabel(s)}
                                 size="sm"
                                 variant={statusId === s.id ? 'primary' : 'outline'}
@@ -81,8 +83,8 @@ function BookCard({
                                 aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
                                 aria-pressed={statusId === s.id}
                             />
-                        ))}
-                    </div>
+                        )}
+                    />
                 ) : null}
             </div>
         </article>

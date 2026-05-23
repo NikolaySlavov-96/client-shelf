@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '~/component/atoms';
+import { Button, List } from '~/component/atoms';
 
 import { NOT_FOUND_SPINES, ROUT_NAMES, TEXTS } from '~/constants';
 
@@ -12,11 +12,15 @@ const NotFound = () => {
 
     return (
         <main className={`flex-col flex-center ${styles.wrap}`}>
-            <div className={styles.spines} aria-hidden="true">
-                {NOT_FOUND_SPINES.map((s, i) => (
-                    <div key={i} className={styles.spine} style={{ height: s.height, background: s.color }} />
-                ))}
-            </div>
+            <List
+                data={NOT_FOUND_SPINES}
+                keyExtractor={(_, i) => String(i)}
+                style={styles.spines}
+                aria-hidden="true"
+                renderItem={({ item: s }) => (
+                    <div className={styles.spine} style={{ height: s.height, background: s.color }} />
+                )}
+            />
 
             <h1 className={styles.code}>{TEXTS.COMMON_NOT_FOUND_TITLE}</h1>
             <p className={styles.message}>{TEXTS.COMMON_NOT_FOUND_SUBTITLE}</p>

@@ -1,5 +1,7 @@
 import { memo } from 'react';
 
+import { List } from '~/component/atoms';
+
 import { BookCard } from '~/component/molecules';
 
 import { TEXTS } from '~/constants';
@@ -19,22 +21,21 @@ interface IBookGridProps {
     className?: string;
 }
 
-function BookGrid({ books, isAuthenticated = false, layout = 'grid', onStatusChange, className }: IBookGridProps) {
-    if (books.length === 0) {
-        return <p className={styles.empty}>{TEXTS.CATALOG_EMPTY}</p>;
-    }
+const CatalogEmpty = () => <p className={styles.empty}>{TEXTS.CATALOG_EMPTY}</p>;
 
+function BookGrid({ books, isAuthenticated = false, layout = 'grid', onStatusChange, className }: IBookGridProps) {
     return (
-        <div
-            className={cx(
+        <List
+            data={books}
+            keyExtractor={(book) => String(book.productId)}
+            style={cx(
                 styles.container,
                 layout === 'list' ? `flex-col ${styles['container--list']}` : styles['container--grid'],
                 className,
             )}
-        >
-            {books.map((book) => (
+            EmptyComponent={CatalogEmpty}
+            renderItem={({ item: book }) => (
                 <BookCard
-                    key={book.productId}
                     productId={book.productId}
                     productTitle={book.productTitle}
                     authorName={book.authorName}
@@ -46,8 +47,8 @@ function BookGrid({ books, isAuthenticated = false, layout = 'grid', onStatusCha
                     isAuthenticated={isAuthenticated}
                     onStatusChange={onStatusChange}
                 />
-            ))}
-        </div>
+            )}
+        />
     );
 }
 
