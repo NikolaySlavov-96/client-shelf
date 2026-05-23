@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
-const _useDeviceDetector = () => {
+const useDeviceDetector = () => {
     const [device, setDevice] = useState('');
 
     const handlerDeviceDetector = useCallback(() => {
@@ -23,10 +23,10 @@ const _useDeviceDetector = () => {
 
         return () => {
             window.removeEventListener('resize', handlerDeviceDetector);
-        }
+        };
     }, []);
 
     return device;
 };
 
-export default _useDeviceDetector;
+export default useDeviceDetector;

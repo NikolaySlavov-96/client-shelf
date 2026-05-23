@@ -1,15 +1,15 @@
 .form input {
-    background-color: var(--cream-2);
-    border-radius: var(--radius-xl);
-    border: none;
-    height: var(--search-input-height);
-    margin-right: var(--spacing-16);
-    padding: var(--spacing-4) var(--spacing-24);
-    width: var(--search-input-width);
+  background-color: var(--cream-2);
+  border-radius: var(--radius-xl);
+  border: none;
+  height: var(--search-input-height);
+  margin-right: var(--spacing-16);
+  padding: var(--spacing-4) var(--spacing-24);
+  width: var(--search-input-width);
 }
 
 .form button {
-    height: var(--search-btn-height);
-    width: var(--search-btn-width);
-    background-color: var(--accent);
+  height: var(--search-btn-height);
+  width: var(--search-btn-width);
+  background-color: var(--accent);
 }

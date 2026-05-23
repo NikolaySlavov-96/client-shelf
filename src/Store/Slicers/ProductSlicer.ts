@@ -1,10 +1,10 @@
-import { StateCreator } from "zustand";
+import { type StateCreator } from 'zustand';
 
-import { ProductService as productService, FileService as fileService } from "../../services";
+import { TEXTS } from '~/constants';
 
-import { Toast } from "../../Toasts";
-import { ESwalIcon } from "../../Types/Swal";
-import { TEXTS } from "../../constants";
+import { FileService as fileService, ProductService as productService } from '~/services';
+import { Toast } from '~/Toasts';
+import { ESwalIcon } from '~/Types/Swal';
 
 // Surface a failed action's reason to the user. _API throws the parsed error
 // body, so an authorization failure (e.g. 403 "account is not verified") carries
@@ -15,20 +15,18 @@ const showActionError = (err: unknown) => {
 };
 
 import {
-    IProductEmailType,
-    IProduct,
-    IProductWithState,
-    IFetchQueryParams,
-    IFetchSearchParams,
-    IState,
-    IAddProductWithImage,
-    IProductRating,
-    IStatusCount
-} from "./ProductSlicer.interface";
-
+    type IAddProductWithImage,
+    type IFetchQueryParams,
+    type IFetchSearchParams,
+    type IProduct,
+    type IProductEmailType,
+    type IProductRating,
+    type IProductWithState,
+    type IState,
+    type IStatusCount,
+} from './ProductSlicer.interface';
 
 export interface IProductSlicer {
-    // error: 
     isLoadingProducts: boolean;
     isLoadingProductByEmails: boolean;
     isLoadingProduct: boolean;
@@ -40,10 +38,10 @@ export interface IProductSlicer {
     productStates: IState[];
     fetchAllProductStates: () => void;
 
-    productByEmail: { count: number, rows: IProductEmailType[] };
+    productByEmail: { count: number; rows: IProductEmailType[] };
     fetchProductsForEmail: (data: IFetchSearchParams) => void;
 
-    products: { count: number, rows: IProduct[] };
+    products: { count: number; rows: IProduct[] };
     fetchProducts: (data: IFetchSearchParams) => void;
 
     productById: IProduct;
@@ -57,7 +55,7 @@ export interface IProductSlicer {
     fetchProductRating: (id: string) => void;
     rateProduct: (id: string, rating: number) => Promise<void>;
 
-    productCollection: { count: number, rows: IProductWithState[] };
+    productCollection: { count: number; rows: IProductWithState[] };
     fetchProductCollection: (data: IFetchQueryParams) => void;
     removeProductState: (productId: number) => Promise<void>;
 
@@ -66,17 +64,17 @@ export interface IProductSlicer {
 
     isProductAdded: boolean;
     addProductWithImage: (data: IAddProductWithImage['data'], fileData: IAddProductWithImage['fileDate']) => void;
-};
+}
 
 // Recompute per-status counts after a single book moves: -1 from its old status (if any),
 // +1 to the new one. Keeps the profile shelf tallies in sync without an extra request.
 const recountStatuses = (
     counts: IStatusCount[],
     previousStatusId: number | null,
-    nextStatusId: number
+    nextStatusId: number,
 ): IStatusCount[] => {
     const byId = new Map(counts.map((c) => [c.statusId, c.count]));
-    if (previousStatusId != null) {
+    if (previousStatusId !== null) {
         byId.set(previousStatusId, Math.max(0, (byId.get(previousStatusId) ?? 0) - 1));
     }
     byId.set(nextStatusId, (byId.get(nextStatusId) ?? 0) + 1);
@@ -96,7 +94,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
     fetchAllProductStates: async () => {
         try {
             const result = await productService.getAllStatus();
-            set({ productStates: result })
+            set({ productStates: result });
         } catch (err) {
             console.log('fetchAllProductStates error --->: ', err);
         }
@@ -152,7 +150,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         set({ isLoadingProduct: true });
         try {
             const { products } = get();
-            const isProductExist = products.rows.filter(p => p.productId === Number(id));
+            const isProductExist = products.rows.filter((p) => p.productId === Number(id));
             if (isProductExist?.length) {
                 set({ productById: isProductExist[0] });
             }
@@ -194,8 +192,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
         // In a filtered section (anything other than "All"), a book whose new status no longer
         // matches the filter leaves the current list; in "All" it stays and just recolours.
-        const leavesCurrentSection =
-            activeFilterId != null && activeFilterId !== 0 && nextStatusId !== activeFilterId;
+        const leavesCurrentSection = activeFilterId !== null && activeFilterId !== 0 && nextStatusId !== activeFilterId;
 
         const nextRows = leavesCurrentSection
             ? products.rows.filter((p) => p.productId !== productId)
@@ -301,9 +298,11 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             formData.append('deliverFile', fileData.file);
             formData.append('src', fileData.name);
 
-            const fileResponseData = await fileService.sendFile(formData as unknown as { deliverFile: File, src: string });
+            const fileResponseData = await fileService.sendFile(
+                formData as unknown as { deliverFile: File; src: string },
+            );
 
-            await productService.createProduct({ ...data, filesId: [fileResponseData.fileId], });
+            await productService.createProduct({ ...data, filesId: [fileResponseData.fileId] });
 
             set({ isProductAdded: true });
         } catch (err) {
@@ -316,9 +315,6 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 });
 
 export default createProductSlicer;
-
-
-
 
 // const onSubmitEditProduct = useCallback(async (data: any) => {
 //     try {

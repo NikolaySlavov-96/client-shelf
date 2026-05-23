@@ -1,1 +1,3 @@
-export interface IQueryBar { search: string };
+export interface IQueryBar {
+    search: string;
+}

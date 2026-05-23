@@ -8,12 +8,12 @@ import { useStoreZ } from '../../../../hooks';
 
 import style from './_NewProductModal.module.css';
 
-const _NewProductModal = () => {
+const NewProductModal = () => {
     const { content, isVisible, closeModal } = useStoreZ();
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            closeModal()
+            closeModal();
         }, 5000);
 
         return () => clearTimeout(timer);
@@ -38,7 +38,7 @@ const _NewProductModal = () => {
             </div>
             <p>Added before 10 second</p>
         </Link>
-    )
-}
+    );
+};
 
-export default memo(_NewProductModal);
+export default memo(NewProductModal);

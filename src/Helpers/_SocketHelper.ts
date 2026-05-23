@@ -1,47 +1,55 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect } from 'react';
 
-import { SocketService } from '../services';
+import { EReceiveEvents, ESendEvents, MODAL_NAMES, STORAGE_KEYS } from '~/constants';
 
-import { EReceiveEvents, ESendEvents, MODAL_NAMES, STORAGE_KEYS } from '../constants';
-
-import { useGetUserAddress, useStoreZ } from "../hooks";
-
-import { IMessage } from "~/Store/Slicers/SupportSlicer";
+import { useGetUserAddress, useStoreZ } from '~/hooks';
+import { SocketService } from '~/services';
+import { type IMessage } from '~/Store/Slicers/SupportSlicer';
 
 const onUnsubscribe = () => {
-    console.log('Unsubscribe')
-}
+    console.log('Unsubscribe');
+};
 
-const _Socket = () => {
+const Socket = () => {
     const { userRole, token } = useStoreZ();
 
     const {
         connectId,
-        openModal, setModalName, setContent, setUsers, setRooms,
-        setSelectedRoom, setWelcomeMessage, addMessage, resetRooms,
-        removeRoom
+        openModal,
+        setModalName,
+        setContent,
+        setUsers,
+        setRooms,
+        setSelectedRoom,
+        setWelcomeMessage,
+        addMessage,
+        resetRooms,
+        removeRoom,
     } = useStoreZ();
 
     const userAddressData = useGetUserAddress();
 
-    const result = useCallback((data: { dailyUsers: number, uncialUsers: number, isNewUser: boolean }) => {
-        setModalName(MODAL_NAMES.NEW_PRODUCT);
-        setContent(data);
-        openModal();
-    }, [setModalName, setContent, openModal]);
+    const result = useCallback(
+        (data: { dailyUsers: number; uncialUsers: number; isNewUser: boolean }) => {
+            setModalName(MODAL_NAMES.NEW_PRODUCT);
+            setContent(data);
+            openModal();
+        },
+        [setModalName, setContent, openModal],
+    );
 
     const updateCountOfVisitors = (data: any) => {
-        console.log(data)
-    }
+        console.log(data);
+    };
 
     const notifyForCreatedRoom = (data: IMessage) => {
         setRooms({ roomName: data.roomName });
         addMessage(data);
         if (userRole !== 'support') {
             localStorage.setItem(STORAGE_KEYS.ISSUE_ROOMS, JSON.stringify(data.roomName));
-            SocketService.sendData(ESendEvents.USER_ACCEPT_JOIN_TO_ROOM, { roomName: data.roomName })
+            SocketService.sendData(ESendEvents.USER_ACCEPT_JOIN_TO_ROOM, { roomName: data.roomName });
         }
-    }
+    };
 
     useEffect(() => {
         SocketService.connect(token);
@@ -53,14 +61,14 @@ const _Socket = () => {
         SocketService.subscribeToEvent(EReceiveEvents.NOTIFY_FOR_CREATE_ROOM, notifyForCreatedRoom);
         SocketService.subscribeToEvent(EReceiveEvents.NOTIFY_ADMINS_OF_NEW_USER, setUsers);
 
-        SocketService.subscribeToEvent(EReceiveEvents.COMPLETE_ISSUE, (data: { message: string, issue: string }) => {
+        SocketService.subscribeToEvent(EReceiveEvents.COMPLETE_ISSUE, (data: { message: string; issue: string }) => {
             if (userRole === 'support') {
                 setSelectedRoom('');
-                removeRoom(data.issue)
+                removeRoom(data.issue);
                 return;
             }
             resetRooms();
-            localStorage.removeItem(STORAGE_KEYS.ISSUE_ROOMS)
+            localStorage.removeItem(STORAGE_KEYS.ISSUE_ROOMS);
         });
 
         SocketService.subscribeToEvent(EReceiveEvents.SUPPORT_MESSAGE, addMessage);
@@ -75,15 +83,15 @@ const _Socket = () => {
             SocketService.unsubscribeFromEvent(EReceiveEvents.NOTIFY_ADMINS_OF_NEW_USER, onUnsubscribe);
             SocketService.unsubscribeFromEvent(EReceiveEvents.SUPPORT_MESSAGE, onUnsubscribe);
             SocketService.disconnect();
-        }
+        };
     }, [token, userRole]);
 
     useEffect(() => {
         const persist = localStorage.getItem(STORAGE_KEYS.ISSUE_ROOMS);
         if (persist) {
             const roomName = JSON.parse(persist);
-            setRooms({ roomName, });
-            SocketService.sendData(ESendEvents.USER_ACCEPT_JOIN_TO_ROOM, { roomName, })
+            setRooms({ roomName });
+            SocketService.sendData(ESendEvents.USER_ACCEPT_JOIN_TO_ROOM, { roomName });
         }
     }, [setRooms]);
 
@@ -94,4 +102,4 @@ const _Socket = () => {
     }, [userAddressData]);
 };
 
-export default _Socket;
+export default Socket;

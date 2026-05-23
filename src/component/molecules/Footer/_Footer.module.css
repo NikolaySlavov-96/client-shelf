@@ -1,20 +1,20 @@
 .footer {
-    padding: var(--spacing-20) var(--spacing-40);
-    background: var(--cream-2);
-    border-top: var(--border-default);
-    text-align: center;
-    font-size: var(--text-sm);
-    color: var(--ink-3);
-    font-family: var(--font-sans);
+  padding: var(--spacing-20) var(--spacing-40);
+  background: var(--cream-2);
+  border-top: var(--border-default);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+  font-family: var(--font-sans);
 }
 
 .inner {
-    max-width: var(--page-max);
-    margin: 0 auto;
+  max-width: var(--page-max);
+  margin: 0 auto;
 }
 
 @media (max-width: 640px) {
-    .footer {
-        padding: var(--spacing-16);
-    }
+  .footer {
+    padding: var(--spacing-16);
+  }
 }

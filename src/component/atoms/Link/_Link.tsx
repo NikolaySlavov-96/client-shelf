@@ -1,23 +1,17 @@
-import { FC, memo, ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { type FC, memo, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 
 interface ILinkProps {
     children: ReactNode;
     to: string;
     className?: string;
-    state?: {};
+    state?: Record<string, unknown>;
 }
 
 const _Link: FC<ILinkProps> = (props) => {
-    const { children, } = props;
+    const { children } = props;
 
-    return (
-        <Link
-            {...props}
-        >
-            {children}
-        </Link>
-    )
-}
+    return <Link {...props}>{children}</Link>;
+};
 
-export default memo(_Link)
+export default memo(_Link);

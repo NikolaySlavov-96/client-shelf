@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 
 const DOMAIN = 'https://geolocation-db.com/json/';
 // https://api.ipify.org/?format=json
 
-const _useGetUserAddress = () => {
+const useGetUserAddress = () => {
     const [userData, setUserData] = useState({});
 
     const checkUserAddress = useCallback(async () => {
@@ -12,9 +12,9 @@ const _useGetUserAddress = () => {
             const result = await test.json();
             setUserData(result);
         } catch (err) {
-
+            console.error(err);
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
         checkUserAddress();
@@ -23,4 +23,4 @@ const _useGetUserAddress = () => {
     return userData;
 };
 
-export default _useGetUserAddress;
+export default useGetUserAddress;

@@ -1,14 +1,14 @@
 .container {
-    position: absolute;
-    padding: var(--spacing-8) var(--spacing-40);
-    top: var(--spacing-80);
-    background-color: var(--cream-2);
-    border-radius: var(--radius-pill);
-    right: var(--spacing-16);
-    opacity: 0;
-    transition: opacity var(--duration-fade) ease-in-out;
+  position: absolute;
+  padding: var(--spacing-8) var(--spacing-40);
+  top: var(--spacing-80);
+  background-color: var(--cream-2);
+  border-radius: var(--radius-pill);
+  right: var(--spacing-16);
+  opacity: 0;
+  transition: opacity var(--duration-fade) ease-in-out;
 }
 
 .visible {
-    opacity: 1;
+  opacity: 1;
 }

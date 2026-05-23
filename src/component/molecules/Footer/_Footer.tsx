@@ -7,8 +7,8 @@ import style from './_Footer.module.css';
 const FOOTED_CONTENT = {
     LINK: 'https://nnsn.pro',
     BUTTON_LABEL: 'NNSN',
-    CONTENT: 'Designed and Implement from '
-}
+    CONTENT: 'Designed and Implement from ',
+};
 
 const _Footer = () => {
     return (
@@ -22,6 +22,6 @@ const _Footer = () => {
             </div>
         </footer>
     );
-}
+};
 
 export default memo(_Footer);

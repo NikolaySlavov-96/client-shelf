@@ -16,13 +16,3 @@ const _ROUT_NAMES = {
 };
 
 export default _ROUT_NAMES;
-
-export const _HEADER_BUTTON_TITLES = {
-    PRODUCT: 'Book',
-    CHAT: 'Chat',
-    COLLECTION_OF_PRODUCTS: 'Collections of Books',
-    CREATE_PRODUCT: 'Create',
-    LOGIN: 'Login',
-    LOGOUT: 'Logout',
-    REGISTER: 'Register',
-}

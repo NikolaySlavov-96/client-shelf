@@ -1,17 +1,15 @@
-import { FC, memo } from "react";
+import { type FC, memo } from 'react';
 
 import { ViewElement } from '../../atoms';
 
-import { IProductSkeleton } from "../Types/Product";
+import { type IProductSkeleton } from '../Types/Product';
 
 import style from './_ProductDetailSkeleton.module.css';
 
 const DEFAULT_HEIGHT = 20;
 
 const _ProductDetailSkeleton: FC<IProductSkeleton> = (props) => {
-    const {
-        hasTitle = true,
-    } = props;
+    const { hasTitle = true } = props;
 
     return (
         <div className={style['container']}>
@@ -22,7 +20,7 @@ const _ProductDetailSkeleton: FC<IProductSkeleton> = (props) => {
             <ViewElement width={220} height={DEFAULT_HEIGHT} />
 
             <ViewElement width={180} height={DEFAULT_HEIGHT} />
-        </div >
+        </div>
     );
 };
 

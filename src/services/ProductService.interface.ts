@@ -11,7 +11,7 @@ interface IProduct {
     authorName: string;
     authorImage: string;
     authorGenre: string;
-    authorStatus: boolean
+    authorStatus: boolean;
     fileUrl: string;
     fileId: number;
     fileSrc: string;
@@ -29,17 +29,17 @@ export interface IRateProductResponse {
     userRating: number;
 }
 
-export interface IGetStatesRequest { };
+export type IGetStatesRequest = Record<string, never>;
 
 export interface IGetStatesResponse {
     id: number;
     stateName: string;
-    symbol: "📖";
-};
+    symbol: '📖';
+}
 
-export interface IGetProductRequest { }
+export type IGetProductRequest = Record<string, never>;
 
-export interface IGetProductResponse extends IProduct { }
+export type IGetProductResponse = IProduct;
 
 export interface IGetProductsRequest {
     limit: number;
@@ -57,16 +57,16 @@ export interface ICreateProductRequest {
     author: string;
     productTitle: string;
     genre: string;
-    filesId?: number[],
+    filesId?: number[];
 }
 
 export interface ICreateProductResponse {
     productId: number;
 }
 
-export interface IEditProductRequest { }
+export type IEditProductRequest = Record<string, never>;
 
-export interface IEditProductResponse { }
+export type IEditProductResponse = Record<string, never>;
 
 export interface ISearchProductByEmailRequest {
     searchContent: string;
@@ -91,7 +91,6 @@ export interface ISearchProductByEmailResponse {
 export interface IGetAllProductByStateRequest extends IGetProductsRequest {
     type: number;
 }
-
 
 interface IProductWithState extends IProduct {
     productStateId: number;
@@ -123,7 +122,7 @@ export interface IAddingProductInLibraryRequest {
 }
 
 export interface IAddingProductInLibraryResponse {
-    userInfo: {};
+    userInfo: Record<string, unknown>;
     message: string;
     messageCode: string;
 }

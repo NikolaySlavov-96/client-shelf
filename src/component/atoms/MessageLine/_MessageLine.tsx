@@ -1,14 +1,14 @@
-import { memo } from "react"
+import { memo } from 'react';
 
-import { IMessage } from "../../../Store/Slicers/SupportSlicer";
+import { convertDateTime } from '../../..//Helpers';
 
-import { convertDateTime } from "../../..//Helpers";
+import { type IMessage } from '../../../Store/Slicers/SupportSlicer';
 
 import style from './_MessageLine.module.css';
 
 interface IMessageLine extends IMessage {
     connectId: string;
-};
+}
 
 const _MessageLine = (props: IMessageLine) => {
     const { message, senderId, connectId, createdAt } = props;
@@ -18,7 +18,7 @@ const _MessageLine = (props: IMessageLine) => {
     const isSender = senderId === connectId;
 
     if (!senderId) {
-        return (<p className={style['message__center']}>{message}</p>)
+        return <p className={style['message__center']}>{message}</p>;
     }
 
     return (
@@ -29,6 +29,6 @@ const _MessageLine = (props: IMessageLine) => {
             </div>
         </div>
     );
-}
+};
 
 export default memo(_MessageLine);

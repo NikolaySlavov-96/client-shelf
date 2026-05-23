@@ -10,7 +10,7 @@ export enum _EReceiveEvents {
     SUPPORT_MESSAGE = 'support_message',
     SUPPORT_MESSAGE_STATUS = 'support_message_status',
     USER_CONNECT = 'user_connect',
-};
+}
 
 export enum _ESendEvents {
     SUPPORT_ACCEPT_USER = 'support_accept_user',
@@ -21,4 +21,4 @@ export enum _ESendEvents {
     SUPPORT_MESSAGE_STATUS = 'support_message_status',
     USER_ACCEPT_JOIN_TO_ROOM = 'user_accept_join_to_room',
     USER_CONNECT = 'user_connect',
-};
+}

@@ -1,6 +1,6 @@
-import { HOST } from "../constants";
+import { HOST } from '../constants';
 
-import useStoreZ from "../hooks/_useStoreZ";
+import useStoreZ from '../hooks/_useStoreZ';
 
 export type TMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -41,26 +41,19 @@ const buildOptions = (method: TMethod, moreData?: IMoreData): IOptions => {
     if (accessToken) {
         options.headers = {
             ...options.headers,
-            'authorization': accessToken,
+            authorization: accessToken,
         };
     }
 
     return options;
 };
 
-// Clear the session locally. Route guards / NavBar react to `isAuthenticated`,
-// so the user lands back on the login flow once the refresh path is exhausted.
 const clearSession = () => {
     useStoreZ.setState({ token: '', refreshToken: '', isAuthenticated: false });
 };
 
-// Calls the refresh endpoint with the stored refresh token and, on success,
-// writes the rotated pair back into the store. Returns the new access token, or
-// null when the session can no longer be renewed. Deliberately uses a raw fetch
-// (no Authorization header) so the expired access token can't trip the server's
-// global auth middleware before reaching /auth/refresh.
 const requestNewToken = async (): Promise<string | null> => {
-    const refreshToken = useStoreZ.getState().refreshToken;
+    const { refreshToken } = useStoreZ.getState();
     if (!refreshToken) {
         clearSession();
         return null;
@@ -134,7 +127,6 @@ const _API = async (method: TMethod, url: string, moreData?: IMoreData) => {
         }
 
         return data;
-
     } catch (err) {
         throw err as Error;
     }

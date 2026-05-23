@@ -37,7 +37,6 @@
   align-items: start;
 }
 
-
 .info__genre {
   font-size: var(--text-xs);
   letter-spacing: var(--tracking-wider);

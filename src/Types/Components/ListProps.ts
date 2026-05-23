@@ -4,4 +4,4 @@ export interface IListProps<ItemT> {
     keyExtractor: (item: ItemT, index: number) => string;
     style?: string;
     EmptyComponent?: () => JSX.Element | null;
-};
+}

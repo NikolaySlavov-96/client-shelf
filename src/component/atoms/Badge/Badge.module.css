@@ -8,17 +8,53 @@
 }
 
 /* Light variants — for badges in lists and shelf cards */
-.badge--light-read { background: var(--status-read-bg); color: var(--status-read-text); }
-.badge--light-reading { background: var(--status-reading-bg); color: var(--status-reading-text); }
-.badge--light-want { background: var(--status-want-bg); color: var(--status-want-text); }
-.badge--light-listening { background: var(--status-listening-bg); color: var(--status-listening-text); }
-.badge--light-listened { background: var(--status-listened-bg); color: var(--status-listened-text); }
-.badge--light-neutral { background: var(--color-surface-alt); color: var(--color-text-secondary); }
+.badge--light-read {
+  background: var(--status-read-bg);
+  color: var(--status-read-text);
+}
+.badge--light-reading {
+  background: var(--status-reading-bg);
+  color: var(--status-reading-text);
+}
+.badge--light-want {
+  background: var(--status-want-bg);
+  color: var(--status-want-text);
+}
+.badge--light-listening {
+  background: var(--status-listening-bg);
+  color: var(--status-listening-text);
+}
+.badge--light-listened {
+  background: var(--status-listened-bg);
+  color: var(--status-listened-text);
+}
+.badge--light-neutral {
+  background: var(--color-surface-alt);
+  color: var(--color-text-secondary);
+}
 
 /* Solid variants — for badges overlaid on book covers */
-.badge--solid-read { background: var(--status-read-solid); color: var(--white); }
-.badge--solid-reading { background: var(--status-reading-solid); color: var(--white); }
-.badge--solid-want { background: var(--status-want-solid); color: var(--white); }
-.badge--solid-listening { background: var(--status-listening-solid); color: var(--white); }
-.badge--solid-listened { background: var(--status-listened-solid); color: var(--white); }
-.badge--solid-neutral { background: var(--color-text-secondary); color: var(--white); }
+.badge--solid-read {
+  background: var(--status-read-solid);
+  color: var(--white);
+}
+.badge--solid-reading {
+  background: var(--status-reading-solid);
+  color: var(--white);
+}
+.badge--solid-want {
+  background: var(--status-want-solid);
+  color: var(--white);
+}
+.badge--solid-listening {
+  background: var(--status-listening-solid);
+  color: var(--white);
+}
+.badge--solid-listened {
+  background: var(--status-listened-solid);
+  color: var(--white);
+}
+.badge--solid-neutral {
+  background: var(--color-text-secondary);
+  color: var(--white);
+}

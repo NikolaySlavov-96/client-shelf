@@ -4,5 +4,4 @@ const _QUERY_LIMIT = {
     PAGE: 1,
 };
 
-
 export default _QUERY_LIMIT;

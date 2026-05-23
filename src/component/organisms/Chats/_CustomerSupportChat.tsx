@@ -1,30 +1,30 @@
-import { memo, useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react';
 
 import { ChatWindowCloser, ChatWithSupport } from '../../molecules';
 
-import { SocketService } from '../../../services';
+import { ESendEvents } from '~/constants';
 
-import { ESendEvents } from '../../../constants';
-
-import { useStoreZ } from '../../../hooks';
+import { useStoreZ } from '~/hooks';
+import { SocketService } from '~/services';
 
 import style from './_CustomerSupportChat.module.css';
 
-const _CustomerSupportChat = () => {
+const CustomerSupportChat = () => {
     const [isOpenChat, setIsOpenChat] = useState(false);
 
     const { rooms, connectId } = useStoreZ();
 
     const roomName = rooms[0]?.roomName;
 
-    const containerStyle = useMemo(() => (
-        `${style['container']} ${isOpenChat ? style['border__open'] : ''}`
-    ), [isOpenChat]);
+    const containerStyle = useMemo(
+        () => `${style['container']} ${isOpenChat ? style['border__open'] : ''}`,
+        [isOpenChat],
+    );
 
     useEffect(() => {
         if (!rooms?.length && isOpenChat) {
             if (connectId) {
-                SocketService.sendData(ESendEvents.SUPPORT_CHAT_USER_JOIN, { connectId, });
+                SocketService.sendData(ESendEvents.SUPPORT_CHAT_USER_JOIN, { connectId });
             } else {
                 SocketService.sendOnlySignal(ESendEvents.SUPPORT_CHAT_USER_JOIN);
             }
@@ -33,17 +33,13 @@ const _CustomerSupportChat = () => {
 
     return (
         <div className={containerStyle}>
-            {isOpenChat ?
-                <ChatWithSupport
-                    onPress={setIsOpenChat}
-                    roomName={roomName}
-                />
-                :
-                <ChatWindowCloser
-                    onPress={setIsOpenChat}
-                />}
+            {isOpenChat ? (
+                <ChatWithSupport onPress={setIsOpenChat} roomName={roomName} />
+            ) : (
+                <ChatWindowCloser onPress={setIsOpenChat} />
+            )}
         </div>
-    )
-}
+    );
+};
 
-export default memo(_CustomerSupportChat);
+export default memo(CustomerSupportChat);

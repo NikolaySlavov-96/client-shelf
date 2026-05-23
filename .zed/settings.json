@@ -1,0 +1,23 @@
+{
+    // Formats with Prettier on every save (reads .prettierrc automatically)
+    "format_on_save": "on",
+    "formatter": "prettier",
+    // Runs `eslint --fix` on save (auto-fix of lint errors)
+    "code_actions_on_format": {
+        "source.fixAll.eslint": true
+    },
+    "languages": {
+        "TypeScript": { "formatter": "prettier" },
+        "TSX": { "formatter": "prettier" },
+        "JavaScript": { "formatter": "prettier" },
+        "JSON": { "formatter": "prettier" },
+        "CSS": { "formatter": "prettier" }
+    },
+    "lsp": {
+        "eslint": {
+            "settings": {
+                "codeActionOnSave": { "rules": ["*"] }
+            }
+        }
+    }
+}

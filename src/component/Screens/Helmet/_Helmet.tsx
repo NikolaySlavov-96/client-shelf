@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 
 import { TitleFromLocation } from '../../../Helpers';
 
-const _Helmet = () => {
+const Helmet = () => {
     const locate = useLocation();
 
     const [title, setTitle] = useState('');
@@ -11,11 +11,10 @@ const _Helmet = () => {
     useEffect(() => {
         const editedTitle = TitleFromLocation(locate);
         setTitle(editedTitle);
-    }, [locate, setTitle])
+    }, [locate, setTitle]);
 
     return (
-        <>
-        </>
+        <></>
         // <HelmetProvider>
         //     <Helmet>
         //         <title>{`${title} - Book Library`}</title>
@@ -26,7 +25,7 @@ const _Helmet = () => {
         //         />
         //     </Helmet>
         // </HelmetProvider>
-    )
-}
+    );
+};
 
-export default memo(_Helmet);
+export default memo(Helmet);

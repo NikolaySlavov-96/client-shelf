@@ -9,36 +9,32 @@ import styles from './AuthTabs.module.css';
 type TAuthTab = 'login' | 'register';
 
 interface IAuthTabsProps {
-  activeTab: TAuthTab;
-  onSwitch: (tab: TAuthTab) => void;
-  className?: string;
+    activeTab: TAuthTab;
+    onSwitch: (tab: TAuthTab) => void;
+    className?: string;
 }
 
 const TABS: { value: TAuthTab; label: string }[] = [
-  { value: 'login', label: TEXTS.AUTH_TAB_LOGIN },
-  { value: 'register', label: TEXTS.AUTH_TAB_REGISTER },
+    { value: 'login', label: TEXTS.AUTH_TAB_LOGIN },
+    { value: 'register', label: TEXTS.AUTH_TAB_REGISTER },
 ];
 
 function AuthTabs({ activeTab, onSwitch, className }: IAuthTabsProps) {
-  return (
-    <div
-      className={cx(styles.tabs, className)}
-      role="tablist"
-      aria-label="Authentication"
-    >
-      {TABS.map((tab) => (
-        <button
-          key={tab.value}
-          role="tab"
-          aria-selected={activeTab === tab.value}
-          className={cx(styles.tab, activeTab === tab.value ? styles['tab--active'] : '')}
-          onClick={() => onSwitch(tab.value)}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
-  );
+    return (
+        <div className={cx(styles.tabs, className)} role="tablist" aria-label="Authentication">
+            {TABS.map((tab) => (
+                <button
+                    key={tab.value}
+                    role="tab"
+                    aria-selected={activeTab === tab.value}
+                    className={cx(styles.tab, activeTab === tab.value ? styles['tab--active'] : '')}
+                    onClick={() => onSwitch(tab.value)}
+                >
+                    {tab.label}
+                </button>
+            ))}
+        </div>
+    );
 }
 
 export default memo(AuthTabs);

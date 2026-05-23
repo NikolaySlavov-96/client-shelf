@@ -1,0 +1,11 @@
+.footer {
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+  text-align: center;
+  margin-top: var(--spacing-16);
+}
+
+.link {
+  color: var(--accent);
+  cursor: pointer;
+}

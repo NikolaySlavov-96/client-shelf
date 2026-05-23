@@ -1,36 +1,38 @@
-import { FC, memo, useCallback, useMemo } from "react";
+import { type FC, memo, useCallback, useMemo } from 'react';
 
-import { List } from "../../atoms";
-import { ProductCard } from "..";
+import { List } from '../../atoms';
 
-import { TProductCard } from "../../../Types/Product";
+import { type TViewType } from '~/Types/Components';
+import { type TProductCard } from '~/Types/Product';
+import { ProductCard } from '..';
 
 import styles from './_ListRenderProduct.module.css';
-import { TViewType } from "~/Types/Components";
 
-
-const emptyComponent = () => (< h2 > There are no items added yet.</h2>);
+const emptyComponent = () => <h2> There are no items added yet.</h2>;
 
 const keyExtractor = (item: TProductCard) => item?.productId.toString();
 
 interface IListRenderProductProps {
     data: TProductCard[];
-    viewType: TViewType,
+    viewType: TViewType;
 }
 
-const _ListRenderProduct: FC<IListRenderProductProps> = (props) => {
+const ListRenderProduct: FC<IListRenderProductProps> = (props) => {
     const { data, viewType } = props;
 
     const containerStyles = useMemo(() => {
         if (viewType === 'list') {
-            return `${styles.item} ${styles[`${viewType}__item`]}`
+            return `${styles.item} ${styles[`${viewType}__item`]}`;
         }
-        return styles['item']
-    }, [viewType])
-
-    const renderItem = useCallback(({ item }: { item: TProductCard }) => {
-        return <ProductCard {...item} viewType={viewType} />
+        return styles['item'];
     }, [viewType]);
+
+    const renderItem = useCallback(
+        ({ item }: { item: TProductCard }) => {
+            return <ProductCard {...item} viewType={viewType} />;
+        },
+        [viewType],
+    );
 
     return (
         <List
@@ -43,4 +45,4 @@ const _ListRenderProduct: FC<IListRenderProductProps> = (props) => {
     );
 };
 
-export default memo(_ListRenderProduct);
+export default memo(ListRenderProduct);

@@ -1,4 +1,4 @@
-import { StateCreator } from "zustand";
+import { type StateCreator } from 'zustand';
 
 export interface IUserQueue {
     connectId: string;
@@ -49,62 +49,71 @@ export interface ISupportSlicer {
 
 const createSupportSlicer: StateCreator<ISupportSlicer> = (set) => ({
     welcomeMessage: '',
-    setWelcomeMessage: ({ message }) => set(state => ({
-        welcomeMessage: message,
-    })),
+    setWelcomeMessage: ({ message }) =>
+        set((state) => ({
+            welcomeMessage: message,
+        })),
 
     users: [],
-    setUsers: (newUser) => set(state => ({
-        users: newUser.userQueue,
-    })),
+    setUsers: (newUser) =>
+        set((state) => ({
+            users: newUser.userQueue,
+        })),
 
     selectedRoom: '',
     setSelectedRoom: (room: string) => set({ selectedRoom: room }),
 
     rooms: [],
-    setRooms: (newRoom) => set(state => ({
-        rooms: [...state.rooms, newRoom],
-    })),
-    updateRoom: (roomName, newData) => set(state => {
-        return {
-            rooms: state.rooms.map(r => r.roomName === roomName ? newData : r)
-        }
-    }),
-    removeRoom: (roomName: string) => set(state => {
-        return {
-            rooms: state.rooms.filter(r => r.roomName !== roomName)
-        }
-    }),
-    resetRooms: () => set(state => ({
-        rooms: [],
-    })),
+    setRooms: (newRoom) =>
+        set((state) => ({
+            rooms: [...state.rooms, newRoom],
+        })),
+    updateRoom: (roomName, newData) =>
+        set((state) => {
+            return {
+                rooms: state.rooms.map((r) => (r.roomName === roomName ? newData : r)),
+            };
+        }),
+    removeRoom: (roomName: string) =>
+        set((state) => {
+            return {
+                rooms: state.rooms.filter((r) => r.roomName !== roomName),
+            };
+        }),
+    resetRooms: () =>
+        set((state) => ({
+            rooms: [],
+        })),
 
     messages: {},
-    addMessage: (data) => set((state) => {
-        const roomName = data.roomName;
-        const currentMessages = state.messages[roomName] || [];
-        return {
-            messages: {
-                ...state.messages,
-                [roomName]: [...currentMessages, data],
-            },
-        };
-    }),
-    updateMessageState: (roomName, newMessageState) => set((state) => {
-        const currentMessage = state.messages[roomName] || {};
-        return {
-            messages: {
-                ...state.messages,
-                [roomName]: {
-                    ...currentMessage,
-                    ...newMessageState,
+    addMessage: (data) =>
+        set((state) => {
+            const { roomName } = data;
+            const currentMessages = state.messages[roomName] || [];
+            return {
+                messages: {
+                    ...state.messages,
+                    [roomName]: [...currentMessages, data],
                 },
-            },
-        };
-    }),
-    resetMessages: () => set(state => ({
-        messages: {},
-    })),
+            };
+        }),
+    updateMessageState: (roomName, newMessageState) =>
+        set((state) => {
+            const currentMessage = state.messages[roomName] || {};
+            return {
+                messages: {
+                    ...state.messages,
+                    [roomName]: {
+                        ...currentMessage,
+                        ...newMessageState,
+                    },
+                },
+            };
+        }),
+    resetMessages: () =>
+        set((state) => ({
+            messages: {},
+        })),
 });
 
 export default createSupportSlicer;

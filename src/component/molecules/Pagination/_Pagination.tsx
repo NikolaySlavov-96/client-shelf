@@ -1,4 +1,4 @@
-import { FC, memo, useCallback } from 'react';
+import { type FC, memo, useCallback } from 'react';
 
 import { Button } from '../../atoms';
 
@@ -13,10 +13,11 @@ const PaginationButton: FC<IPaginationButtonProps> = (props) => {
     const { onSubmit, content } = props;
 
     return (
-        <Button variant="outline" size="sm" className={style["page"]} onClick={onSubmit}>{content}</Button>
-    )
+        <Button variant="outline" size="sm" className={style['page']} onClick={onSubmit}>
+            {content}
+        </Button>
+    );
 };
-
 
 interface IPaginationProps {
     count: number;
@@ -24,17 +25,17 @@ interface IPaginationProps {
     page: number;
 }
 
-const _Pagination: FC<IPaginationProps> = (props) => {
+const Pagination: FC<IPaginationProps> = (props) => {
     const { count, page, onSubmit } = props;
 
     const onPressArrowBack = useCallback(() => {
-        (page - 1) > 0 && onSubmit(page - 1)
+        if (page - 1 > 0) onSubmit(page - 1);
     }, [onSubmit, page]);
 
     const onPressArrowNext = useCallback(() => {
-        const hasNextPage = count >= (page + 1);
+        const hasNextPage = count >= page + 1;
 
-        return hasNextPage ? onSubmit(page + 1) : () => { };
+        return hasNextPage ? onSubmit(page + 1) : () => {};
     }, [count, page, onSubmit]);
 
     const twoPagesBefore = page - 2;
@@ -44,31 +45,21 @@ const _Pagination: FC<IPaginationProps> = (props) => {
 
     return (
         <div className={`flex-center ${style['container']}`}>
-            <PaginationButton content='&#x3c;' onSubmit={onPressArrowBack} />
-            {
-                twoPagesBefore > 0 && (
-                    <PaginationButton content={twoPagesBefore} onSubmit={() => onSubmit(twoPagesBefore)} />
-                )
-            }
-            {
-                onePageBefore > 0 && (
-                    <PaginationButton content={onePageBefore} onSubmit={() => onSubmit(onePageBefore)} />
-                )
-            }
-            <p className={`${style["current__page"]} ${style["page"]} ${style["pageSize"]}`} >{page}</p>
-            {
-                count >= onePageAhead && (
-                    <PaginationButton content={onePageAhead} onSubmit={() => onSubmit(onePageAhead)} />
-                )
-            }
-            {
-                count >= twoPagesAhead && (
-                    <PaginationButton content={twoPagesAhead} onSubmit={() => onSubmit(twoPagesAhead)} />
-                )
-            }
-            <PaginationButton content='&#x3e;' onSubmit={onPressArrowNext} />
+            <PaginationButton content="&#x3c;" onSubmit={onPressArrowBack} />
+            {twoPagesBefore > 0 && (
+                <PaginationButton content={twoPagesBefore} onSubmit={() => onSubmit(twoPagesBefore)} />
+            )}
+            {onePageBefore > 0 && <PaginationButton content={onePageBefore} onSubmit={() => onSubmit(onePageBefore)} />}
+            <p className={`${style['current__page']} ${style['page']} ${style['pageSize']}`}>{page}</p>
+            {count >= onePageAhead && (
+                <PaginationButton content={onePageAhead} onSubmit={() => onSubmit(onePageAhead)} />
+            )}
+            {count >= twoPagesAhead && (
+                <PaginationButton content={twoPagesAhead} onSubmit={() => onSubmit(twoPagesAhead)} />
+            )}
+            <PaginationButton content="&#x3e;" onSubmit={onPressArrowNext} />
         </div>
     );
-}
+};
 
-export default memo(_Pagination);
+export default memo(Pagination);

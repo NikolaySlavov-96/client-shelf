@@ -1,18 +1,13 @@
 import { Swal } from '../lib/toast';
-
 import { ESwalIcon } from '../Types/Swal';
-import { IToastGlobal } from './ToastInterface';
 
+import { type IToastGlobal } from './ToastInterface';
 
 const _InformationToast = (props: IToastGlobal) => {
-    const {
-        typeIcon = ESwalIcon.ERROR,
-        title = '',
-        subContent = '',
-    } = props;
+    const { typeIcon = ESwalIcon.ERROR, title = '', subContent = '' } = props;
 
     const renderContent = {
-        title: title,
+        title,
         icon: typeIcon,
         text: subContent,
     };

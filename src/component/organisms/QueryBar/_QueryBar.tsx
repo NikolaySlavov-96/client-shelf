@@ -1,17 +1,16 @@
-import { Dispatch, FC, memo, SetStateAction, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { type Dispatch, type FC, memo, type SetStateAction, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-import { Select, SearchField, LayoutIcon } from "../../molecules";
+import { LayoutIcon, SearchField, Select } from '~/component/molecules';
 
-import { SEARCH_NAME } from "../../../constants";
+import { SEARCH_NAME } from '~/constants';
 
-import { useForm, useStoreZ } from "../../../hooks";
-
-import { TOptionType } from "../../../Types/Select";
-import { IQueryBar } from "../../../Types/QueryBar";
+import { useForm, useStoreZ } from '~/hooks';
+import { type TViewType } from '~/Types/Components';
+import { type IQueryBar } from '~/Types/QueryBar';
+import { type TOptionType } from '~/Types/Select';
 
 import style from './_QueryBar.module.css';
-import { TViewType } from "~/Types/Components";
 
 // TODO Moving
 const pageSizeOptions = [
@@ -31,19 +30,19 @@ const pageSizeOptions = [
         label: '72',
         value: '72',
     },
-]
+];
 
 interface IQueryBarProps {
     hasLeftSelector: boolean;
     onPressSearch: ({ search }: IQueryBar) => void;
     leftSelectData?: number;
     leftSelectorData?: TOptionType[];
-    onPressLeftSelector?: Dispatch<SetStateAction<number>>,
-    viewType?: TViewType,
-    onPressViewType?: (viewTypeParam: TViewType) => void,
+    onPressLeftSelector?: Dispatch<SetStateAction<number>>;
+    viewType?: TViewType;
+    onPressViewType?: (viewTypeParam: TViewType) => void;
 }
 
-const _QueryBar: FC<IQueryBarProps> = (props) => {
+const QueryBar: FC<IQueryBarProps> = (props) => {
     const {
         leftSelectorData,
         hasLeftSelector,
@@ -58,42 +57,53 @@ const _QueryBar: FC<IQueryBarProps> = (props) => {
 
     const { setPageLimit } = useStoreZ();
 
-    const { values, changeHandler, onSubmit } = useForm({
-        search: '',
-    }, onPressSearch, {
-        search: ['required', 2]
-    }, false);
+    const { values, changeHandler, onSubmit } = useForm(
+        {
+            search: '',
+        },
+        onPressSearch,
+        {
+            search: ['required', 2],
+        },
+        false,
+    );
 
     const currentLimitParam = searchParams.get(SEARCH_NAME.LIMIT);
 
-    const pageLimit = useCallback((e: TOptionType) => {
-        const pageSize = e.value;
-        setPageLimit(Number(pageSize));
-        setSearchParams(prev => ({ ...prev, limit: pageSize }));
-    }, [setPageLimit, setSearchParams]);
+    const pageLimit = useCallback(
+        (e: TOptionType) => {
+            const pageSize = e.value;
+            setPageLimit(Number(pageSize));
+            setSearchParams((prev) => ({ ...prev, limit: pageSize }));
+        },
+        [setPageLimit, setSearchParams],
+    );
 
-    const changeState = useCallback((e: TOptionType) => {
-        const state = Number(e.value);
-        onPressLeftSelector && onPressLeftSelector(state);
-    }, [onPressLeftSelector]);
+    const changeState = useCallback(
+        (e: TOptionType) => {
+            const state = Number(e.value);
+            if (onPressLeftSelector) onPressLeftSelector(state);
+        },
+        [onPressLeftSelector],
+    );
 
     return (
         <div className={`flex-between ${style['container']}`}>
-            {hasLeftSelector ? <Select
-                options={leftSelectorData || []}
-                placeHolder={(leftSelectorData && leftSelectData) ? leftSelectorData[leftSelectData - 1].label : ''}
-                onChange={changeState}
-                size={'240'}
-            /> : <div></div>}
+            {hasLeftSelector ? (
+                <Select
+                    options={leftSelectorData || []}
+                    placeHolder={leftSelectorData && leftSelectData ? leftSelectorData[leftSelectData - 1].label : ''}
+                    onChange={changeState}
+                    size={'240'}
+                />
+            ) : (
+                <div />
+            )}
 
-            <SearchField
-                values={values as unknown as IQueryBar}
-                changeHandler={changeHandler}
-                onSubmit={onSubmit}
-            />
+            <SearchField values={values as unknown as IQueryBar} changeHandler={changeHandler} onSubmit={onSubmit} />
 
-            <div className={`${style['right__container']}`}>
-                {onPressViewType && viewType ? (<LayoutIcon typeView={viewType} onChange={onPressViewType} />) : null}
+            <div className={`flex-align ${style['right__container']}`}>
+                {onPressViewType && viewType ? <LayoutIcon typeView={viewType} onChange={onPressViewType} /> : null}
 
                 <Select
                     options={pageSizeOptions}
@@ -106,4 +116,4 @@ const _QueryBar: FC<IQueryBarProps> = (props) => {
     );
 };
 
-export default memo(_QueryBar);
+export default memo(QueryBar);

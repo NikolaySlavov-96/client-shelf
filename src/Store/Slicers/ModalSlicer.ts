@@ -1,4 +1,4 @@
-import { StateCreator } from "zustand";
+import { type StateCreator } from 'zustand';
 
 export interface IModalSlicer {
     modalName: string;
@@ -18,20 +18,22 @@ const createModalSlicer: StateCreator<IModalSlicer> = (set) => ({
     modalName: '',
     setModalName: (data) => set({ modalName: data }),
     content: [],
-    setContent: (newDate) => set(state => ({
-        content: [...state.content, newDate],
-    })),
+    setContent: (newDate) =>
+        set((state) => ({
+            content: [...state.content, newDate],
+        })),
     modalPayload: undefined,
     error: { message: '' },
     setErrors: (error) => set({ error }),
     isVisible: false,
     openModal: () => set({ isVisible: true }),
     closeModal: () => set({ isVisible: false, modalPayload: undefined }),
-    openNamedModal: (name, payload) => set({
-        modalName: name,
-        modalPayload: payload,
-        isVisible: true,
-    }),
+    openNamedModal: (name, payload) =>
+        set({
+            modalName: name,
+            modalPayload: payload,
+            isVisible: true,
+        }),
 });
 
 export default createModalSlicer;

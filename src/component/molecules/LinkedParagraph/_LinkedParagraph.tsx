@@ -1,4 +1,4 @@
-import { FC, memo } from 'react';
+import { type FC, memo } from 'react';
 
 import { Link } from '../../atoms';
 
@@ -15,9 +15,7 @@ const _LinkedParagraph: FC<ILinkedParagraphProps> = (props) => {
     const { styles, staticContent, to, pressContent } = props;
 
     return (
-        <p
-            className={`${style['paragraph']} ${!!styles ? styles : ''}`}
-        >
+        <p className={`${style['paragraph']} ${styles ? styles : ''}`}>
             {staticContent}
             <Link to={to}>{pressContent}</Link>
         </p>

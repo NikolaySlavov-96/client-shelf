@@ -1,10 +1,10 @@
-import { CSSProperties, FC, FormEvent, memo, ReactNode } from 'react'
+import { CSSProperties, type FC, type FormEvent, memo, type ReactNode } from 'react';
 
 const Separator = memo(() => {
-    return (
-        <div style={{ marginBottom: '2rem' }}></div>
-    );
+    return <div style={{ marginBottom: '2rem' }} />;
 });
+
+Separator.displayName = 'Separator';
 
 interface IInputFormProps {
     buttonLabel: string;
@@ -35,13 +35,10 @@ const _InputForm: FC<IInputFormProps> = (props) => {
     const onPress = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         onSubmit(e);
-    }
+    };
 
     return (
-        <form
-            className={formStyles}
-            onSubmit={onPress}
-        >
+        <form className={formStyles} onSubmit={onPress}>
             {beforeChildren}
 
             {children}
@@ -55,7 +52,7 @@ const _InputForm: FC<IInputFormProps> = (props) => {
 
             {afterButton}
         </form>
-    )
-}
+    );
+};
 
 export default memo(_InputForm);
