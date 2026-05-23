@@ -1,6 +1,6 @@
 import { type KeyboardEvent, memo, useState } from 'react';
 
-import List from '~/component/atoms/List/_List';
+import { List } from '~/component/atoms';
 
 import { cx } from '~/Utils';
 
