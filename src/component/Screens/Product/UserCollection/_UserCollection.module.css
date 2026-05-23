@@ -90,7 +90,7 @@
   background: var(--white);
   border: var(--border-default);
   border-radius: var(--radius-md);
-  padding: var(--spacing-4) var(--spacing-16);
+  padding: var(--spacing-4) var(--spacing-8);
   margin-bottom: var(--spacing-28);
 }
 
