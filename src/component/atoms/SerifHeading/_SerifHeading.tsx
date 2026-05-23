@@ -1,6 +1,6 @@
 import { type FC, memo, type ReactNode } from 'react';
 
-import { cx } from '../../../Utils';
+import { cx } from '~/Utils';
 
 import styles from './_SerifHeading.module.css';
 

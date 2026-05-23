@@ -1,8 +1,8 @@
 import { memo } from 'react';
 
-import { convertDateTime } from '../../..//Helpers';
+import { convertDateTime } from '~/Helpers';
 
-import { type IMessage } from '../../../Store/Slicers/SupportSlicer';
+import { type IMessage } from '~/Store/Slicers/SupportSlicer';
 
 import style from './_MessageLine.module.css';
 

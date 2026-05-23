@@ -1,6 +1,6 @@
 import { Fragment, useCallback } from 'react';
 
-import { type IListProps } from '../../../Types/Components';
+import { type IListProps } from '~/Types/Components';
 
 const List = <ItemT,>(props: IListProps<ItemT>) => {
     const { data, renderItem, keyExtractor, EmptyComponent, style, ...rest } = props;

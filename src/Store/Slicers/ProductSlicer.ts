@@ -6,9 +6,6 @@ import { FileService as fileService, ProductService as productService } from '~/
 import { Toast } from '~/Toasts';
 import { ESwalIcon } from '~/Types/Swal';
 
-// Surface a failed action's reason to the user. _API throws the parsed error
-// body, so an authorization failure (e.g. 403 "account is not verified") carries
-// a `message` we can show instead of failing silently in the console.
 const showActionError = (err: unknown) => {
     const message = (err as { message?: string })?.message;
     Toast({ title: message ?? TEXTS.TOAST_GENERIC_ERROR, typeIcon: ESwalIcon.ERROR });
@@ -58,6 +55,7 @@ export interface IProductSlicer {
     productCollection: { count: number; rows: IProductWithState[] };
     fetchProductCollection: (data: IFetchQueryParams) => void;
     removeProductState: (productId: number) => Promise<void>;
+    updateShelfStatus: (productId: number, nextStatusId: number, activeStatusId?: number | null) => Promise<void>;
 
     statusCounts: IStatusCount[];
     fetchStatusCounts: () => void;
@@ -184,14 +182,11 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         const currentRow = products.rows.find((p) => p.productId === productId);
         const previousStatusId = currentRow?.statusId ?? null;
 
-        // Nothing to move — the book is already in this status.
         if (previousStatusId === nextStatusId) {
             set({ productState: { stateId: nextStatusId } });
             return;
         }
 
-        // In a filtered section (anything other than "All"), a book whose new status no longer
-        // matches the filter leaves the current list; in "All" it stays and just recolours.
         const leavesCurrentSection = activeFilterId !== null && activeFilterId !== 0 && nextStatusId !== activeFilterId;
 
         const nextRows = leavesCurrentSection
@@ -203,8 +198,6 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         set({ isAddingProductState: true });
         try {
             await productService.addStatusOnProduct({ productId: id, statusId: state });
-            // Commit to the store only after the server confirms — on failure
-            // nothing was changed, so there is nothing to roll back.
             set({
                 products: { count: nextCount, rows: nextRows },
                 statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
@@ -231,7 +224,6 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         const { productRating } = get();
         const previous = productRating;
 
-        // optimistic — reflect the user's pick immediately
         set({ productRating: { ...productRating, userRating: rating } });
 
         try {
@@ -285,8 +277,42 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         } catch (err) {
             console.log('removeProductState error --->: ', err);
             showActionError(err);
-            // rollback on failure
             set({ productCollection: { count: productCollection.count, rows: previousRows } });
+        }
+    },
+
+    updateShelfStatus: async (productId, nextStatusId, activeStatusId = null) => {
+        const { productCollection, statusCounts } = get();
+        const currentRow = productCollection.rows.find((p) => p.productId === productId);
+        const previousStatusId = currentRow?.productStateId ?? null;
+
+        if (previousStatusId === nextStatusId) return;
+
+        const leavesCurrentSection = activeStatusId !== null && activeStatusId !== 0 && nextStatusId !== activeStatusId;
+
+        const previousRows = productCollection.rows;
+        const previousCount = productCollection.count;
+
+        const nextRows = leavesCurrentSection
+            ? previousRows.filter((p) => p.productId !== productId)
+            : previousRows.map((p) => (p.productId === productId ? { ...p, productStateId: nextStatusId } : p));
+        const nextCount = leavesCurrentSection ? Math.max(0, previousCount - 1) : previousCount;
+
+        set({
+            productCollection: { count: nextCount, rows: nextRows },
+            statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
+        });
+
+        try {
+            await productService.addStatusOnProduct({ productId: String(productId), statusId: String(nextStatusId) });
+        } catch (err) {
+            console.log('updateShelfStatus error --->: ', err);
+            showActionError(err);
+            // rollback both the rows and the counts
+            set({
+                productCollection: { count: previousCount, rows: previousRows },
+                statusCounts,
+            });
         }
     },
 

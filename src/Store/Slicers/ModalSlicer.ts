@@ -3,9 +3,9 @@ import { type StateCreator } from 'zustand';
 export interface IModalSlicer {
     modalName: string;
     setModalName: (data: string) => void;
-    content: any[]; // append-only feed (used by NewProductModal socket notifications)
+    content: any[];
     setContent: (newData: any) => void;
-    modalPayload: unknown; // typed payload for the currently-open modal (consumed by the modal component)
+    modalPayload: unknown;
     error: { message: string };
     setErrors: (newData: any) => void;
     isVisible: boolean;

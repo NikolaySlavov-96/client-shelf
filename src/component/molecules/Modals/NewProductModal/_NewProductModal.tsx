@@ -1,10 +1,10 @@
 import { memo, useEffect } from 'react';
 
-import { Link } from '../../../atoms';
+import { Link } from '~/component/atoms';
 
-import { ROUT_NAMES } from '../../../../constants';
+import { ROUT_NAMES } from '~/constants';
 
-import { useStoreZ } from '../../../../hooks';
+import { useStoreZ } from '~/hooks';
 
 import style from './_NewProductModal.module.css';
 

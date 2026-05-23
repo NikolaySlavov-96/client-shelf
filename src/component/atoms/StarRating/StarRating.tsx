@@ -1,6 +1,6 @@
 import { type KeyboardEvent, memo, useState } from 'react';
 
-import { cx } from '../../../Utils';
+import { cx } from '~/Utils';
 
 import styles from './StarRating.module.css';
 

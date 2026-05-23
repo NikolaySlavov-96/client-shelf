@@ -2,7 +2,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { TEXTS } from '../../../../constants';
+import { TEXTS } from '~/constants';
 
 import Settings from './_Settings';
 

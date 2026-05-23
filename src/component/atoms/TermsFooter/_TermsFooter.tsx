@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-import { TEXTS } from '../../../constants';
+import { TEXTS } from '~/constants';
 
 import styles from './_TermsFooter.module.css';
 

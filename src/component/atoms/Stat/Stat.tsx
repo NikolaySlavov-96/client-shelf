@@ -1,4 +1,4 @@
-import { cx } from '../../../Utils';
+import { cx } from '~/Utils';
 
 import styles from './Stat.module.css';
 

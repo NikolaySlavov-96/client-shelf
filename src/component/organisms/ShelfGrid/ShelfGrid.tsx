@@ -21,10 +21,11 @@ function getStatusId(book: TShelfBook): number {
 interface IShelfGridProps {
     books: TShelfBook[];
     onRemove?: (productId: number) => void;
+    onStatusChange?: (productId: number, statusId: number) => void;
     className?: string;
 }
 
-function ShelfGrid({ books, onRemove, className }: IShelfGridProps) {
+function ShelfGrid({ books, onRemove, onStatusChange, className }: IShelfGridProps) {
     if (books.length === 0) {
         return <p className={styles.empty}>{TEXTS.PROFILE_EMPTY_SHELF}</p>;
     }
@@ -41,6 +42,7 @@ function ShelfGrid({ books, onRemove, className }: IShelfGridProps) {
                     fileUrl={book.fileUrl}
                     fileSrc={book.fileSrc}
                     onRemove={onRemove}
+                    onStatusChange={onStatusChange}
                 />
             ))}
         </div>

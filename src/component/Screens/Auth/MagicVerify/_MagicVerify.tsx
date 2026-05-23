@@ -1,13 +1,13 @@
 import { memo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { VerifyStatusScreen } from '../../../organisms';
+import { VerifyStatusScreen } from '~/component/organisms';
 
-import { ROUT_NAMES, TEXTS } from '../../../../constants';
+import { ROUT_NAMES, TEXTS } from '~/constants';
 
-import { useStoreZ } from '../../../../hooks';
-import { Toast } from '../../../../Toasts';
-import { ESwalIcon } from '../../../../Types/Swal';
+import { useStoreZ } from '~/hooks';
+import { Toast } from '~/Toasts';
+import { ESwalIcon } from '~/Types/Swal';
 
 const MagicVerify = () => {
     const navigate = useNavigate();

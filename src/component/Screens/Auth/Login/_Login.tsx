@@ -1,15 +1,15 @@
 import { memo, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, FormField } from '../../../atoms';
+import { Button, FormField } from '~/component/atoms';
 
-import { AuthLayout } from '../../../organisms';
+import { AuthLayout } from '~/component/organisms';
 
-import { ROUT_NAMES, ServerError, TEXTS } from '../../../../constants';
+import { ROUT_NAMES, ServerError, TEXTS } from '~/constants';
 
-import { useAuthForm, useStoreZ } from '../../../../hooks';
-import { Toast } from '../../../../Toasts';
-import { ESwalIcon } from '../../../../Types/Swal';
+import { useAuthForm, useStoreZ } from '~/hooks';
+import { Toast } from '~/Toasts';
+import { ESwalIcon } from '~/Types/Swal';
 
 import styles from './_Login.module.css';
 

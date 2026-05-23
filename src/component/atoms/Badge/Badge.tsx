@@ -15,7 +15,6 @@ interface IBadgeProps {
 }
 
 function Badge({ statusId, badgeStyle = 'light', className }: IBadgeProps) {
-    // Label is data: it comes from the API-backed status list, not from the client
     const label = useStoreZ((s) => s.productStates.find((st) => st.id === statusId)?.stateName);
 
     if (!label) {

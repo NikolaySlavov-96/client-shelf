@@ -1,6 +1,6 @@
 import { type StateCreator } from 'zustand';
 
-import { type E_FORM_NAMES } from '../../constants';
+import { type E_FORM_NAMES } from '~/constants';
 
 import { type TViewType } from '~/Types/Components';
 

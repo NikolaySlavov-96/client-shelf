@@ -1,15 +1,14 @@
 import { memo, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import FilterPills from '../../../../component/molecules/FilterPills/FilterPills';
-import { LayoutIcon, Pagination } from '../../../molecules';
+import { FilterPills, LayoutIcon, Pagination } from '~/component/molecules';
 
-import BookGrid from '../../../../component/organisms/BookGrid/BookGrid';
+import { BookGrid } from '~/component/organisms';
 
-import { SEARCH_NAME, TEXTS } from '../../../../constants';
+import { SEARCH_NAME, TEXTS } from '~/constants';
 
+import { useStoreZ } from '~/hooks';
 import { type TViewType } from '~/Types/Components';
-import { useStoreZ } from '../../../../hooks';
 
 import styles from './_Products.module.css';
 
@@ -105,23 +104,6 @@ const Products = () => {
         [updateParams],
     );
 
-    const handleSearch = useCallback(
-        (value: string) => {
-            updateParams(
-                (p) => {
-                    if (value) {
-                        p.set(SEARCH_NAME.CONTENT, value);
-                    } else {
-                        p.delete(SEARCH_NAME.CONTENT);
-                    }
-                    p.delete(SEARCH_NAME.PAGE);
-                },
-                { replace: true },
-            );
-        },
-        [updateParams],
-    );
-
     const handlePageChange = useCallback(
         (next: number) => {
             updateParams((p) => {
@@ -150,29 +132,15 @@ const Products = () => {
                 <p className={styles.header__sub}>{TEXTS.CATALOG_SUBTITLE}</p>
             </header>
 
-            <div className={`flex-align ${styles.searchRow}`}>
-                <div className={styles.searchBox}>
-                    <span className={styles.searchBox__icon} aria-hidden="true">
-                        ⌕
-                    </span>
-                    <input
-                        className={styles.searchBox__input}
-                        type="text"
-                        placeholder={TEXTS.CATALOG_SEARCH_PLACEHOLDER}
-                        value={searchContent}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        aria-label={TEXTS.CATALOG_SEARCH_PLACEHOLDER}
-                    />
-                </div>
+            <div className={`flex-between ${styles.toolbar}`}>
+                <FilterPills
+                    options={filterOptions}
+                    activeValue={activeFilter}
+                    onSelect={handleFilterChange}
+                    className={styles.filters}
+                />
                 <LayoutIcon typeView={layout} onChange={handleLayoutChange} />
             </div>
-
-            <FilterPills
-                options={filterOptions}
-                activeValue={activeFilter}
-                onSelect={handleFilterChange}
-                className={styles.filters}
-            />
 
             {isLoadingProducts ? (
                 <div className={styles.loading} aria-live="polite">

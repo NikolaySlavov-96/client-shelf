@@ -37,7 +37,6 @@ export const TEXTS = {
     // Catalog
     CATALOG_TITLE: 'Book Catalog',
     CATALOG_SUBTITLE: 'Find your next favourite book',
-    CATALOG_SEARCH_PLACEHOLDER: 'Search by title or author...',
     CATALOG_EMPTY: 'No books found.',
     CATALOG_FILTER_ALL: 'All',
     // Book Detail

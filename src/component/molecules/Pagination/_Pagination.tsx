@@ -1,6 +1,6 @@
 import { type FC, memo, useCallback } from 'react';
 
-import { Button } from '../../atoms';
+import { Button } from '~/component/atoms';
 
 import style from './_Pagination.module.css';
 

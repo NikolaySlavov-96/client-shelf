@@ -1,13 +1,13 @@
 import { memo, useCallback, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { Pagination } from '../../../molecules';
+import { Pagination } from '~/component/molecules';
 
-import { ShelfGrid } from '../../../../component/organisms';
+import { ShelfGrid } from '~/component/organisms';
 
-import { SEARCH_NAME, TEXTS } from '../../../../constants';
+import { SEARCH_NAME, TEXTS } from '~/constants';
 
-import { useStoreZ } from '../../../../hooks';
+import { useStoreZ } from '~/hooks';
 
 import styles from './_SearchByEmail.module.css';
 

@@ -2,7 +2,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { EStatusId } from '../../../../constants/statusMap';
+import { EStatusId } from '~/constants/statusMap';
 
 import Products from './_Products';
 

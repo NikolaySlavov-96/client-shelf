@@ -1,13 +1,13 @@
 import { type ChangeEvent, type FormEvent, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Avatar, Button } from '../../../atoms';
+import { Avatar, Button } from '~/component/atoms';
 
-import { ROUT_NAMES, TEXTS } from '../../../../constants';
+import { ROUT_NAMES, TEXTS } from '~/constants';
 
-import { useStoreZ } from '../../../../hooks';
-import { Toast } from '../../../../Toasts';
-import { ESwalIcon } from '../../../../Types/Swal';
+import { useStoreZ } from '~/hooks';
+import { Toast } from '~/Toasts';
+import { ESwalIcon } from '~/Types/Swal';
 
 import styles from './_Settings.module.css';
 

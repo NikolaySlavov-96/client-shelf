@@ -1,8 +1,8 @@
 import { memo } from 'react';
 
-import { TEXTS } from '../../../constants';
+import { TEXTS } from '~/constants';
 
-import { cx } from '../../../Utils';
+import { cx } from '~/Utils';
 
 import styles from './AuthTabs.module.css';
 

@@ -1,7 +1,7 @@
 import { type StateCreator } from 'zustand';
 
+import { FileService, ProfileService } from '~/services';
 import { type IProfile, type IUpdateProfileRequest } from '~/Types/services/ProfileService';
-import { FileService, ProfileService } from '../../services';
 
 import { type IAuthSlicer } from './AuthSlicer';
 import { type ICommonSlicer } from './CommonSlicer';

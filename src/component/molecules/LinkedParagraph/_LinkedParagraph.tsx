@@ -1,6 +1,6 @@
 import { type FC, memo } from 'react';
 
-import { Link } from '../../atoms';
+import { Link } from '~/component/atoms';
 
 import style from './_LinkedParagraph.module.css';
 

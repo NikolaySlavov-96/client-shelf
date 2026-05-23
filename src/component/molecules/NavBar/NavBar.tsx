@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Avatar, Button } from '../../atoms';
+import { Avatar, Button } from '~/component/atoms';
 
-import { MODAL_NAMES, ROUT_NAMES, TEXTS } from '../../../constants';
+import { MODAL_NAMES, ROUT_NAMES, TEXTS } from '~/constants';
 
-import { cx } from '../../../Utils';
+import { cx } from '~/Utils';
 
-import { useStoreZ } from '../../../hooks';
+import { useStoreZ } from '~/hooks';
 import type { ISearchModalPayload } from '../SearchModal/SearchModal';
 
 import styles from './NavBar.module.css';

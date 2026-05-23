@@ -1,9 +1,9 @@
 import { memo } from 'react';
 
-import { TEXTS } from '../../../constants';
+import { TEXTS } from '~/constants';
 
-import { getProgressContrast } from '../../../Helpers';
-import { cx } from '../../../Utils';
+import { getProgressContrast } from '~/Helpers';
+import { cx } from '~/Utils';
 
 import styles from './ProgressBar.module.css';
 

@@ -1,6 +1,6 @@
 import { type Dispatch, type FC, memo, type SetStateAction, useCallback } from 'react';
 
-import { ChatHeader } from '../../../component/atoms';
+import { ChatHeader } from '~/component/atoms';
 
 import style from './_ChatWindowCloser.module.css';
 

@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-import { cx } from '../../../Utils';
+import { cx } from '~/Utils';
 
 import styles from './FilterPills.module.css';
 

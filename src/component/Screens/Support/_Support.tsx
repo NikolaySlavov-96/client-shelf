@@ -1,12 +1,12 @@
 import { memo, useCallback, useEffect, useRef } from 'react';
 
-import { ChatHeader, List, MessageForm, MessageLine } from '../../atoms';
+import { ChatHeader, List, MessageForm, MessageLine } from '~/component/atoms';
 
-import { ESendEvents } from '../../../constants';
+import { ESendEvents } from '~/constants';
 
-import { useStoreZ } from '../../../hooks';
-import { SocketService } from '../../../services';
-import { type IMessage, type IRoom, type IUserQueue } from '../../../Store/Slicers/SupportSlicer';
+import { useStoreZ } from '~/hooks';
+import { SocketService } from '~/services';
+import { type IMessage, type IRoom, type IUserQueue } from '~/Store/Slicers/SupportSlicer';
 
 import style from './_Support.module.css';
 

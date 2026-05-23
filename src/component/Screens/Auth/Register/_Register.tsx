@@ -1,13 +1,13 @@
 import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button, FormField } from '../../../atoms';
+import { Button, FormField } from '~/component/atoms';
 
-import { AuthLayout } from '../../../organisms';
+import { AuthLayout } from '~/component/organisms';
 
-import { ROUT_NAMES, ServerError, TEXTS } from '../../../../constants';
+import { ROUT_NAMES, ServerError, TEXTS } from '~/constants';
 
-import { useAuthForm, useStoreZ } from '../../../../hooks';
+import { useAuthForm, useStoreZ } from '~/hooks';
 
 const Register = () => {
     const navigate = useNavigate();

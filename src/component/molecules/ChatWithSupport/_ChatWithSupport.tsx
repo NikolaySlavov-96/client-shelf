@@ -1,14 +1,14 @@
 import { type Dispatch, type FC, memo, type SetStateAction, useCallback, useEffect, useRef } from 'react';
 
-import { ChatHeader, List, MessageForm, MessageLine } from '../../../component/atoms';
+import { ChatHeader, List, MessageForm, MessageLine } from '~/component/atoms';
 
-import { ESendEvents } from '../../../constants';
+import { ESendEvents } from '~/constants';
 
-import { SUPPORT_TOAST } from '../../../Configuration';
-import { useStoreZ } from '../../../hooks';
-import { SocketService } from '../../../services';
-import { type IMessage } from '../../../Store/Slicers/SupportSlicer';
-import { ToastWithButton } from '../../../Toasts';
+import { SUPPORT_TOAST } from '~/Configuration';
+import { useStoreZ } from '~/hooks';
+import { SocketService } from '~/services';
+import { type IMessage } from '~/Store/Slicers/SupportSlicer';
+import { ToastWithButton } from '~/Toasts';
 
 import style from './_ChatWithSupport.module.css';
 

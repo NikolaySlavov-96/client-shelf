@@ -1,17 +1,16 @@
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { Avatar, Button, Stat } from '../../../atoms';
+import { Avatar, Button, Stat } from '~/component/atoms';
 
-import { ProgressBar, ShelfTabs } from '../../../../component/molecules';
-import { Pagination } from '../../../molecules';
+import { Pagination, ProgressBar, ShelfTabs } from '~/component/molecules';
 
-import { ShelfGrid } from '../../../../component/organisms';
+import { ShelfGrid } from '~/component/organisms';
 
-import { ROUT_NAMES, SEARCH_NAME, TEXTS } from '../../../../constants';
-import { EStatusId } from '../../../../constants/statusMap';
+import { ROUT_NAMES, SEARCH_NAME, TEXTS } from '~/constants';
+import { EStatusId } from '~/constants/statusMap';
 
-import { useStoreZ } from '../../../../hooks';
+import { useStoreZ } from '~/hooks';
 
 import styles from './_UserCollection.module.css';
 
@@ -64,6 +63,7 @@ const UserCollection = () => {
         productCollection,
         fetchProductCollection,
         removeProductState,
+        updateShelfStatus,
         statusCounts,
         fetchStatusCounts,
         profile,
@@ -163,6 +163,13 @@ const UserCollection = () => {
         [updateParams],
     );
 
+    const handleStatusChange = useCallback(
+        (productId: number, nextStatusId: number) => {
+            updateShelfStatus(productId, nextStatusId, activeStatusId);
+        },
+        [updateShelfStatus, activeStatusId],
+    );
+
     const handleFriendView = useCallback(() => {
         if (friendEmail.trim()) {
             navigate(
@@ -259,7 +266,11 @@ const UserCollection = () => {
                 <div className={styles.loading}>{TEXTS.COMMON_LOADING}</div>
             ) : (
                 <>
-                    <ShelfGrid books={productCollection.rows} onRemove={removeProductState} />
+                    <ShelfGrid
+                        books={productCollection.rows}
+                        onRemove={removeProductState}
+                        onStatusChange={handleStatusChange}
+                    />
                     <Pagination count={pageCount} page={page} onSubmit={setPage} />
                 </>
             )}

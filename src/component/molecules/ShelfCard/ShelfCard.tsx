@@ -1,11 +1,12 @@
 import { memo, useCallback } from 'react';
 
-import { Badge, BookCover } from '~/component/atoms';
+import { Badge, BookCover, Button } from '~/component/atoms';
 
-import { TEXTS } from '~/constants';
+import { getStatusLabel, TEXTS } from '~/constants';
 
 import { cx } from '~/Utils';
 
+import { useStatuses } from '~/hooks';
 import { Toast, ToastWithButton } from '~/Toasts';
 import { ESwalIcon } from '~/Types/Swal';
 
@@ -19,6 +20,7 @@ interface IShelfCardProps {
     fileUrl?: string;
     fileSrc?: string;
     onRemove?: (productId: number) => void;
+    onStatusChange?: (productId: number, statusId: number) => void;
     className?: string;
 }
 
@@ -30,8 +32,11 @@ function ShelfCard({
     fileUrl,
     fileSrc,
     onRemove,
+    onStatusChange,
     className,
 }: IShelfCardProps) {
+    const { statuses } = useStatuses();
+
     const handleRemove = useCallback(async () => {
         if (!onRemove) return;
         const result = await ToastWithButton({
@@ -49,6 +54,14 @@ function ShelfCard({
             Toast({ title: TEXTS.TOAST_REMOVE_SUCCESS, typeIcon: ESwalIcon.SUCCESS });
         }
     }, [onRemove, productId]);
+
+    const handleStatusClick = useCallback(
+        (sid: number) => {
+            if (sid === statusId) return;
+            onStatusChange?.(productId, sid);
+        },
+        [onStatusChange, productId, statusId],
+    );
 
     return (
         <article className={cx(styles.card, className)}>
@@ -75,6 +88,21 @@ function ShelfCard({
                         </button>
                     ) : null}
                 </div>
+                {onStatusChange ? (
+                    <div className={styles.actions}>
+                        {statuses.map((s) => (
+                            <Button
+                                key={s.id}
+                                label={getStatusLabel(s)}
+                                size="sm"
+                                variant={statusId === s.id ? 'primary' : 'outline'}
+                                onClick={() => handleStatusClick(s.id)}
+                                aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
+                                aria-pressed={statusId === s.id}
+                            />
+                        ))}
+                    </div>
+                ) : null}
             </div>
         </article>
     );

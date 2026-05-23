@@ -28,10 +28,6 @@ export interface IAuthSlicer {
 
 type TFullStore = IAuthSlicer & ICommonSlicer & ISupportSlicer & IModalSlicer & IProductSlicer;
 
-// AuthService sits inside a module-load circular dependency
-// (AuthService -> _api -> _API -> useStoreZ -> AuthSlicer). Calling it at
-// module-eval time can hit the import while its binding is still in the
-// temporal dead zone, so resolve it lazily on first use instead.
 let _authService: ReturnType<typeof AuthService> | null = null;
 const getAuthService = () => (_authService ??= AuthService());
 

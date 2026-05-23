@@ -1,6 +1,6 @@
 import { type FC, memo } from 'react';
 
-import { Button } from '../../atoms';
+import { Button } from '~/component/atoms';
 
 import { type TViewType } from '~/Types/Components';
 

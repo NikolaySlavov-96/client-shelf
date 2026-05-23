@@ -16,12 +16,10 @@ const connect = (token?: string) => {
     socket = io(HOST, { ...options, auth: { token: token ?? '' } });
 
     socket.on('connect', () => {
-        console.log('Socket Connected');
         useStoreZ.getState().setConnectId(socket.id ?? '');
     });
 
     socket.on('disconnect', () => {
-        console.log('Socket Disconnect');
         useStoreZ.getState().setConnectId('');
     });
 };

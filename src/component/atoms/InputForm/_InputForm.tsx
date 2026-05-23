@@ -1,4 +1,4 @@
-import { CSSProperties, type FC, type FormEvent, memo, type ReactNode } from 'react';
+import { type FC, type FormEvent, memo, type ReactNode } from 'react';
 
 const Separator = memo(() => {
     return <div style={{ marginBottom: '2rem' }} />;

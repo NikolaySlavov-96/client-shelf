@@ -17,24 +17,23 @@ import api from './_api';
 const PREFIX = '/auth';
 
 const _AuthServiceFactory = () => {
-    const register = async (data: IRegisterRequest): Promise<IRegisterResponse> =>
+    const register = (data: IRegisterRequest): Promise<IRegisterResponse> =>
         api.post(`${PREFIX}/register`, { inputData: data });
 
-    const login = async (data: ILoginRequest): Promise<ILoginResponse> =>
-        api.post(`${PREFIX}/login`, { inputData: data });
+    const login = (data: ILoginRequest): Promise<ILoginResponse> => api.post(`${PREFIX}/login`, { inputData: data });
 
-    const logout = async (data: ILogOutRequest): Promise<ILogOutResponse> =>
+    const logout = (data: ILogOutRequest): Promise<ILogOutResponse> =>
         api.post(`${PREFIX}/logout`, { inputData: data });
 
-    const checkField = async () => api.get(`${PREFIX}/check`);
+    const checkField = () => api.get(`${PREFIX}/check`);
 
-    const verifyToken = async (verifyToken: IVerifyTokeRequest): Promise<IVerifyTokenResponse> =>
+    const verifyToken = (verifyToken: IVerifyTokeRequest): Promise<IVerifyTokenResponse> =>
         api.post(`${PREFIX}/verify`, { inputData: { verifyToken } });
 
-    const requestMagicLink = async (data: IMagicLinkRequest): Promise<IMagicLinkResponse> =>
+    const requestMagicLink = (data: IMagicLinkRequest): Promise<IMagicLinkResponse> =>
         api.post(`${PREFIX}/magic-link`, { inputData: data });
 
-    const verifyMagicLink = async (token: string): Promise<IVerifyMagicResponse> =>
+    const verifyMagicLink = (token: string): Promise<IVerifyMagicResponse> =>
         api.post(`${PREFIX}/magic-link/verify`, { inputData: { token } });
 
     return {

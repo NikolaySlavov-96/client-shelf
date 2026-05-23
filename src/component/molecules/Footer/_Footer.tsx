@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-import { LinkedParagraph } from '../../molecules';
+import { LinkedParagraph } from '~/component/molecules';
 
 import style from './_Footer.module.css';
 

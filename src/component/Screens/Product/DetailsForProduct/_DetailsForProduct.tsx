@@ -1,15 +1,15 @@
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Badge, BookCover, Button, StarRating } from '../../../atoms';
+import { Badge, BookCover, Button, StarRating } from '~/component/atoms';
 
-import { getStatusLabel, ROUT_NAMES, TEXTS } from '../../../../constants';
+import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
 
-import { useStatuses, useStoreZ } from '../../../../hooks';
+import { useStatuses, useStoreZ } from '~/hooks';
 
+import { getProductDetailStats } from './_DetailsForProduct.config';
 import styles from './_DetailsForProduct.module.css';
 
-// TODO: Nikolay -> Improve code with config
 const DetailsForProduct = () => {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -97,30 +97,16 @@ const DetailsForProduct = () => {
                         <p className={styles.info__author}>{productById?.authorName}</p>
 
                         <div className={styles.stats}>
-                            <div className={`flex-col ${styles.stat}`}>
-                                <span className={styles.stat__value}>
-                                    {productById?.pages ?? TEXTS.COMMON_PLACEHOLDER_VALUE}
-                                </span>
-                                <span className={styles.stat__label}>{TEXTS.DETAIL_PAGES}</span>
-                            </div>
-                            <div className={`flex-col ${styles.stat}`}>
-                                <span className={styles.stat__value}>
-                                    {productById?.publishedYear ?? TEXTS.COMMON_PLACEHOLDER_VALUE}
-                                </span>
-                                <span className={styles.stat__label}>{TEXTS.DETAIL_YEAR}</span>
-                            </div>
-                            <div className={`flex-col ${styles.stat}`}>
-                                <span className={styles.stat__value}>
-                                    <StarRating
-                                        value={Math.round(productRating.average)}
-                                        ariaLabel={TEXTS.DETAIL_RATING}
-                                    />
-                                </span>
-                                <span className={styles.stat__label}>
-                                    {TEXTS.DETAIL_RATING}
-                                    {productRating.count > 0 ? ` (${productRating.count})` : ''}
-                                </span>
-                            </div>
+                            {getProductDetailStats({
+                                pages: productById?.pages,
+                                publishedYear: productById?.publishedYear,
+                                rating: productRating,
+                            }).map((stat) => (
+                                <div className={`flex-col ${styles.stat}`} key={stat.id}>
+                                    <span className={styles.stat__value}>{stat.value}</span>
+                                    <span className={styles.stat__label}>{stat.label}</span>
+                                </div>
+                            ))}
                         </div>
 
                         <p className={styles.desc}>{productById?.description ?? TEXTS.DETAIL_DESC_PLACEHOLDER}</p>

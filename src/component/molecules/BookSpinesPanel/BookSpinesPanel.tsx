@@ -1,6 +1,6 @@
 import { type FC, memo } from 'react';
 
-import { BOOK_SPINES, TEXTS } from '../../../constants';
+import { BOOK_SPINES, TEXTS } from '~/constants';
 
 import styles from './BookSpinesPanel.module.css';
 

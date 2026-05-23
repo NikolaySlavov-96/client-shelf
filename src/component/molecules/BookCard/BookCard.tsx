@@ -1,14 +1,14 @@
 import { memo, type MouseEvent, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { BookCover, Button } from '../../atoms';
+import { BookCover, Button } from '~/component/atoms';
 
-import { getStatusLabel, ROUT_NAMES, TEXTS } from '../../../constants';
+import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
 
-import { cx } from '../../../Utils';
+import { cx } from '~/Utils';
 
-import { useStatuses } from '../../../hooks';
-import type { TViewType } from '../../../Types/Components';
+import { useStatuses } from '~/hooks';
+import type { TViewType } from '~/Types/Components';
 
 import styles from './BookCard.module.css';
 

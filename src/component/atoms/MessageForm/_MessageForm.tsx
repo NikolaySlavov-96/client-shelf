@@ -1,15 +1,15 @@
 import { memo, useCallback } from 'react';
 
-import { ESendEvents } from '../../../constants';
+import { ESendEvents } from '~/constants';
 
-import { useForm } from '../../../hooks';
-import { SocketService } from '../../../services';
+import { useForm } from '~/hooks';
+import { SocketService } from '~/services';
 import { InputForm } from '..';
 
 const DEFAUlT_BUTTON_LABEL = 'Send';
 
 const MessageForm = (props: any) => {
-    const { buttonLabel = DEFAUlT_BUTTON_LABEL, containerStyles, roomName, connectId } = props;
+    const { buttonLabel = DEFAUlT_BUTTON_LABEL, roomName, connectId } = props;
 
     const sendMessage = useCallback(
         (data: { message: string }) => {

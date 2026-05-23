@@ -1,11 +1,11 @@
 import { memo, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { VerifyStatusScreen } from '../../../organisms';
+import { VerifyStatusScreen } from '~/component/organisms';
 
-import { ROUT_NAMES, TEXTS } from '../../../../constants';
+import { ROUT_NAMES, TEXTS } from '~/constants';
 
-import { useStoreZ } from '../../../../hooks';
+import { useStoreZ } from '~/hooks';
 
 const VerifyAccount = () => {
     const navigate = useNavigate();

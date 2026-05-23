@@ -1,24 +1,29 @@
 import { type ChangeEvent, type FormEvent, memo, useCallback, useEffect, useState } from 'react';
 
-import { Button } from '../../atoms';
+import { Button } from '~/component/atoms';
 
-import { TEXTS } from '../../../constants';
+import { TEXTS } from '~/constants';
 
-import { useStoreZ } from '../../../hooks';
-import { InformationToast } from '../../../Toasts';
-import { ESwalIcon } from '../../../Types/Swal';
+import { useStoreZ } from '~/hooks';
+import { InformationToast } from '~/Toasts';
+import { ESwalIcon } from '~/Types/Swal';
 
+import {
+    CREATE_PRODUCT_FIELDS,
+    CREATE_PRODUCT_INITIAL_VALUES,
+    type TCreateProductTextField,
+} from './_CreateProduct.config';
 import styles from './_CreateProduct.module.css';
 
-// TODO: Nikolay -> Improve code with config
 const CreateProduct = () => {
     const { addProductWithImage, isProductAdded, isLoadingProductAddition } = useStoreZ();
 
-    const [author, setAuthor] = useState('');
-    const [productTitle, setProductTitle] = useState('');
-    const [genre, setGenre] = useState('');
+    const [values, setValues] = useState(CREATE_PRODUCT_INITIAL_VALUES);
     const [file, setFile] = useState<File | undefined>(undefined);
-    const [fileName, setFileName] = useState('');
+
+    const handleTextChange = useCallback((key: TCreateProductTextField, value: string) => {
+        setValues((prev) => ({ ...prev, [key]: value }));
+    }, []);
 
     const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const { target } = e;
@@ -31,9 +36,10 @@ const CreateProduct = () => {
         (e: FormEvent) => {
             e.preventDefault();
             if (!file) return;
+            const { author, productTitle, genre, fileName } = values;
             addProductWithImage({ author, productTitle, genre }, { file, name: fileName });
         },
-        [author, productTitle, genre, file, fileName, addProductWithImage],
+        [values, file, addProductWithImage],
     );
 
     useEffect(() => {
@@ -54,75 +60,32 @@ const CreateProduct = () => {
 
             <div className={styles.card}>
                 <form className={`flex-col ${styles.form}`} onSubmit={handleSubmit} noValidate>
-                    <div className={`flex-col ${styles.field}`}>
-                        <label className={styles.field__label} htmlFor="create-author">
-                            {TEXTS.CREATE_LABEL_AUTHOR}
-                        </label>
-                        <input
-                            id="create-author"
-                            className={styles.field__input}
-                            type="text"
-                            placeholder={TEXTS.CREATE_PLACEHOLDER_AUTHOR}
-                            value={author}
-                            onChange={(e) => setAuthor(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className={`flex-col ${styles.field}`}>
-                        <label className={styles.field__label} htmlFor="create-title">
-                            {TEXTS.CREATE_LABEL_TITLE}
-                        </label>
-                        <input
-                            id="create-title"
-                            className={styles.field__input}
-                            type="text"
-                            placeholder={TEXTS.CREATE_PLACEHOLDER_TITLE}
-                            value={productTitle}
-                            onChange={(e) => setProductTitle(e.target.value)}
-                            required
-                        />
-                    </div>
-
-                    <div className={`flex-col ${styles.field}`}>
-                        <label className={styles.field__label} htmlFor="create-genre">
-                            {TEXTS.CREATE_LABEL_GENRE}
-                        </label>
-                        <input
-                            id="create-genre"
-                            className={styles.field__input}
-                            type="text"
-                            placeholder={TEXTS.CREATE_PLACEHOLDER_GENRE}
-                            value={genre}
-                            onChange={(e) => setGenre(e.target.value)}
-                        />
-                    </div>
-
-                    <div className={`flex-col ${styles.field}`}>
-                        <label className={styles.field__label} htmlFor="create-image">
-                            {TEXTS.CREATE_LABEL_IMAGE}
-                        </label>
-                        <input
-                            id="create-image"
-                            className={styles.field__input}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                        />
-                    </div>
-
-                    <div className={`flex-col ${styles.field}`}>
-                        <label className={styles.field__label} htmlFor="create-src">
-                            {TEXTS.CREATE_LABEL_SRC}
-                        </label>
-                        <input
-                            id="create-src"
-                            className={styles.field__input}
-                            type="text"
-                            value={fileName}
-                            onChange={(e) => setFileName(e.target.value)}
-                        />
-                    </div>
+                    {CREATE_PRODUCT_FIELDS.map((field) => (
+                        <div className={`flex-col ${styles.field}`} key={field.id}>
+                            <label className={styles.field__label} htmlFor={field.id}>
+                                {field.label}
+                            </label>
+                            {field.kind === 'text' ? (
+                                <input
+                                    id={field.id}
+                                    className={styles.field__input}
+                                    type="text"
+                                    placeholder={field.placeholder}
+                                    value={values[field.key]}
+                                    onChange={(e) => handleTextChange(field.key, e.target.value)}
+                                    required={field.required}
+                                />
+                            ) : (
+                                <input
+                                    id={field.id}
+                                    className={styles.field__input}
+                                    type="file"
+                                    accept={field.accept}
+                                    onChange={handleFileChange}
+                                />
+                            )}
+                        </div>
+                    ))}
 
                     <Button
                         label={TEXTS.CREATE_BTN}
@@ -130,7 +93,7 @@ const CreateProduct = () => {
                         size="full"
                         type="submit"
                         isLoading={isLoadingProductAddition}
-                        isDisabled={!author || !productTitle || !file}
+                        isDisabled={!values.author || !values.productTitle || !file}
                     />
                 </form>
             </div>

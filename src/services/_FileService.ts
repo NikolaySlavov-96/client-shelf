@@ -3,5 +3,5 @@ import { type ISendFileRequest, type ISendFileResponse } from './FileService.int
 
 const PREFIX = '/file';
 
-export const sendFile = async (data: ISendFileRequest): Promise<ISendFileResponse> =>
+export const sendFile = (data: ISendFileRequest): Promise<ISendFileResponse> =>
     api.post(`${PREFIX}/addImage`, { inputData: data, isImage: true });

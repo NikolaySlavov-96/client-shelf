@@ -1,5 +1,3 @@
-// Application-owned profile resource. Identity fields (email/role/isVerify)
-// come from the auth store, not from here.
 export interface IProfile {
     userId: number;
     year: number;

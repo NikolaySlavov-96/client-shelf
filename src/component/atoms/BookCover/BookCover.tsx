@@ -13,10 +13,7 @@ interface IBookCoverProps {
     productTitle: string;
     fileUrl?: string;
     fileSrc?: string;
-    /** Sizing + how the title is shown. `detail` centers the title as a
-     * placeholder (only when there is no image); the rest overlay it. */
     variant?: TBookCoverVariant;
-    /** Rendered top-right, e.g. a status <Badge />. */
     children?: ReactNode;
     className?: string;
 }

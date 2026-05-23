@@ -1,9 +1,9 @@
 import { memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Button } from '../../atoms';
+import { Button } from '~/component/atoms';
 
-import { NOT_FOUND_SPINES, ROUT_NAMES, TEXTS } from '../../../constants';
+import { NOT_FOUND_SPINES, ROUT_NAMES, TEXTS } from '~/constants';
 
 import styles from './_NotFound.module.css';
 
