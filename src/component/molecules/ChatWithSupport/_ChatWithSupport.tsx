@@ -1,17 +1,14 @@
-import { Dispatch, FC, memo, SetStateAction, useCallback, useEffect, useRef } from "react";
+import { type Dispatch, type FC, memo, type SetStateAction, useCallback, useEffect, useRef } from 'react';
 
-import { ChatHeader, List, MessageForm, MessageLine } from "../../../component/atoms";
+import { ChatHeader, List, MessageForm, MessageLine } from '~/component/atoms';
 
-import { ToastWithButton } from "../../../Toasts";
+import { ESendEvents } from '~/constants';
 
-import { SocketService } from "../../../services";
-
-import { ESendEvents } from "../../../constants";
-import { SUPPORT_TOAST } from "../../../Configuration";
-
-import { useStoreZ } from "../../../hooks";
-
-import { IMessage } from "../../../Store/Slicers/SupportSlicer";
+import { SUPPORT_TOAST } from '~/Configuration';
+import { useStoreZ } from '~/hooks';
+import { SocketService } from '~/services';
+import { type IMessage } from '~/Store/Slicers/SupportSlicer';
+import { ToastWithButton } from '~/Toasts';
 
 import style from './_ChatWithSupport.module.css';
 
@@ -20,10 +17,10 @@ const DEFAULT_TITLE = 'Support Chat';
 const keyExtractor = (item: IMessage, index: number) => index.toString();
 
 interface IChatWihSupportProps {
-    onPress: Dispatch<SetStateAction<boolean>>
+    onPress: Dispatch<SetStateAction<boolean>>;
     roomName: string;
 }
-const _ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
+const ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
     const { onPress, roomName } = props;
 
     const messageEndRef = useRef<HTMLDivElement | null>(null);
@@ -32,20 +29,23 @@ const _ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
     const roomMessages = messages[roomName] || [];
 
     const onClose = useCallback(() => {
-        onPress(s => !s);
-        SocketService.sendData(ESendEvents.SUPPORT_CHAT_USER_LEAVE, { roomName, connectId, });
+        onPress((s) => !s);
+        SocketService.sendData(ESendEvents.SUPPORT_CHAT_USER_LEAVE, { roomName, connectId });
     }, [onPress, roomName, connectId]);
 
     const onVerifyChoice = useCallback(async () => {
         const result = await ToastWithButton(SUPPORT_TOAST);
         if (result?.isConfirmed) {
-            onClose()
+            onClose();
         }
     }, [onClose]);
 
-    const renderItem = useCallback(({ item }: { item: IMessage }) => {
-        return (<MessageLine {...item} connectId={connectId} />);
-    }, [connectId]);
+    const renderItem = useCallback(
+        ({ item }: { item: IMessage }) => {
+            return <MessageLine {...item} connectId={connectId} />;
+        },
+        [connectId],
+    );
 
     const scrollToBottom = () => {
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -58,25 +58,21 @@ const _ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
     return (
         <>
             <ChatHeader>
-                <p>{!!roomName ? roomName : DEFAULT_TITLE}</p>
+                <p>{roomName ? roomName : DEFAULT_TITLE}</p>
                 <button onClick={onVerifyChoice}>{'X'}</button>
             </ChatHeader>
             <div className={style['chat__container']}>
                 <p className={style['welcome__message']}>{welcomeMessage}</p>
-                <List
-                    data={roomMessages}
-                    renderItem={renderItem}
-                    keyExtractor={keyExtractor}
-                />
+                <List data={roomMessages} renderItem={renderItem} keyExtractor={keyExtractor} />
                 <div ref={messageEndRef} />
             </div>
-            {!!roomName ? (
+            {roomName ? (
                 <div className={style['input__container']}>
                     <MessageForm roomName={roomName} connectId={connectId} />
                 </div>
             ) : null}
         </>
     );
-}
+};
 
-export default memo(_ChatWithSupport);
+export default memo(ChatWithSupport);

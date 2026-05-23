@@ -1,112 +1,109 @@
-import { memo, useCallback, useEffect, useState } from 'react';
+import { type ChangeEvent, type FormEvent, memo, useCallback, useEffect, useState } from 'react';
 
-import { InputField, InputForm, SectionTitle } from '../../atoms';
+import { Button, List } from '~/component/atoms';
 
-import { InformationToast } from '../../../Toasts';
-import { ESwalIcon } from '../../../Types/Swal';
+import { TEXTS } from '~/constants';
 
-import { useStoreZ } from '../../../hooks';
+import { useStoreZ } from '~/hooks';
+import { InformationToast } from '~/Toasts';
+import { ESwalIcon } from '~/Types/Swal';
 
-import { E_FORM_FIELDS, E_FORM_NAMES } from '../../../constants';
+import {
+    CREATE_PRODUCT_FIELDS,
+    CREATE_PRODUCT_INITIAL_VALUES,
+    type TCreateProductTextField,
+} from './_CreateProduct.config';
+import styles from './_CreateProduct.module.css';
 
-import style from './_CreateProduct.module.css';
+const CreateProduct = () => {
+    const { addProductWithImage, isProductAdded, isLoadingProductAddition } = useStoreZ();
 
-const SECTION_TITLE = 'Added new book';
-const BUTTON_LABEL = 'Create new Book';
-const SUCCESS_MESSAGE = "Successfully added picture";
+    const [values, setValues] = useState(CREATE_PRODUCT_INITIAL_VALUES);
+    const [file, setFile] = useState<File | undefined>(undefined);
 
-const _CreateProduct = () => {
-    const { addProductWithImage, isProductAdded, isLoadingProductAddition, search } = useStoreZ();
+    const handleTextChange = useCallback((key: TCreateProductTextField, value: string) => {
+        setValues((prev) => ({ ...prev, [key]: value }));
+    }, []);
 
-    const [file, setFile] = useState<File>();
-    const [name, setName] = useState('');
-
-    const changeHandlerImage = (e: any) => {
-        const target = e.target;
-        if (target.type === 'file') {
+    const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        const { target } = e;
+        if (target.files && target.files[0]) {
             setFile(target.files[0]);
-        } else {
-            setName(target.value);
         }
-    };
+    }, []);
 
-    const onCreateNewBook = useCallback(() => {
-        if (!file) { return }
-
-        const getValue = search?.get(E_FORM_NAMES.CREATE_BOOK || '')?.fields;
-
-        const author = getValue?.get(E_FORM_FIELDS.AUTHOR) || '';
-        const productTitle = getValue?.get(E_FORM_FIELDS.PRODUCT_TITLE) || '';
-        const genre = getValue?.get(E_FORM_FIELDS.GENRE) || '';
-
-        addProductWithImage({ author, productTitle, genre }, { file, name });
-    }, [name, file, addProductWithImage, search]);
+    const handleSubmit = useCallback(
+        (e: FormEvent) => {
+            e.preventDefault();
+            if (!file) return;
+            const { author, productTitle, genre, fileName } = values;
+            addProductWithImage({ author, productTitle, genre }, { file, name: fileName });
+        },
+        [values, file, addProductWithImage],
+    );
 
     useEffect(() => {
         if (!isLoadingProductAddition) {
             if (!isProductAdded) {
-                InformationToast({ title: 'err.message', typeIcon: ESwalIcon.ERROR });
+                InformationToast({ title: TEXTS.TOAST_GENERIC_ERROR, typeIcon: ESwalIcon.ERROR });
                 return;
             }
-            InformationToast({ title: SUCCESS_MESSAGE, typeIcon: ESwalIcon.SUCCESS });
+            InformationToast({ title: TEXTS.TOAST_IMAGE_SUCCESS, typeIcon: ESwalIcon.SUCCESS });
         }
-    }, [isLoadingProductAddition, isProductAdded])
-
-    if (isLoadingProductAddition) {
-        // Added Loader screen
-    }
+    }, [isLoadingProductAddition, isProductAdded]);
 
     return (
-        <section className={`section ${style["create__section"]}`}>
+        <main className={styles.wrap}>
+            <header className={styles.header}>
+                <h1 className={styles.header__title}>{TEXTS.CREATE_TITLE}</h1>
+            </header>
 
-            <SectionTitle content={SECTION_TITLE} />
-
-            <div className={`form__container global__bg-radius`}>
-                <InputForm
-                    onSubmit={onCreateNewBook}
-                    buttonLabel={BUTTON_LABEL}
-                >
-                    <InputField
-                        label='Author Name:'
-                        name='author'
-                        formName={E_FORM_NAMES.CREATE_BOOK}
-                        placeholder='Author Name'
+            <div className={styles.card}>
+                <form className={`flex-col ${styles.form}`} onSubmit={handleSubmit} noValidate>
+                    <List
+                        data={CREATE_PRODUCT_FIELDS}
+                        keyExtractor={(field) => field.id}
+                        style="flex-col"
+                        renderItem={({ item: field }) => (
+                            <div className={`flex-col ${styles.field}`}>
+                                <label className={styles.field__label} htmlFor={field.id}>
+                                    {field.label}
+                                </label>
+                                {field.kind === 'text' ? (
+                                    <input
+                                        id={field.id}
+                                        className={styles.field__input}
+                                        type="text"
+                                        placeholder={field.placeholder}
+                                        value={values[field.key]}
+                                        onChange={(e) => handleTextChange(field.key, e.target.value)}
+                                        required={field.required}
+                                    />
+                                ) : (
+                                    <input
+                                        id={field.id}
+                                        className={styles.field__input}
+                                        type="file"
+                                        accept={field.accept}
+                                        onChange={handleFileChange}
+                                    />
+                                )}
+                            </div>
+                        )}
                     />
 
-                    <InputField
-                        label='Book title:'
-                        name='productTitle'
-                        formName={E_FORM_NAMES.CREATE_BOOK}
-                        placeholder='Book title'
+                    <Button
+                        label={TEXTS.CREATE_BTN}
+                        variant="primary"
+                        size="full"
+                        type="submit"
+                        isLoading={isLoadingProductAddition}
+                        isDisabled={!values.author || !values.productTitle || !file}
                     />
-
-                    <InputField
-                        label='Book genre:'
-                        name='genre'
-                        formName={E_FORM_NAMES.CREATE_BOOK}
-                        placeholder='Book genre'
-                    />
-
-                    <InputField
-                        label='Image:'
-                        name='image'
-                        onBlur={changeHandlerImage}
-                        onChange={changeHandlerImage}
-                        type='file'
-                    />
-
-                    <InputField
-                        label='src:'
-                        name='src'
-                        onBlur={changeHandlerImage}
-                        onChange={changeHandlerImage}
-                        value={name}
-                    />
-
-                </InputForm>
-            </div >
-        </section >
+                </form>
+            </div>
+        </main>
     );
-}
+};
 
-export default memo(_CreateProduct);
+export default memo(CreateProduct);

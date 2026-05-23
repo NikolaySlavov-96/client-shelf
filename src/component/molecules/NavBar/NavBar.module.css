@@ -1,0 +1,103 @@
+.nav {
+  height: var(--nav-height);
+  background: var(--cream);
+  border-bottom: var(--border-default);
+  padding: 0 var(--spacing-40);
+  z-index: var(--z-nav);
+}
+
+.nav__logo {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  color: var(--ink);
+  gap: var(--spacing-8);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.nav__logo-accent {
+  color: var(--accent);
+}
+
+.nav__search-trigger {
+  gap: var(--spacing-8);
+  padding: var(--spacing-8) var(--spacing-16);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  font-size: var(--text-md);
+  color: var(--ink-3);
+  min-width: var(--search-trigger-min-width);
+  transition: var(--transition-base);
+  cursor: pointer;
+}
+
+.nav__search-trigger:hover {
+  border-color: var(--accent-2);
+}
+
+.nav__search-icon {
+  font-size: var(--text-lg);
+  opacity: var(--opacity-muted);
+  flex-shrink: 0;
+}
+
+.nav__user {
+  gap: var(--spacing-8);
+  cursor: pointer;
+}
+
+.nav__name {
+  font-size: var(--text-md);
+  color: var(--ink-2);
+  transition: var(--transition-fast);
+}
+
+.nav__name:hover {
+  color: var(--accent);
+}
+
+.nav__links {
+  gap: var(--spacing-8);
+}
+
+/* Hamburger — mobile */
+.nav__toggle {
+  display: none;
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: var(--border-default);
+  background: transparent;
+  cursor: pointer;
+  font-size: var(--text-xl);
+  color: var(--ink-2);
+}
+
+@media (max-width: 639px) {
+  .nav {
+    padding: 0 var(--spacing-16);
+  }
+
+  .nav__links {
+    display: none;
+  }
+
+  .nav__toggle {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav__links--open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    background: var(--cream);
+    border-bottom: var(--border-default);
+    padding: var(--spacing-16);
+    gap: var(--spacing-8);
+    z-index: var(--z-dropdown);
+  }
+}

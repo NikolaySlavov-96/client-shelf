@@ -1,15 +1,18 @@
 .container {
-  max-width: 350px;
-  max-height: 400px;
-  min-width: 300px;
-  background-color: var(--secondary-text);
+  max-width: var(--chat-float-max-width);
+  max-height: var(--chat-panel-height);
+  min-width: var(--chat-float-min-width);
+  background: var(--white);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-window);
   position: fixed;
-  right: 10px;
-  bottom: 10px;
+  right: var(--spacing-12);
+  bottom: var(--spacing-12);
   overflow: hidden;
-  border-radius: 10px;
+  z-index: var(--z-chat);
 }
 
 .border__open {
-  border-radius: 10px 10px 0 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }

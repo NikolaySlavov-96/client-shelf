@@ -4,5 +4,5 @@ export const SUPPORT_TOAST = {
     isCancelButton: true,
     isConfirmButton: true,
     confirmButtonTitle: 'Ok',
-    cancelButtonTitle: 'Cancel'
-}
+    cancelButtonTitle: 'Cancel',
+};

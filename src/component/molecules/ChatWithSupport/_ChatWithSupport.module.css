@@ -1,5 +1,5 @@
 .chat__container {
-  height: 300px;
+  height: var(--chat-height);
   overflow-y: auto;
   overflow-x: hidden;
   box-sizing: border-box;
@@ -9,7 +9,7 @@
 .send__input-button {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
+  padding: var(--spacing-10);
 }
 
 .welcome__message {
@@ -17,6 +17,6 @@
 }
 
 .input__container {
-  padding: 4px;
+  padding: var(--spacing-4);
   text-align: center;
 }

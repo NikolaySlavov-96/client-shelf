@@ -1,14 +1,13 @@
-import Swal from 'sweetalert2';
-
-import { IToastGlobal } from './ToastInterface';
-
+import { Swal } from '../lib/toast';
 import { ESwalIcon } from '../Types/Swal';
+
+import { type IToastGlobal } from './ToastInterface';
 
 const BUTTON_COLORS = {
     CONFIRM: 'red',
     DENY: 'yellow',
-    CANCEL: 'gree'
-}
+    CANCEL: 'green',
+};
 
 interface ITostWithButton extends Omit<IToastGlobal, 'typeIcon'> {
     cancelButtonTitle?: string;
@@ -55,9 +54,9 @@ const _ToastWithButton = async (props: ITostWithButton) => {
         // toast: false,
         showLoaderOnConfirm: false,
         showLoaderOnDeny: false,
-    }
+    };
 
     return await Swal.fire(renderData);
-}
+};
 
 export default _ToastWithButton;

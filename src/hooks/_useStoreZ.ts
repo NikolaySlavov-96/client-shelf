@@ -1,23 +1,40 @@
-import { create } from "zustand";
-import { persist } from 'zustand/middleware';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
-import createCommonSlicer, { ICommonSlicer } from "../Store/Slicers/CommonSlicer";
-import createModalSlicer, { IModalSlicer } from "../Store/Slicers/ModalSlicer";
-import createSupportSlicer, { ISupportSlicer } from "../Store/Slicers/SupportSlicer";
-import createProductSlicer, { IProductSlicer } from "../Store/Slicers/ProductSlicer";
+import createAuthSlicer, { type IAuthSlicer } from '../Store/Slicers/AuthSlicer';
+import createCommonSlicer, { type ICommonSlicer } from '../Store/Slicers/CommonSlicer';
+import createModalSlicer, { type IModalSlicer } from '../Store/Slicers/ModalSlicer';
+import createProductSlicer, { type IProductSlicer } from '../Store/Slicers/ProductSlicer';
+import createProfileSlicer, { type IProfileSlicer } from '../Store/Slicers/ProfileSlicer';
+import createSupportSlicer, { type ISupportSlicer } from '../Store/Slicers/SupportSlicer';
 
-import { STORAGE_KEYS } from "../constants";
+type TStoreState = IAuthSlicer & IModalSlicer & ISupportSlicer & ICommonSlicer & IProductSlicer & IProfileSlicer;
 
-// const commonSlicerPersist = persist(createCommonSlicer, {
-//     name: STORAGE_KEYS.CONNECT_ID
-// })
-type StoreState = IModalSlicer & ISupportSlicer & ICommonSlicer & IProductSlicer;
-
-const _useStoreZ = create<StoreState>((set, get, store) => ({
-    ...createModalSlicer(set, get, store),
-    ...createSupportSlicer(set, get, store),
-    ...createCommonSlicer(set, get, store),
-    ...createProductSlicer(set, get, store),
-}));
+const _useStoreZ = create<TStoreState>()(
+    persist(
+        (set, get, store) => ({
+            ...createAuthSlicer(set, get, store),
+            ...createModalSlicer(set, get, store),
+            ...createSupportSlicer(set, get, store),
+            ...createCommonSlicer(set, get, store),
+            ...createProductSlicer(set, get, store),
+            ...createProfileSlicer(set, get, store),
+        }),
+        {
+            name: '@Product_AuthState',
+            storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({
+                email: state.email,
+                token: state.token,
+                refreshToken: state.refreshToken,
+                userId: state.userId,
+                userRole: state.userRole,
+                isAuthenticated: state.isAuthenticated,
+                isVerifyUser: state.isVerifyUser,
+                viewType: state.viewType,
+            }),
+        },
+    ),
+);
 
 export default _useStoreZ;

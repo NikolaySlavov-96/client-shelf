@@ -1,0 +1,23 @@
+.avatar {
+  border-radius: var(--radius-full);
+  background: var(--accent-light);
+  border: var(--border-8-accent-2);
+  font-weight: var(--font-weight-medium);
+  color: var(--accent);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.avatar--sm {
+  width: var(--avatar-sm);
+  height: var(--avatar-sm);
+  font-size: var(--text-sm);
+}
+
+.avatar--lg {
+  width: var(--avatar-lg);
+  height: var(--avatar-lg);
+  font-size: var(--text-3xl);
+  font-family: var(--font-serif);
+  border-width: var(--spacing-4);
+}

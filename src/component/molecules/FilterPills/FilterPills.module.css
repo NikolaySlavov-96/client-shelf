@@ -1,0 +1,34 @@
+.container {
+  display: flex;
+  gap: var(--spacing-8);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-20);
+}
+
+.pill {
+  padding: var(--spacing-8) var(--spacing-16);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  border: var(--border-default);
+  background: var(--white);
+  color: var(--ink-2);
+  transition: var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.pill:hover {
+  border-color: var(--accent-2);
+  color: var(--accent);
+}
+
+.pill--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--white);
+}
+
+.pill--active:hover {
+  color: var(--white);
+  border-color: var(--accent);
+}

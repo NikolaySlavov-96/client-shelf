@@ -1,0 +1,1 @@
+../ai-blueprint/.claude/rules/frontend/react.md

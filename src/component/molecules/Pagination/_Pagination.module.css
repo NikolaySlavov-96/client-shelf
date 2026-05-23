@@ -1,16 +1,38 @@
 .container {
-  width: 100%;
+  flex-wrap: wrap;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-24);
+  font-family: var(--font-sans);
+}
+
+/* Размери само за елементите на пагинацията (бутони + текуща страница) */
+.pageSize {
+  padding: var(--spacing-4) var(--spacing-12);
 }
 
 .page {
-  padding: 5px 10px;
-  border: 1px solid black;
-  border-radius: 4px;
-  margin: 0.2rem;
+  border: var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--ink-2);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.page:hover {
+  border-color: var(--accent-2);
+  color: var(--accent);
 }
 
 .current__page {
-  display: inline-block;
-  background-color: var(--primary-accent);
-  padding: 8px 14px;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--white);
+  font-weight: var(--font-weight-medium);
+}
+
+.current__page:hover {
+  color: var(--white);
+  border-color: var(--accent);
 }

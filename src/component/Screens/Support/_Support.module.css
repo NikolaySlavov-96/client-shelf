@@ -1,55 +1,91 @@
 .container {
   display: flex;
   flex-wrap: wrap;
-  margin: 20px;
+  gap: var(--spacing-20);
+  padding: var(--spacing-20);
+  max-width: var(--page-max);
+  margin: 0 auto;
 }
 
 .chat__container {
-  max-height: 400px;
+  max-height: var(--chat-panel-height);
   width: 40%;
-  max-width: 400px;
-  margin-right: 20px;
-  background-color: var(--secondary-text);
+  max-width: var(--chat-panel-height);
+  background: var(--white);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  border-radius: 10px;
+  box-shadow: var(--shadow-card);
 }
 
 .list-chat__container {
-  height: 400px;
+  height: var(--chat-panel-height);
+  overflow-y: auto;
 }
 
-/* Room Line (Header) */
-.message__container {
-  height: 400px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
+/* Rooms / messages */
 .room__container {
-  width: 52%;
+  flex: 1;
+  min-width: var(--support-room-min-width);
 }
 
 .room__header {
-  background-color: var(--primary-accent);
-  height: 40px;
-  align-content: center;
-  margin-bottom: 20px;
-  overflow: auto;
-  box-sizing: border-box;
+  background: var(--cream-2);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-8) var(--spacing-12);
+  margin-bottom: var(--spacing-16);
+  display: flex;
+  gap: var(--spacing-8);
+  overflow-x: auto;
+}
+
+.room__header button {
+  padding: var(--spacing-4) var(--spacing-12);
+  border-radius: var(--radius-sm);
+  border: var(--border-default);
+  background: var(--white);
+  color: var(--ink-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
 }
 
 .room__header button:hover {
-  background-color: wheat;
+  background: var(--accent-light);
+  border-color: var(--accent-2);
+  color: var(--accent);
 }
 
 .room__header button:active {
-  background-color: red;
+  background: var(--accent);
+  color: var(--white);
+  border-color: var(--accent);
+}
+
+.message__container {
+  flex: 1;
+  background: var(--white);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  min-height: var(--chat-panel-height);
 }
 
 .chat__window {
-  background-color: antiquewhite;
-  height: 80%;
+  flex: 1;
+  background: var(--cream);
+  padding: var(--spacing-12);
   overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .chat__container {
+    width: 100%;
+    max-width: none;
+  }
 }

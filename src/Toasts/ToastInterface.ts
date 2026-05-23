@@ -1,4 +1,4 @@
-import { ESwalIcon } from "../Types/Swal";
+import { type ESwalIcon } from '../Types/Swal';
 
 export interface IToastGlobal {
     typeIcon: ESwalIcon;

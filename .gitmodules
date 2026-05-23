@@ -1,0 +1,3 @@
+[submodule "ai-blueprint"]
+	path = ai-blueprint
+	url = https://github.com/nnsn-pro/ai-blueprint

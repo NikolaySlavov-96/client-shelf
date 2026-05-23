@@ -1,2 +1,2 @@
-export { IListProps } from './ListProps';
-export { TViewType } from './ProductCards';
+export type { IListProps } from './ListProps';
+export type { TViewType } from './ProductCards';

@@ -5,7 +5,7 @@ In it you can add book from any user with an account. You can view the project a
 
 #Functionality
 
-If you are a user with account you can create Book or adding already exsisting book in your collection with tags read, for-reading, purchase, for-purcase and listening. 
+If you are a user with account you can create Book or adding already exsisting book in your collection with tags read, for-reading, purchase, for-purcase and listening.
 Guest can view only exsistings books.
 
 The application uses API with address: ... which uses for database mongo atlas. Repository of API can be view in: https://github.com/NikolaySlavov-96/API-Book-Library
@@ -14,7 +14,6 @@ with fundamental paths: /book/ and /auth/
 #Using of application
 
 You can clone or download repository and then you only need to download all the library with npm install. This application using localstorage in your browser.
-
 
 # Getting Started with Create React App
 

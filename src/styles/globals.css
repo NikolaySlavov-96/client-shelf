@@ -1,0 +1,611 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ===== RESET ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-sans);
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+  /* --- Colors --- */
+  --ink: #1a1714;
+  --ink-2: #5a5550;
+  --ink-3: #9c9690;
+  --cream: #faf8f4;
+  --cream-2: #f3f0ea;
+  --cream-3: #ebe6dd;
+  --accent: #8b5e3c;
+  --accent-hover: #7a5234;
+  --accent-2: #c49a6c;
+  --accent-light: #f5ece3;
+  --white: #ffffff;
+  --border: color-mix(in srgb, var(--ink-2) 15%, transparent);
+  --border-med: color-mix(in srgb, var(--ink-2) 25%, transparent);
+  --overlay: rgba(20, 18, 16, 0.55);
+  --error: #df4402;
+  --select-hover: #ff7300;
+  --deco-accent-2: color-mix(in srgb, var(--accent-2) 8%, transparent);
+  --deco-accent: color-mix(in srgb, var(--accent) 10%, transparent);
+  --white-muted: color-mix(in srgb, var(--white) 45%, transparent);
+
+  /* Status — light (for badges in lists) */
+  --status-read-bg: #d1fae5;
+  --status-read-text: #065f46;
+  --status-reading-bg: #dcfce7;
+  --status-reading-text: #14532d;
+  --status-want-bg: #e0e7ff;
+  --status-want-text: #3730a3;
+  --status-listening-bg: #ffedd5;
+  --status-listening-text: #9a3412;
+  --status-listened-bg: #fef3c7;
+  --status-listened-text: #78350f;
+
+  /* Status — solid (for badges on book covers) */
+  --status-reading-solid: rgba(45, 106, 79, 0.9);
+  --status-read-solid: rgba(27, 67, 50, 0.9);
+  --status-want-solid: rgba(92, 107, 192, 0.9);
+  --status-listening-solid: rgba(230, 126, 34, 0.9);
+  --status-listened-solid: rgba(160, 64, 0, 0.9);
+
+  /* --- Typography --- */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --line-height-base: 1.5;
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.4;
+  --line-height-loose: 1.7;
+  --line-height-none: 1;
+
+  /* Letter spacing (tracking) */
+  --tracking-tight: 0.02em;
+  --tracking-snug: 0.03em;
+  --tracking-normal: 0.05em;
+  --tracking-wide: 0.06em;
+  --tracking-wider: 0.08em;
+
+  /* Font sizes */
+  --text-xs: var(--spacing-10);
+  --text-sm: var(--spacing-12);
+  --text-md: var(--spacing-14);
+  --text-lg: var(--spacing-16);
+  --text-xl: 18px;
+  --text-2xl: 22px;
+  --text-3xl: 26px;
+  --text-4xl: var(--spacing-28);
+  --text-5xl: 30px;
+  --text-6xl: var(--spacing-32);
+  --text-7xl: var(--spacing-40);
+
+  /* Font weights */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+  --font-weight-extra-bold: 700;
+
+  /* --- Spacing --- */
+  --spacing-2: 2px;
+  --spacing-4: 4px;
+  --spacing-6: 6px;
+  --spacing-8: 8px;
+  --spacing-10: 10px;
+  --spacing-12: 12px;
+  --spacing-14: 14px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-28: 28px;
+  --spacing-32: 32px;
+  --spacing-36: 36px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-56: 56px;
+  --spacing-60: 60px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+
+  /* --- Component sizes --- */
+  --avatar-sm: var(--spacing-32);
+  --avatar-lg: 88px;
+  --scrollbar-width: var(--spacing-6);
+  --select-sm: 70px;
+  --select-md: 240px;
+  --product-card-size: 300px;
+  --login-panel-width: 420px;
+  --login-card-width: 340px;
+  --login-deco-lg: 320px;
+  --login-deco-md: var(--select-md);
+  --icon-input-offset: 38px;
+  --search-modal-width: 580px;
+  --search-modal-results-height: 380px;
+  --grid-min-160: 160px;
+  --grid-min-180: 180px;
+  --book-cover-grid: 200px;
+  --book-cover-shelf: 190px;
+  --book-cover-detail: 300px;
+  --book-cover-detail-sm: 240px;
+  --detail-cover-col: 220px;
+  --product-img-w: 200px;
+  --product-img-h: 100px;
+  --goal-input-width: 72px;
+  --search-input-width: var(--select-md);
+  --search-input-height: 22px;
+  --search-btn-width: var(--spacing-80);
+  --search-btn-height: 26px;
+  --search-trigger-min-width: 200px;
+  --chat-height: 300px;
+  --chat-panel-height: 400px;
+  --chat-float-max-width: 350px;
+  --chat-float-min-width: 300px;
+  --support-room-min-width: 320px;
+
+  /* --- Z-index --- */
+  --z-dropdown: 99;
+  --z-nav: 100;
+  --z-chat: 200;
+  --z-modal: 300;
+
+  /* --- Border radius --- */
+  --radius-xs: var(--spacing-4);
+  --radius-sm: var(--spacing-6);
+  --radius-md: var(--spacing-8);
+  --radius-lg: var(--spacing-10);
+  --radius-xl: var(--spacing-12);
+  --radius-2xl: var(--spacing-16);
+  --radius-pill: var(--spacing-20);
+  --radius-full: 50%;
+
+  /* --- Composite border tokens --- */
+  --border-default: 1px solid var(--border);
+  --border-med-default: 1px solid var(--border-med);
+  --border-accent: 1px solid var(--accent);
+  --border-accent-2: 1px solid var(--accent-2);
+  --border-transparent: 1px solid transparent;
+  --border-2-transparent: 2px solid transparent;
+  --border-2-accent: 2px solid var(--accent);
+  --border-8-accent-2: var(--spacing-8) solid var(--accent-2);
+
+  /* --- Opacity --- */
+  --opacity-disabled: 0.5;
+  --opacity-muted: 0.6;
+  --opacity-faint: 0.4;
+  --opacity-high: 0.9;
+  --opacity-low: 0.1;
+
+  /* --- Shadows --- */
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.07);
+  --shadow-tab: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-focus: 0 0 0 3px color-mix(in srgb, var(--accent-2) 12%, transparent);
+  --shadow-window: 0 0 10px rgba(0, 0, 0, 0.3);
+
+  /* --- Transitions --- */
+  --transition-fast: all 0.12s;
+  --transition-base: all 0.15s;
+  --transition-slow: all 0.2s;
+
+  /* Durations (for property-specific transitions / animations) */
+  --duration-bar: 0.4s;
+  --duration-fade: 1s;
+  --duration-skeleton: 2.5s;
+
+  /* --- Layout --- */
+  --nav-height: var(--spacing-60);
+  --page-max: 1140px;
+  --page-max-md: 1100px;
+  --page-max-sm: 1000px;
+  --page-max-form: 640px;
+  --hairline: 1px;
+}
+
+/* ===== GLOBAL BASE ===== */
+body {
+  font-family: var(--font-sans);
+  background: var(--cream);
+  color: var(--ink);
+  font-size: var(--text-md);
+  line-height: var(--line-height-base);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== ACCESSIBILITY ===== */
+.sr-only {
+  position: absolute;
+  width: var(--hairline);
+  height: var(--hairline);
+  padding: 0;
+  margin: calc(-1 * var(--hairline));
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== LAYOUT UTILITIES ===== */
+.flex {
+  display: flex;
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flex-start {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.flex-align {
+  display: flex;
+  align-items: center;
+}
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+.flex-1 {
+  flex: 1;
+}
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+.grid-auto-fill-180 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-min-180), 1fr));
+  gap: var(--spacing-20);
+}
+
+.grid-auto-fill-160 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--grid-min-160), 1fr));
+  gap: var(--spacing-20);
+}
+
+.grid-detail {
+  display: grid;
+  grid-template-columns: var(--detail-cover-col) 1fr;
+  gap: var(--spacing-48);
+  align-items: start;
+}
+
+/* ===== SPACING UTILITIES ===== */
+.gap-1 {
+  gap: var(--spacing-4);
+}
+.gap-2 {
+  gap: var(--spacing-8);
+}
+.gap-3 {
+  gap: var(--spacing-12);
+}
+.gap-4 {
+  gap: var(--spacing-16);
+}
+.gap-5 {
+  gap: var(--spacing-20);
+}
+.gap-6 {
+  gap: var(--spacing-24);
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+.mb-auto {
+  margin-bottom: auto;
+}
+
+/* ===== TYPOGRAPHY UTILITIES ===== */
+.text-serif {
+  font-family: var(--font-serif);
+}
+.text-sans {
+  font-family: var(--font-sans);
+}
+
+.text-xs {
+  font-size: var(--text-xs);
+}
+.text-sm {
+  font-size: var(--text-sm);
+}
+.text-md {
+  font-size: var(--text-md);
+}
+.text-lg {
+  font-size: var(--text-lg);
+}
+.text-xl {
+  font-size: var(--text-xl);
+}
+.text-2xl {
+  font-size: var(--text-2xl);
+}
+.text-3xl {
+  font-size: var(--text-3xl);
+}
+.text-4xl {
+  font-size: var(--text-4xl);
+}
+.text-5xl {
+  font-size: var(--text-5xl);
+}
+.text-6xl {
+  font-size: var(--text-6xl);
+}
+.text-7xl {
+  font-size: var(--text-7xl);
+}
+
+.text-muted {
+  color: var(--ink-3);
+}
+.text-secondary {
+  color: var(--ink-2);
+}
+.text-accent {
+  color: var(--accent);
+}
+.text-white {
+  color: var(--white);
+}
+.text-ink {
+  color: var(--ink);
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.text-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.text-center {
+  text-align: center;
+}
+
+.font-light {
+  font-weight: var(--font-weight-light);
+}
+.font-regular {
+  font-weight: var(--font-weight-regular);
+}
+.font-medium {
+  font-weight: var(--font-weight-medium);
+}
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.line-tight {
+  line-height: var(--line-height-tight);
+}
+
+/* ===== VISUAL UTILITIES ===== */
+.rounded-sm {
+  border-radius: var(--radius-sm);
+}
+.rounded-md {
+  border-radius: var(--radius-md);
+}
+.rounded-lg {
+  border-radius: var(--radius-lg);
+}
+.rounded-xl {
+  border-radius: var(--radius-xl);
+}
+.rounded-2xl {
+  border-radius: var(--radius-2xl);
+}
+.rounded-pill {
+  border-radius: var(--radius-pill);
+}
+.rounded-full {
+  border-radius: var(--radius-full);
+}
+
+.border-default {
+  border: var(--border-default);
+}
+.border-med {
+  border: var(--border-med-default);
+}
+.border-accent {
+  border: var(--border-accent);
+}
+.border-accent-2 {
+  border: var(--border-accent-2);
+}
+.border-bottom {
+  border-bottom: var(--border-default);
+}
+
+.bg-cream {
+  background: var(--cream);
+}
+.bg-cream-2 {
+  background: var(--cream-2);
+}
+.bg-cream-3 {
+  background: var(--cream-3);
+}
+.bg-white {
+  background: var(--white);
+}
+.bg-accent {
+  background: var(--accent);
+}
+.bg-accent-light {
+  background: var(--accent-light);
+}
+.bg-ink {
+  background: var(--ink);
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+.shadow-window {
+  box-shadow: var(--shadow-window);
+}
+
+.transition-base {
+  transition: var(--transition-base);
+}
+.transition-fast {
+  transition: var(--transition-fast);
+}
+
+/* ===== POSITIONING UTILITIES ===== */
+.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+.sticky-top {
+  position: sticky;
+  top: 0;
+}
+.z-nav {
+  z-index: var(--z-nav);
+}
+.z-modal {
+  z-index: var(--z-modal);
+}
+
+.absolute-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* ===== PAGE LAYOUT ===== */
+.page-wrap {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--spacing-36) var(--spacing-40);
+}
+
+.page-wrap--narrow {
+  max-width: var(--page-max-sm);
+  margin: 0 auto;
+  padding: var(--spacing-36) var(--spacing-40);
+}
+
+/* ===== DISABLED / COMING SOON ===== */
+.coming-soon {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-6));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.25s ease;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 639px) {
+  .page-wrap,
+  .page-wrap--narrow {
+    padding: var(--spacing-16) var(--spacing-16);
+  }
+
+  .grid-auto-fill-180 {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .grid-detail {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 640px) {
+  .page-wrap,
+  .page-wrap--narrow {
+    padding: var(--spacing-24) var(--spacing-24);
+  }
+}
+
+@media (min-width: 1024px) {
+  .page-wrap,
+  .page-wrap--narrow {
+    padding: var(--spacing-36) var(--spacing-40);
+  }
+}

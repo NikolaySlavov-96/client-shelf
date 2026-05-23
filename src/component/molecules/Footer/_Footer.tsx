@@ -1,23 +1,19 @@
-import { FC, memo, ReactNode } from 'react';
+import { memo } from 'react';
 
-import { LinkedParagraph } from '../../molecules';
+import { LinkedParagraph } from '~/component/molecules';
 
 import style from './_Footer.module.css';
 
 const FOOTED_CONTENT = {
     LINK: 'https://nnsn.pro',
     BUTTON_LABEL: 'NNSN',
-    CONTENT: 'Designed and Implement from '
-}
+    CONTENT: 'Designed and Implement from ',
+};
 
-interface IFooterProps {
-    children: ReactNode
-}
-
-const _Footer: FC<IFooterProps> = () => {
+const _Footer = () => {
     return (
-        <footer className={`global__bg-radius ${style['footer_container']}`}>
-            <div className={`${style['div']}`}>
+        <footer className={style.footer}>
+            <div className={style.inner}>
                 <LinkedParagraph
                     staticContent={FOOTED_CONTENT.CONTENT}
                     to={FOOTED_CONTENT.LINK}
@@ -26,6 +22,6 @@ const _Footer: FC<IFooterProps> = () => {
             </div>
         </footer>
     );
-}
+};
 
 export default memo(_Footer);

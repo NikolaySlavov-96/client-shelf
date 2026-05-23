@@ -1,107 +1,178 @@
-import { memo, useCallback, useEffect, useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom"
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { IconActionButton } from "../../../atoms";
-import { ProductDetails, Select } from "../../../molecules";
+import { Badge, BookCover, Button, List, StarRating } from '~/component/atoms';
 
-import { ProductDetailSkeleton, SelectSkeleton } from "../../../../Skeleton/molecules";
+import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
 
-import { useAuthContext } from "../../../../contexts/AuthContext";
+import { useStatuses, useStoreZ } from '~/hooks';
 
-import { useStoreZ } from "../../../../hooks";
+import { getProductDetailStats } from './_DetailsForProduct.config';
+import styles from './_DetailsForProduct.module.css';
 
-import { FormatSelectOptions } from "../../../../Helpers";
-import { TOptionType } from "../../../../Types/Select";
-
-import style from './_DetailsForProduct.module.css';
-
-// TODO replace any
-const createProductOptions = (productState: any, mappedStates: any) => {
-    return mappedStates.filter((b: any) => b.value !== productState)
-}
-
-const DEFAULT_MESSAGE = 'Please select...';
-
-const _DetailsForProduct = () => {
+const DetailsForProduct = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [shareEmail, setShareEmail] = useState('');
 
-    const { email } = useAuthContext();
-    const { productStates, fetchProductById, productById, isLoadingProduct, fetchProductState, addingProductState, productState } = useStoreZ();
+    const { statuses } = useStatuses();
 
-    const mappedStates = useMemo(() => {
-        const data = FormatSelectOptions(productStates, { value: 'id', label: 'stateName' });
-        return data;
-    }, [productStates]);
+    const {
+        isAuthenticated,
+        fetchProductById,
+        productById,
+        isLoadingProduct,
+        fetchProductState,
+        addingProductState,
+        productState,
+        productRating,
+        fetchProductRating,
+        rateProduct,
+        email,
+    } = useStoreZ();
 
-    const changeState = useCallback((e: TOptionType, id: string) => {
-        const state = e.value;
-        addingProductState(id, state);
-    }, [addingProductState]);
+    const currentStatusId = productState?.stateId ?? 0;
 
-    const onPressBackButton = useCallback(() => {
-        navigate(-1);
-    }, [navigate]);
+    const handleBack = useCallback(() => navigate(-1), [navigate]);
 
-    const selectedLabel = useMemo(() => {
-        const hasProductState = productState && typeof productState.stateId === 'number' && productState.stateId !== 0
-        const hasMappedStates = !!mappedStates.length
-        if (hasProductState && hasMappedStates) {
-            return mappedStates[productState.stateId - 1].label
+    const handleStatusChange = useCallback(
+        (statusId: number) => {
+            if (id) addingProductState(id, String(statusId));
+        },
+        [id, addingProductState],
+    );
+
+    const handleRate = useCallback(
+        (rating: number) => {
+            if (id) rateProduct(id, rating);
+        },
+        [id, rateProduct],
+    );
+
+    const handleShareSubmit = useCallback(() => {
+        const trimmed = shareEmail.trim();
+        if (!trimmed) return;
+        navigate(`${ROUT_NAMES.REVIEW_PRODUCTS_BY_EMAIL.replace(':email', '')}${encodeURIComponent(trimmed)}`);
+    }, [shareEmail, navigate]);
+
+    const hasId = id && id !== '0';
+    useEffect(() => {
+        if (hasId) {
+            fetchProductById(id);
+            fetchProductRating(id);
         }
-        return DEFAULT_MESSAGE
-    }, [mappedStates, productState]);
-
-    const selectOptions = useMemo(() => (
-        createProductOptions(productState?.stateId, mappedStates)
-    ), [productState?.stateId, mappedStates]);
+    }, [id, hasId, fetchProductById, fetchProductRating]);
 
     useEffect(() => {
-        const productId = id?.toString();
-        if (productId && productId !== '0') {
-            fetchProductById(productId);
+        if (email && hasId) {
+            fetchProductState(id);
         }
-    }, [id, fetchProductById]);
-
-    useEffect(() => {
-        const productId = id?.toString();
-        if (!!email && productId && productId !== '0') {
-            fetchProductState(productId);
-        }
-    }, [id, fetchProductState, email])
-
-    const productId = productById?.productId?.toString();
-    if (!isLoadingProduct && productId === '0') {
-        return null;
-    }
+    }, [id, hasId, email, fetchProductState]);
 
     return (
-        <section className={style['detail__card']}>
+        <main className={styles.wrap}>
+            <button className={styles.back} onClick={handleBack} type="button">
+                {TEXTS.DETAIL_BACK}
+            </button>
 
-            <IconActionButton onClick={onPressBackButton} />
+            {isLoadingProduct ? (
+                <div className={styles.loading}>{TEXTS.COMMON_LOADING}</div>
+            ) : (
+                <div className={styles.grid}>
+                    <BookCover
+                        productId={productById?.productId ?? 0}
+                        productTitle={productById?.productTitle ?? ''}
+                        fileUrl={productById?.fileUrl}
+                        fileSrc={productById?.fileSrc}
+                        variant="detail"
+                    >
+                        {currentStatusId ? <Badge statusId={currentStatusId} badgeStyle="solid" /> : null}
+                    </BookCover>
 
-            <div className={style['product-card__detail']}>
-                {isLoadingProduct ?
-                    <ProductDetailSkeleton /> :
-                    <ProductDetails {...productById} />}
-            </div>
+                    <div className={styles.info}>
+                        <p className={styles.info__genre}>
+                            {productById?.authorGenre ?? TEXTS.COMMON_PLACEHOLDER_VALUE}
+                        </p>
+                        <h1 className={styles.info__title}>{productById?.productTitle}</h1>
+                        <p className={styles.info__author}>{productById?.authorName}</p>
 
-            {!!email ?
-                isLoadingProduct ?
-                    <SelectSkeleton />
-                    : (
-                        <div className={`${style['functionality']}`}>
-                            <Select
-                                options={selectOptions}
-                                placeHolder={selectedLabel}
-                                onChange={(e) => changeState(e, productId)}
-                                size='70'
-                            />
-                        </div>)
-                : null
-            }
-        </section>
+                        <List
+                            data={getProductDetailStats({
+                                pages: productById?.pages,
+                                publishedYear: productById?.publishedYear,
+                                rating: productRating,
+                            })}
+                            keyExtractor={(stat) => stat.id}
+                            style={styles.stats}
+                            renderItem={({ item: stat }) => (
+                                <div className={`flex-col ${styles.stat}`}>
+                                    <span className={styles.stat__value}>{stat.value}</span>
+                                    <span className={styles.stat__label}>{stat.label}</span>
+                                </div>
+                            )}
+                        />
+
+                        <p className={styles.desc}>{productById?.description ?? TEXTS.DETAIL_DESC_PLACEHOLDER}</p>
+
+                        {isAuthenticated ? (
+                            <>
+                                <div className={styles.actions}>
+                                    <p className={styles.actions__label}>{TEXTS.DETAIL_YOUR_RATING}</p>
+                                    <StarRating
+                                        value={productRating.userRating}
+                                        interactive
+                                        onRate={handleRate}
+                                        ariaLabel={TEXTS.DETAIL_YOUR_RATING}
+                                    />
+                                </div>
+
+                                <div className={styles.actions}>
+                                    <p className={styles.actions__label}>{TEXTS.DETAIL_ADD_TO_SHELF}</p>
+                                    <List
+                                        data={statuses}
+                                        keyExtractor={(s) => String(s.id)}
+                                        style={styles.actions__btns}
+                                        renderItem={({ item: s }) => (
+                                            <Button
+                                                label={getStatusLabel(s)}
+                                                variant={currentStatusId === s.id ? 'primary' : 'outline'}
+                                                size="md"
+                                                onClick={() => handleStatusChange(s.id)}
+                                                ariaLabel={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
+                                            />
+                                        )}
+                                    />
+                                </div>
+
+                                <div className={styles.share}>
+                                    <p className={styles.share__label}>{TEXTS.DETAIL_SHARE_LABEL}</p>
+                                    <div className={styles.share__row}>
+                                        <input
+                                            className={styles.share__input}
+                                            type="email"
+                                            placeholder={TEXTS.DETAIL_SHARE_PLACEHOLDER}
+                                            value={shareEmail}
+                                            onChange={(e) => setShareEmail(e.target.value)}
+                                            onKeyDown={(e) => (e.key === 'Enter' ? handleShareSubmit() : undefined)}
+                                            aria-label={TEXTS.DETAIL_SHARE_LABEL}
+                                        />
+                                        <button
+                                            className={styles.share__btn}
+                                            onClick={handleShareSubmit}
+                                            type="button"
+                                            disabled={!shareEmail.trim()}
+                                        >
+                                            {TEXTS.DETAIL_SHARE_BTN}
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
+                        ) : null}
+                    </div>
+                </div>
+            )}
+        </main>
     );
-}
+};
 
-export default memo(_DetailsForProduct);
+export default memo(DetailsForProduct);

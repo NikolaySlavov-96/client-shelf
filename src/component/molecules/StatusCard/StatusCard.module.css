@@ -1,0 +1,15 @@
+.main {
+  min-height: calc(100vh - var(--nav-height));
+  padding: var(--spacing-10);
+  background: var(--cream);
+}
+
+.card {
+  background: var(--white);
+  border: var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-10);
+  max-width: 420px;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+}

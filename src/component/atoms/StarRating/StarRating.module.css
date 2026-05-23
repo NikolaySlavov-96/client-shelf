@@ -1,0 +1,37 @@
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.star {
+  font-size: var(--text-lg);
+  line-height: var(--line-height-none);
+  color: var(--ink-3);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.star--on {
+  color: var(--accent);
+}
+
+button.star {
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+button.star:hover {
+  transform: scale(1.1);
+}
+
+button.star:focus-visible {
+  outline: var(--border-2-accent);
+  outline-offset: var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+.star--static {
+  cursor: default;
+}

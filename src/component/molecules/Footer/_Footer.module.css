@@ -1,8 +1,20 @@
-.footer_container {
-    padding: 10px 14px;
+.footer {
+  padding: var(--spacing-20) var(--spacing-40);
+  background: var(--cream-2);
+  border-top: var(--border-default);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+  font-family: var(--font-sans);
 }
 
-.div {
-    border-radius: 16px;
-    padding: 10px 0 3px 0;
+.inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .footer {
+    padding: var(--spacing-16);
+  }
 }

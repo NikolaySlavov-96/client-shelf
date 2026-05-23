@@ -1,0 +1,21 @@
+.wrap {
+  display: flex;
+  min-height: calc(100vh - var(--nav-height));
+}
+
+.right {
+  width: var(--login-panel-width);
+  padding: var(--spacing-40);
+}
+
+.card {
+  width: 100%;
+  max-width: var(--login-card-width);
+}
+
+@media (max-width: 768px) {
+  .right {
+    width: 100%;
+    padding: var(--spacing-24);
+  }
+}

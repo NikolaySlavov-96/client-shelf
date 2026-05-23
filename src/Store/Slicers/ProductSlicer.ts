@@ -1,20 +1,29 @@
-import { StateCreator } from "zustand";
+import { type StateCreator } from 'zustand';
 
-import { ProductService as productService, FileService as fileService } from "../../services";
+import { TEXTS } from '~/constants';
+
+import { FileService as fileService, ProductService as productService } from '~/services';
+import { Toast } from '~/Toasts';
+import { ESwalIcon } from '~/Types/Swal';
+
+const showActionError = (err: unknown) => {
+    const message = (err as { message?: string })?.message;
+    Toast({ title: message ?? TEXTS.TOAST_GENERIC_ERROR, typeIcon: ESwalIcon.ERROR });
+};
 
 import {
-    IProductEmailType,
-    IProduct,
-    IProductWithState,
-    IFetchQueryParams,
-    IFetchSearchParams,
-    IState,
-    IAddProductWithImage
-} from "./ProductSlicer.interface";
-
+    type IAddProductWithImage,
+    type IFetchQueryParams,
+    type IFetchSearchParams,
+    type IProduct,
+    type IProductEmailType,
+    type IProductRating,
+    type IProductWithState,
+    type IState,
+    type IStatusCount,
+} from './ProductSlicer.interface';
 
 export interface IProductSlicer {
-    // error: 
     isLoadingProducts: boolean;
     isLoadingProductByEmails: boolean;
     isLoadingProduct: boolean;
@@ -26,10 +35,10 @@ export interface IProductSlicer {
     productStates: IState[];
     fetchAllProductStates: () => void;
 
-    productByEmail: { count: number, rows: IProductEmailType[] };
+    productByEmail: { count: number; rows: IProductEmailType[] };
     fetchProductsForEmail: (data: IFetchSearchParams) => void;
 
-    products: { count: number, rows: IProduct[] };
+    products: { count: number; rows: IProduct[] };
     fetchProducts: (data: IFetchSearchParams) => void;
 
     productById: IProduct;
@@ -37,13 +46,37 @@ export interface IProductSlicer {
 
     productState: { stateId: number };
     fetchProductState: (id: string) => void;
-    addingProductState: (id: string, state: string) => void;
+    addingProductState: (id: string, state: string, activeFilterId?: number | null) => void;
 
-    productCollection: { count: number, rows: IProductWithState[] };
+    productRating: IProductRating;
+    fetchProductRating: (id: string) => void;
+    rateProduct: (id: string, rating: number) => Promise<void>;
+
+    productCollection: { count: number; rows: IProductWithState[] };
     fetchProductCollection: (data: IFetchQueryParams) => void;
+    removeProductState: (productId: number) => Promise<void>;
+    updateShelfStatus: (productId: number, nextStatusId: number, activeStatusId?: number | null) => Promise<void>;
+
+    statusCounts: IStatusCount[];
+    fetchStatusCounts: () => void;
 
     isProductAdded: boolean;
     addProductWithImage: (data: IAddProductWithImage['data'], fileData: IAddProductWithImage['fileDate']) => void;
+}
+
+// Recompute per-status counts after a single book moves: -1 from its old status (if any),
+// +1 to the new one. Keeps the profile shelf tallies in sync without an extra request.
+const recountStatuses = (
+    counts: IStatusCount[],
+    previousStatusId: number | null,
+    nextStatusId: number,
+): IStatusCount[] => {
+    const byId = new Map(counts.map((c) => [c.statusId, c.count]));
+    if (previousStatusId !== null) {
+        byId.set(previousStatusId, Math.max(0, (byId.get(previousStatusId) ?? 0) - 1));
+    }
+    byId.set(nextStatusId, (byId.get(nextStatusId) ?? 0) + 1);
+    return Array.from(byId.entries()).map(([statusId, count]) => ({ statusId, count }));
 };
 
 const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
@@ -59,7 +92,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
     fetchAllProductStates: async () => {
         try {
             const result = await productService.getAllStatus();
-            set({ productStates: result })
+            set({ productStates: result });
         } catch (err) {
             console.log('fetchAllProductStates error --->: ', err);
         }
@@ -98,6 +131,11 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         productType: '',
         productStatus: false,
         productTitle: '',
+        pages: null,
+        publishedYear: null,
+        description: null,
+        ratingAverage: 0,
+        ratingCount: 0,
         authorName: '',
         authorImage: '',
         authorGenre: '',
@@ -110,7 +148,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         set({ isLoadingProduct: true });
         try {
             const { products } = get();
-            const isProductExist = products.rows.filter(p => p.productId === Number(id));
+            const isProductExist = products.rows.filter((p) => p.productId === Number(id));
             if (isProductExist?.length) {
                 set({ productById: isProductExist[0] });
             }
@@ -136,17 +174,65 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             set({ isLoadingProductState: false });
         }
     },
-    addingProductState: async (id, state) => {
+    addingProductState: async (id, state, activeFilterId = null) => {
+        const productId = Number(id);
+        const nextStatusId = Number(state);
+
+        const { products, statusCounts } = get();
+        const currentRow = products.rows.find((p) => p.productId === productId);
+        const previousStatusId = currentRow?.statusId ?? null;
+
+        if (previousStatusId === nextStatusId) {
+            set({ productState: { stateId: nextStatusId } });
+            return;
+        }
+
+        const leavesCurrentSection = activeFilterId !== null && activeFilterId !== 0 && nextStatusId !== activeFilterId;
+
+        const nextRows = leavesCurrentSection
+            ? products.rows.filter((p) => p.productId !== productId)
+            : products.rows.map((p) => (p.productId === productId ? { ...p, statusId: nextStatusId } : p));
+
+        const nextCount = leavesCurrentSection ? Math.max(0, products.count - 1) : products.count;
+
         set({ isAddingProductState: true });
         try {
-            const result = await productService.addStatusOnProduct({ productId: id, statusId: state });
-            console.log("🚀 ~ addingProductState: ~ result:", result)
-            // TODO Visualize success message
-            set({ productState: { stateId: Number(state) } });
+            await productService.addStatusOnProduct({ productId: id, statusId: state });
+            set({
+                products: { count: nextCount, rows: nextRows },
+                statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
+                productState: { stateId: nextStatusId },
+            });
         } catch (err) {
             console.log('addingProductState error --->: ', err);
+            showActionError(err);
         } finally {
             set({ isAddingProductState: false });
+        }
+    },
+
+    productRating: { average: 0, count: 0, userRating: 0 },
+    fetchProductRating: async (id) => {
+        try {
+            const result = await productService.getProductRating(id);
+            set({ productRating: result });
+        } catch (err) {
+            console.log('fetchProductRating error --->: ', err);
+        }
+    },
+    rateProduct: async (id, rating) => {
+        const { productRating } = get();
+        const previous = productRating;
+
+        set({ productRating: { ...productRating, userRating: rating } });
+
+        try {
+            const result = await productService.rateProduct(id, rating);
+            set({ productRating: result });
+        } catch (err) {
+            console.log('rateProduct error --->: ', err);
+            showActionError(err);
+            set({ productRating: previous });
         }
     },
 
@@ -163,6 +249,73 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         }
     },
 
+    statusCounts: [],
+    fetchStatusCounts: async () => {
+        try {
+            const result = await productService.getStatusCounts();
+            set({ statusCounts: result });
+        } catch (err) {
+            console.log('fetchStatusCounts error --->: ', err);
+        }
+    },
+
+    removeProductState: async (productId) => {
+        const { productCollection } = get();
+        const previousRows = productCollection.rows;
+        const optimisticRows = previousRows.filter((p) => p.productId !== productId);
+
+        set({
+            productCollection: {
+                count: Math.max(0, productCollection.count - (previousRows.length - optimisticRows.length)),
+                rows: optimisticRows,
+            },
+        });
+
+        try {
+            await productService.removeStatusFromProduct(productId);
+            get().fetchStatusCounts();
+        } catch (err) {
+            console.log('removeProductState error --->: ', err);
+            showActionError(err);
+            set({ productCollection: { count: productCollection.count, rows: previousRows } });
+        }
+    },
+
+    updateShelfStatus: async (productId, nextStatusId, activeStatusId = null) => {
+        const { productCollection, statusCounts } = get();
+        const currentRow = productCollection.rows.find((p) => p.productId === productId);
+        const previousStatusId = currentRow?.productStateId ?? null;
+
+        if (previousStatusId === nextStatusId) return;
+
+        const leavesCurrentSection = activeStatusId !== null && activeStatusId !== 0 && nextStatusId !== activeStatusId;
+
+        const previousRows = productCollection.rows;
+        const previousCount = productCollection.count;
+
+        const nextRows = leavesCurrentSection
+            ? previousRows.filter((p) => p.productId !== productId)
+            : previousRows.map((p) => (p.productId === productId ? { ...p, productStateId: nextStatusId } : p));
+        const nextCount = leavesCurrentSection ? Math.max(0, previousCount - 1) : previousCount;
+
+        set({
+            productCollection: { count: nextCount, rows: nextRows },
+            statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
+        });
+
+        try {
+            await productService.addStatusOnProduct({ productId: String(productId), statusId: String(nextStatusId) });
+        } catch (err) {
+            console.log('updateShelfStatus error --->: ', err);
+            showActionError(err);
+            // rollback both the rows and the counts
+            set({
+                productCollection: { count: previousCount, rows: previousRows },
+                statusCounts,
+            });
+        }
+    },
+
     isProductAdded: false,
     addProductWithImage: async (data, fileData) => {
         set({ isLoadingProductAddition: true });
@@ -171,14 +324,16 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             formData.append('deliverFile', fileData.file);
             formData.append('src', fileData.name);
 
-            const fileResponseData = await fileService.sendFile(formData as unknown as { deliverFile: File, src: string });
+            const fileResponseData = await fileService.sendFile(
+                formData as unknown as { deliverFile: File; src: string },
+            );
 
-            await productService.createProduct({ ...data, filesId: [fileResponseData.fileId], });
+            await productService.createProduct({ ...data, filesId: [fileResponseData.fileId] });
 
             set({ isProductAdded: true });
         } catch (err) {
             console.log('addProductWithImage --->: ', err);
-            // set(erroMessage)
+            showActionError(err);
         } finally {
             set({ isLoadingProductAddition: false });
         }
@@ -186,9 +341,6 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 });
 
 export default createProductSlicer;
-
-
-
 
 // const onSubmitEditProduct = useCallback(async (data: any) => {
 //     try {

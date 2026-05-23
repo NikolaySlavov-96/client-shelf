@@ -1,20 +1,42 @@
-import { memo, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { memo, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { useAuthContext } from '../../../../contexts/AuthContext';
+import { VerifyStatusScreen } from '~/component/organisms';
 
+import { ROUT_NAMES, TEXTS } from '~/constants';
 
-const _VerifyAccount = () => {
+import { useStoreZ } from '~/hooks';
 
+const VerifyAccount = () => {
+    const navigate = useNavigate();
     const { verifyToken } = useParams();
-    const { verifyAccountWithToken } = useAuthContext();
+    const { verifyAccountWithToken } = useStoreZ();
 
-    useEffect(() => {
-        verifyAccountWithToken(verifyToken);
-    }, []);
+    const verify = useCallback(
+        async (t: string) => {
+            await verifyAccountWithToken(t);
+        },
+        [verifyAccountWithToken],
+    );
 
+    const onAction = useCallback(
+        (state: 'success' | 'error') => navigate(state === 'success' ? ROUT_NAMES.LOGIN : ROUT_NAMES.HOME),
+        [navigate],
+    );
 
-    return (<></>);
-}
+    return (
+        <VerifyStatusScreen
+            token={verifyToken}
+            verify={verify}
+            titles={{
+                verifying: TEXTS.COMMON_LOADING,
+                success: TEXTS.TOAST_REGISTER_SUCCESS,
+                error: TEXTS.TOAST_GENERIC_ERROR,
+            }}
+            actionLabel={TEXTS.COMMON_BACK_TO_HOME}
+            onAction={onAction}
+        />
+    );
+};
 
-export default memo(_VerifyAccount);
+export default memo(VerifyAccount);

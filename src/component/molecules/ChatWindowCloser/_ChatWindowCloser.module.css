@@ -1,3 +1,14 @@
 .btn {
-    background-color: var(--primary-accent);
-  }
+  width: 100%;
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: var(--transition-fast);
+}
+
+.btn:hover {
+  background: var(--accent-hover);
+}

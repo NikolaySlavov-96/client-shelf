@@ -1,11 +1,14 @@
-import { FC, memo, } from "react";
+import { type FC, memo } from 'react';
+
+import { Button } from '~/component/atoms';
+
+import { type TViewType } from '~/Types/Components';
 
 import style from './_LayoutIcon.module.css';
-import { TViewType } from "~/Types/Components";
 
 const getColor = (status: boolean) => {
-    return status ? 'red023e8a' : '#e3e3e3'
-}
+    return status ? 'var(--accent)' : 'var(--ink-3)';
+};
 
 interface IIconProps {
     isSelected: boolean;
@@ -14,14 +17,22 @@ interface IIconProps {
 const Grid: FC<IIconProps> = ({ isSelected }) => {
     const color = getColor(isSelected);
 
-    return (<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill={color}><path d="M120-520v-320h320v320H120Zm0 400v-320h320v320H120Zm400-400v-320h320v320H520Zm0 400v-320h320v320H520ZM200-600h160v-160H200v160Zm400 0h160v-160H600v160Zm0 400h160v-160H600v160Zm-400 0h160v-160H200v160Zm400-400Zm0 240Zm-240 0Zm0-240Z" /></svg>)
-}
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill={color}>
+            <path d="M120-520v-320h320v320H120Zm0 400v-320h320v320H120Zm400-400v-320h320v320H520Zm0 400v-320h320v320H520ZM200-600h160v-160H200v160Zm400 0h160v-160H600v160Zm0 400h160v-160H600v160Zm-400 0h160v-160H200v160Zm400-400Zm0 240Zm-240 0Zm0-240Z" />
+        </svg>
+    );
+};
 
 const List: FC<IIconProps> = ({ isSelected }) => {
     const color = getColor(isSelected);
 
-    return (<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill={color}><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" /></svg>)
-}
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill={color}>
+            <path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z" />
+        </svg>
+    );
+};
 
 interface ISelectProps {
     typeView: TViewType;
@@ -29,18 +40,28 @@ interface ISelectProps {
 }
 
 const _LayoutIcon: FC<ISelectProps> = (props) => {
-    const { typeView, onChange, } = props;
+    const { typeView, onChange } = props;
 
     return (
-        <div className={`${style["container"]}`}>
-            <button onClick={() => onChange('list')}>
+        <div className={`${style['container']}`} role="group" aria-label="View layout">
+            <Button
+                variant="text"
+                onClick={() => onChange('list')}
+                aria-pressed={typeView === 'list'}
+                ariaLabel="List view"
+            >
                 <List isSelected={typeView === 'list'} />
-            </button>
-            <button onClick={() => onChange('grid')}>
+            </Button>
+            <Button
+                variant="text"
+                onClick={() => onChange('grid')}
+                aria-pressed={typeView === 'grid'}
+                ariaLabel="Grid view"
+            >
                 <Grid isSelected={typeView === 'grid'} />
-            </button>
+            </Button>
         </div>
     );
-}
+};
 
 export default memo(_LayoutIcon);

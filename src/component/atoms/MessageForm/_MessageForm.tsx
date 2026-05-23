@@ -1,41 +1,44 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback } from 'react';
 
-import { useForm } from "../../../hooks";
+import { ESendEvents } from '~/constants';
 
-import { SocketService } from "../../../services";
-
-import { ESendEvents } from "../../../constants";
-
-import { InputForm } from "..";
+import { useForm } from '~/hooks';
+import { SocketService } from '~/services';
+import { InputForm } from '..';
 
 const DEFAUlT_BUTTON_LABEL = 'Send';
 
-const _MessageForm = (props: any) => {
-    const {
-        buttonLabel = DEFAUlT_BUTTON_LABEL,
-        containerStyles,
-        roomName,
-        connectId,
-    } = props;
+const MessageForm = (props: any) => {
+    const { buttonLabel = DEFAUlT_BUTTON_LABEL, roomName, connectId } = props;
 
-    const sendMessage = useCallback((data: { message: string }) => {
-        SocketService.sendData(ESendEvents.SUPPORT_MESSAGE, {
-            roomName,
-            message: data.message,
-        })
-    }, [roomName]);
+    const sendMessage = useCallback(
+        (data: { message: string }) => {
+            SocketService.sendData(ESendEvents.SUPPORT_MESSAGE, {
+                roomName,
+                message: data.message,
+            });
+        },
+        [roomName],
+    );
 
-    const { values, changeHandler, onSubmit } = useForm({
-        message: '',
-    }, sendMessage, {
-        message: ['required', 1]
-    });
+    const { values, changeHandler, onSubmit } = useForm(
+        {
+            message: '',
+        },
+        sendMessage,
+        {
+            message: ['required', 1],
+        },
+    );
 
-    const activityHandler = useCallback((e: any) => {
-        changeHandler(e);
-        // add debounce from 2 second before send event again
-        SocketService.sendData(ESendEvents.SUPPORT_ACTIVITY, { roomName, connectId })
-    }, [changeHandler, connectId, roomName]);
+    const activityHandler = useCallback(
+        (e: any) => {
+            changeHandler(e);
+            // add debounce from 2 second before send event again
+            SocketService.sendData(ESendEvents.SUPPORT_ACTIVITY, { roomName, connectId });
+        },
+        [changeHandler, connectId, roomName],
+    );
 
     return (
         <InputForm
@@ -45,8 +48,8 @@ const _MessageForm = (props: any) => {
         >
             <input
                 type="text"
-                name='message'
-                id='message'
+                name="message"
+                id="message"
                 placeholder={DEFAUlT_BUTTON_LABEL}
                 value={values.message}
                 onChange={activityHandler}
@@ -56,4 +59,4 @@ const _MessageForm = (props: any) => {
     );
 };
 
-export default memo(_MessageForm);
+export default memo(MessageForm);

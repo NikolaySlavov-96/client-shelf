@@ -1,53 +1,79 @@
-import { memo, useEffect, useState, } from "react";
+import { memo, useCallback, useEffect } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 
-import { useParams } from "react-router-dom";
+import { Pagination } from '~/component/molecules';
 
-import { SectionTitle } from "../../../atoms";
-import { Pagination } from "../../../molecules";
-import { QueryBar, ListRenderProduct } from "../../../organisms";
+import { ShelfGrid } from '~/component/organisms';
 
-import { useStoreZ, useViewType } from "../../../../hooks";
-import { ListRenderProductSkeletons } from "../../../../Skeleton/organisms";
+import { SEARCH_NAME, TEXTS } from '~/constants';
 
-const SECTION_TITLE = 'Review user books - ??with email';
+import { useStoreZ } from '~/hooks';
 
-const _SearchByEmail = () => {
-    const param = useParams();
+import styles from './_SearchByEmail.module.css';
 
-    const [page, setPage] = useState(1);
+const SearchByEmail = () => {
+    const { email } = useParams<{ email: string }>();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const { viewType, onChangeViewType } = useViewType();
+    // Page lives in the URL so a shared search link reopens the same page.
+    const pageParam = Number(searchParams.get(SEARCH_NAME.PAGE));
+    const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
+    const setPage = useCallback(
+        (next: number) => {
+            setSearchParams((prev) => {
+                const params = new URLSearchParams(prev);
+                if (next <= 1) {
+                    params.delete(SEARCH_NAME.PAGE);
+                } else {
+                    params.set(SEARCH_NAME.PAGE, String(next));
+                }
+                return params;
+            });
+        },
+        [setSearchParams],
+    );
+
     const { isLoadingProductByEmails, pageLimit, productByEmail, fetchProductsForEmail } = useStoreZ();
 
-    const count = Math.ceil(productByEmail.count / pageLimit) || 0;
+    useEffect(() => {
+        setSearchParams(
+            (prev) => {
+                const params = new URLSearchParams(prev);
+                params.delete(SEARCH_NAME.PAGE);
+                return params;
+            },
+            { replace: true },
+        );
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [email]);
 
     useEffect(() => {
-        if (param.email !== '') {
-            fetchProductsForEmail({ searchContent: param.email || '', limit: pageLimit, page, })
+        if (email) {
+            fetchProductsForEmail({ searchContent: email, limit: pageLimit, page });
         }
-    }, [fetchProductsForEmail, param.email, pageLimit, page])
+    }, [fetchProductsForEmail, email, pageLimit, page]);
+
+    const displayEmail = decodeURIComponent(email ?? '');
+    const pageCount = Math.ceil(productByEmail.count / pageLimit) || 0;
 
     return (
-        <section className={'content__page'}>
-
-            <SectionTitle content={SECTION_TITLE} />
-
-            <QueryBar
-                hasLeftSelector={false}
-                // TODO 
-                onPressSearch={(data) => console.log('SearchByEmail', data)}
-                viewType={viewType}
-                onPressViewType={onChangeViewType}
-            />
+        <main className={styles.wrap}>
+            <header className={styles.header}>
+                <h1 className={styles.header__title}>{TEXTS.SEARCH_EMAIL_TITLE}</h1>
+                <p className={styles.header__email}>{displayEmail}</p>
+            </header>
 
             {isLoadingProductByEmails ? (
-                <ListRenderProductSkeletons limit={pageLimit} viewType={viewType} />) : (
-                <ListRenderProduct data={productByEmail?.rows || []} viewType={viewType} />
+                <div className={styles.loading}>{TEXTS.COMMON_LOADING}</div>
+            ) : (
+                <>
+                    <ShelfGrid books={productByEmail.rows} />
+                    <Pagination count={pageCount} page={page} onSubmit={setPage} />
+                </>
             )}
-
-            <Pagination count={count} page={page} onSubmit={setPage} />
-        </section >
+        </main>
     );
-}
+};
 
-export default memo(_SearchByEmail);
+export default memo(SearchByEmail);

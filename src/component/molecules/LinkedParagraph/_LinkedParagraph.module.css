@@ -1,11 +1,19 @@
 .paragraph {
-  padding-bottom: 7px;
+  padding-bottom: var(--spacing-8);
   text-align: center;
+  font-size: var(--text-sm);
+  color: var(--ink-3);
+  font-family: var(--font-sans);
 }
 
 .paragraph a {
-  color: var(--secondary-text);
-  font-family: Georgia, "Times New Roman", Times, serif;
-  font-size: 22px;
-  padding-left: 20px;
+  color: var(--accent);
+  font-family: var(--font-serif);
+  font-size: var(--text-md);
+  padding-left: var(--spacing-8);
+  transition: var(--transition-fast);
+}
+
+.paragraph a:hover {
+  color: var(--accent-hover);
 }

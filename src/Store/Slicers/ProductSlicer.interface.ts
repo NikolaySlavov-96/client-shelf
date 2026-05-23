@@ -9,6 +9,12 @@ export interface IProduct {
     productType: string;
     productStatus: boolean;
     productTitle: string;
+    pages: number | null;
+    publishedYear: number | null;
+    description: string | null;
+    statusId?: number | null;
+    ratingAverage?: number;
+    ratingCount?: number;
     authorName: string;
     authorImage: string;
     authorGenre: string;
@@ -16,6 +22,17 @@ export interface IProduct {
     fileUrl: string;
     fileId: number;
     fileSrc: string;
+}
+
+export interface IProductRating {
+    average: number;
+    count: number;
+    userRating: number;
+}
+
+export interface IStatusCount {
+    statusId: number;
+    count: number;
 }
 
 export interface IProductWithState extends IProduct {
@@ -37,6 +54,7 @@ export interface IFetchSearchParams {
     page: number;
     limit: number;
     searchContent: string;
+    statusId?: number | null;
 }
 
 export interface IFetchQueryParams extends IFetchSearchParams {

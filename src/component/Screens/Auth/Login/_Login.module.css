@@ -1,0 +1,40 @@
+.divider {
+  gap: var(--spacing-12);
+  margin: var(--spacing-20) 0;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: var(--hairline);
+  background: var(--border);
+}
+
+.divider__text {
+  font-size: var(--text-xs);
+  color: var(--ink-3);
+}
+
+.emailLink {
+  width: 100%;
+  padding: var(--spacing-8) var(--spacing-12);
+  background: var(--cream-2);
+  border: var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: var(--transition-fast);
+  margin-bottom: var(--spacing-16);
+}
+
+.emailLink:hover:not(:disabled) {
+  background: var(--cream-3);
+}
+
+.emailLink:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}

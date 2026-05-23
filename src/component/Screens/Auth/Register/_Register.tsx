@@ -1,110 +1,79 @@
-import { memo, useCallback } from 'react';
+import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { InputField, InputForm, SectionTitle } from '../../../atoms';
-import { LinkedParagraph } from '../../../molecules';
+import { Button, FormField } from '~/component/atoms';
 
-import { Toast } from '../../../../Toasts';
-import { ESwalIcon } from '../../../../Types/Swal';
+import { AuthLayout } from '~/component/organisms';
 
-import { useAuthContext } from '../../../../contexts/AuthContext';
+import { ROUT_NAMES, ServerError, TEXTS } from '~/constants';
 
-import { E_FORM_FIELDS, E_FORM_NAMES, ROUT_NAMES, ServerError } from '../../../../constants';
+import { useAuthForm, useStoreZ } from '~/hooks';
 
-import { useStoreZ } from '../../../../hooks';
-
-const BUTTON_LABEL = 'Register';
-
-const _Register = () => {
+const Register = () => {
     const navigate = useNavigate();
+    const { onSubmitRegister } = useStoreZ();
 
-    const { onSubmitRegister } = useAuthContext();
-    const { search } = useStoreZ();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [year, setYear] = useState('');
 
-    const onSubmitFunction = useCallback(async () => {
-        const getValue = search?.get(E_FORM_NAMES.REGISTER || '')?.fields;
-
-        const email = getValue?.get(E_FORM_FIELDS.EMAIL) || '';
-        const password = getValue?.get(E_FORM_FIELDS.PASSWORD) || '';
-        const rePassword = getValue?.get(E_FORM_FIELDS.RE_PASSWORD) || '';
-        const year = getValue?.get(E_FORM_FIELDS.YEAR) || '';
-
-        if (password === '' || password !== rePassword) {
-            return;
-        }
-
-        const result = await onSubmitRegister({ email, password, year });
-
-        if (result?.messageCode === ServerError.SUCCESSFULLY_REGISTER.messageCode) {
-            Toast({ title: 'Success', typeIcon: ESwalIcon.SUCCESS })
-            navigate(ROUT_NAMES.LOGIN);
-        } else {
-            Toast({ title: result?.message, typeIcon: ESwalIcon.ERROR })
-        }
-    }, [onSubmitRegister, search, navigate]);
-
-    // const err = {
-    //     rePassword: '',
-    //     year: '',
-    // }
-    // if (values.password !== values.rePassword) {
-    //     err.rePassword = 'Password don\'t match';
-    // }
-
-    // const yearToNumber = Number(values.year);
-    // if (yearToNumber < 0 || yearToNumber > 110) {
-    //     err.year = 'Year not valid'
-    // }
+    const { isLoading, handleSubmit } = useAuthForm({
+        submit: (values: { email: string; password: string; year: string }) => onSubmitRegister(values),
+        successCode: ServerError.SUCCESSFULLY_REGISTER.messageCode,
+        successText: TEXTS.TOAST_REGISTER_SUCCESS,
+        onSuccess: () => navigate(ROUT_NAMES.LOGIN),
+    });
 
     return (
-        <section className={`section`}>
-
-            <SectionTitle content='Register Page' />
-
-            <div className={`global__bg-radius form__container`}>
-                <InputForm
-                    onSubmit={onSubmitFunction}
-                    buttonLabel={BUTTON_LABEL}
-                    addSeparatorAfterButton
-                    afterButton={
-                        <LinkedParagraph
-                            staticContent='Have a account'
-                            to={ROUT_NAMES.LOGIN}
-                            pressContent='Sign Up'
-                        />
-                    }
-                >
-                    <InputField
-                        label='Email'
-                        name='email'
-                        formName={E_FORM_NAMES.REGISTER}
-                        type="email"
-                    />
-
-                    <InputField
-                        label='Password'
-                        name='password'
-                        formName={E_FORM_NAMES.REGISTER}
-                        type='password'
-                    />
-
-                    <InputField
-                        label='Repeat Password'
-                        name='rePassword'
-                        formName={E_FORM_NAMES.REGISTER}
-                        type='password'
-                    />
-
-                    <InputField
-                        label='Year'
-                        name='year'
-                        formName={E_FORM_NAMES.REGISTER}
-                        type='number'
-                    />
-                </InputForm>
-            </div >
-        </section >
+        <AuthLayout
+            tagline={TEXTS.AUTH_REGISTER_TAGLINE}
+            heading={TEXTS.AUTH_REGISTER_HEADING}
+            subtitle={TEXTS.AUTH_REGISTER_SUBTITLE}
+            activeTab="register"
+            onSwitchTab={(tab) => (tab === 'login' ? navigate(ROUT_NAMES.LOGIN) : undefined)}
+        >
+            <form onSubmit={(e) => handleSubmit(e, { email, password, year }, !!email && !!password)} noValidate>
+                <FormField
+                    id="reg-email"
+                    label={TEXTS.AUTH_LABEL_EMAIL}
+                    type="email"
+                    placeholder={TEXTS.AUTH_PLACEHOLDER_EMAIL}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                    required
+                />
+                <FormField
+                    id="reg-password"
+                    label={TEXTS.AUTH_LABEL_PASSWORD}
+                    type="password"
+                    placeholder={TEXTS.AUTH_PLACEHOLDER_PASSWORD}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                />
+                <FormField
+                    id="reg-year"
+                    label={TEXTS.AUTH_LABEL_YEAR}
+                    type="number"
+                    placeholder={TEXTS.AUTH_PLACEHOLDER_YEAR}
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    min={1900}
+                    max={2099}
+                />
+                <Button
+                    label={TEXTS.AUTH_BTN_REGISTER}
+                    variant="primary"
+                    size="full"
+                    type="submit"
+                    isLoading={isLoading}
+                    isDisabled={!email || !password}
+                />
+            </form>
+        </AuthLayout>
     );
-}
+};
 
-export default memo(_Register);
+export default memo(Register);
