@@ -17,7 +17,23 @@ import globals from 'globals';
 
 export default [
     {
-        ignores: ['node_modules/**', 'dist/**', 'build/**', 'ai-blueprint/**'],
+        ignores: [
+            'node_modules/**',
+            'dist/**',
+            'build/**',
+            'ai-blueprint/**',
+            '.github/**',
+            '.vscode/**',
+            '.idea/**',
+            '.zed/**',
+            '.claude/**',
+            'public/**',
+            '**/*.yml',
+            '**/*.yaml',
+            '**/*.md',
+            '**/*.json',
+            '**/*.html',
+        ],
     },
 
     js.configs.recommended,

@@ -3,3 +3,14 @@ dist
 build
 public
 package-lock.json
+.github
+.vscode
+.idea
+.zed
+.claude
+ai-blueprint
+*.yml
+*.yaml
+*.md
+*.json
+*.html
