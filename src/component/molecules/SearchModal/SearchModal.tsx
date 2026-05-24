@@ -68,7 +68,9 @@ function SearchModal() {
     const trimmed = query.trim().toLowerCase();
     const filtered = trimmed
         ? source.filter(
-              (b) => b.productTitle.toLowerCase().includes(trimmed) || b.authorName.toLowerCase().includes(trimmed),
+              (b) =>
+                  b.productTitle.toLowerCase().includes(trimmed) ||
+                  b.authors.some((a) => a.name.toLowerCase().includes(trimmed)),
           )
         : source.slice(0, 6);
 
@@ -123,7 +125,9 @@ function SearchModal() {
                                         />
                                         <span className={`flex-col ${styles.bookInfo}`}>
                                             <span className={styles.bookTitle}>{book.productTitle}</span>
-                                            <span className={styles.bookAuthor}>{book.authorName}</span>
+                                            <span className={styles.bookAuthor}>
+                                                {book.authors.map((a) => a.name).join(', ')}
+                                            </span>
                                         </span>
                                         <span className={styles.addLabel}>{TEXTS.SEARCH_ADD}</span>
                                     </button>

@@ -1,11 +1,20 @@
 import { TEXTS } from '~/constants';
 
-export type TCreateProductTextField = 'author' | 'productTitle' | 'genre' | 'fileName';
+export type TCreateProductTextField = 'productTitle' | 'genre' | 'fileName';
 
 interface ICreateProductTextFieldConfig {
     kind: 'text';
     id: string;
     key: TCreateProductTextField;
+    label: string;
+    placeholder?: string;
+    required?: boolean;
+}
+
+interface ICreateProductChipsFieldConfig {
+    kind: 'chips';
+    id: string;
+    key: 'authors';
     label: string;
     placeholder?: string;
     required?: boolean;
@@ -18,13 +27,23 @@ interface ICreateProductFileFieldConfig {
     accept: string;
 }
 
-export type TCreateProductFieldConfig = ICreateProductTextFieldConfig | ICreateProductFileFieldConfig;
+export type TCreateProductFieldConfig =
+    | ICreateProductTextFieldConfig
+    | ICreateProductChipsFieldConfig
+    | ICreateProductFileFieldConfig;
+
+export interface ICreateProductValues {
+    authors: string[];
+    productTitle: string;
+    genre: string;
+    fileName: string;
+}
 
 export const CREATE_PRODUCT_FIELDS: TCreateProductFieldConfig[] = [
     {
-        kind: 'text',
-        id: 'create-author',
-        key: 'author',
+        kind: 'chips',
+        id: 'create-authors',
+        key: 'authors',
         label: TEXTS.CREATE_LABEL_AUTHOR,
         placeholder: TEXTS.CREATE_PLACEHOLDER_AUTHOR,
         required: true,
@@ -58,8 +77,8 @@ export const CREATE_PRODUCT_FIELDS: TCreateProductFieldConfig[] = [
     },
 ];
 
-export const CREATE_PRODUCT_INITIAL_VALUES: Record<TCreateProductTextField, string> = {
-    author: '',
+export const CREATE_PRODUCT_INITIAL_VALUES: ICreateProductValues = {
+    authors: [],
     productTitle: '',
     genre: '',
     fileName: '',

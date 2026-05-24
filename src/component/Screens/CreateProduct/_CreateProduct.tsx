@@ -2,6 +2,8 @@ import { type ChangeEvent, type FormEvent, memo, useCallback, useEffect, useStat
 
 import { Button, List } from '~/component/atoms';
 
+import { ChipsInput } from '~/component/molecules';
+
 import { TEXTS } from '~/constants';
 
 import { useStoreZ } from '~/hooks';
@@ -11,6 +13,7 @@ import { ESwalIcon } from '~/Types/Swal';
 import {
     CREATE_PRODUCT_FIELDS,
     CREATE_PRODUCT_INITIAL_VALUES,
+    type ICreateProductValues,
     type TCreateProductTextField,
 } from './_CreateProduct.config';
 import styles from './_CreateProduct.module.css';
@@ -18,11 +21,15 @@ import styles from './_CreateProduct.module.css';
 const CreateProduct = () => {
     const { addProductWithImage, isProductAdded, isLoadingProductAddition } = useStoreZ();
 
-    const [values, setValues] = useState(CREATE_PRODUCT_INITIAL_VALUES);
+    const [values, setValues] = useState<ICreateProductValues>(CREATE_PRODUCT_INITIAL_VALUES);
     const [file, setFile] = useState<File | undefined>(undefined);
 
     const handleTextChange = useCallback((key: TCreateProductTextField, value: string) => {
         setValues((prev) => ({ ...prev, [key]: value }));
+    }, []);
+
+    const handleAuthorsChange = useCallback((next: string[]) => {
+        setValues((prev) => ({ ...prev, authors: next }));
     }, []);
 
     const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -36,8 +43,8 @@ const CreateProduct = () => {
         (e: FormEvent) => {
             e.preventDefault();
             if (!file) return;
-            const { author, productTitle, genre, fileName } = values;
-            addProductWithImage({ author, productTitle, genre }, { file, name: fileName });
+            const { authors, productTitle, genre, fileName } = values;
+            addProductWithImage({ authors, productTitle, genre }, { file, name: fileName });
         },
         [values, file, addProductWithImage],
     );
@@ -79,6 +86,14 @@ const CreateProduct = () => {
                                         onChange={(e) => handleTextChange(field.key, e.target.value)}
                                         required={field.required}
                                     />
+                                ) : field.kind === 'chips' ? (
+                                    <ChipsInput
+                                        id={field.id}
+                                        values={values.authors}
+                                        onChange={handleAuthorsChange}
+                                        placeholder={field.placeholder}
+                                        ariaLabel={field.label}
+                                    />
                                 ) : (
                                     <input
                                         id={field.id}
@@ -98,7 +113,7 @@ const CreateProduct = () => {
                         size="full"
                         type="submit"
                         isLoading={isLoadingProductAddition}
-                        isDisabled={!values.author || !values.productTitle || !file}
+                        isDisabled={values.authors.length === 0 || !values.productTitle || !file}
                     />
                 </form>
             </div>

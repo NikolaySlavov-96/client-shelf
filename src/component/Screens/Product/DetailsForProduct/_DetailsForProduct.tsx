@@ -91,10 +91,10 @@ const DetailsForProduct = () => {
 
                     <div className={styles.info}>
                         <p className={styles.info__genre}>
-                            {productById?.authorGenre ?? TEXTS.COMMON_PLACEHOLDER_VALUE}
+                            {productById?.productType || TEXTS.COMMON_PLACEHOLDER_VALUE}
                         </p>
                         <h1 className={styles.info__title}>{productById?.productTitle}</h1>
-                        <p className={styles.info__author}>{productById?.authorName}</p>
+                        <p className={styles.info__author}>{productById?.authors?.map((a) => a.name).join(', ')}</p>
 
                         <List
                             data={getProductDetailStats({

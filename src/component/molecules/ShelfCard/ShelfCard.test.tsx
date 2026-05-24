@@ -16,7 +16,7 @@ jest.mock('../../../Toasts', () => ({
 const baseProps = {
     productId: 7,
     productTitle: 'Dune',
-    authorName: 'Frank Herbert',
+    authors: [{ id: 1, name: 'Frank Herbert' }],
     statusId: 1,
 };
 

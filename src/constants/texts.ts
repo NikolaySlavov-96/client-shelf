@@ -100,12 +100,12 @@ export const TEXTS = {
     // Create Product
     CREATE_TITLE: 'Add new book',
     CREATE_BTN: 'Create book',
-    CREATE_LABEL_AUTHOR: 'Author name',
+    CREATE_LABEL_AUTHOR: 'Authors',
     CREATE_LABEL_TITLE: 'Book title',
     CREATE_LABEL_GENRE: 'Genre',
     CREATE_LABEL_IMAGE: 'Cover image',
     CREATE_LABEL_SRC: 'Image name',
-    CREATE_PLACEHOLDER_AUTHOR: 'Author name',
+    CREATE_PLACEHOLDER_AUTHOR: 'Type a name and press Enter',
     CREATE_PLACEHOLDER_TITLE: 'Book title',
     CREATE_PLACEHOLDER_GENRE: 'Genre',
     // Support Chat

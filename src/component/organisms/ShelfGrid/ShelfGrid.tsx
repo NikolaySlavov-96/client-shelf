@@ -1,6 +1,7 @@
 import { memo } from 'react';
 
 import { List } from '~/component/atoms';
+
 import ShelfCard from '~/component/molecules/ShelfCard/ShelfCard';
 
 import { TEXTS } from '~/constants';
@@ -39,7 +40,7 @@ function ShelfGrid({ books, onRemove, onStatusChange, className }: IShelfGridPro
                 <ShelfCard
                     productId={book.productId}
                     productTitle={book.productTitle}
-                    authorName={book.authorName}
+                    authors={book.authors}
                     statusId={getStatusId(book)}
                     fileUrl={book.fileUrl}
                     fileSrc={book.fileSrc}

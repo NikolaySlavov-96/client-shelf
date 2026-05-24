@@ -7,6 +7,7 @@ import { getStatusLabel, TEXTS } from '~/constants';
 import { cx } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
+import { type IAuthor } from '~/Store/Slicers/ProductSlicer.interface';
 import { Toast, ToastWithButton } from '~/Toasts';
 import { ESwalIcon } from '~/Types/Swal';
 
@@ -15,7 +16,7 @@ import styles from './ShelfCard.module.css';
 interface IShelfCardProps {
     productId: number;
     productTitle: string;
-    authorName: string;
+    authors: IAuthor[];
     statusId: number;
     fileUrl?: string;
     fileSrc?: string;
@@ -27,7 +28,7 @@ interface IShelfCardProps {
 function ShelfCard({
     productId,
     productTitle,
-    authorName,
+    authors,
     statusId,
     fileUrl,
     fileSrc,
@@ -74,7 +75,7 @@ function ShelfCard({
             />
 
             <div className={styles.body}>
-                <p className={styles.author}>{authorName}</p>
+                <p className={styles.author}>{authors.map((a) => a.name).join(', ')}</p>
                 <div className={`flex-between ${styles.footer}`}>
                     <Badge statusId={statusId} badgeStyle="light" />
                     {onRemove ? (
