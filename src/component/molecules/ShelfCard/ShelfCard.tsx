@@ -4,7 +4,7 @@ import { Badge, BookCover, Button, List } from '~/component/atoms';
 
 import { getStatusLabel, TEXTS } from '~/constants';
 
-import { cx } from '~/Utils';
+import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
 import { type IAuthor } from '~/Store/Slicers/ProductSlicer.interface';
@@ -75,7 +75,7 @@ function ShelfCard({
             />
 
             <div className={styles.body}>
-                <p className={styles.author}>{authors.map((a) => a.name).join(', ')}</p>
+                <p className={styles.author}>{formatAuthors(authors)}</p>
                 <div className={`flex-between ${styles.footer}`}>
                     <Badge statusId={statusId} badgeStyle="light" />
                     {onRemove ? (

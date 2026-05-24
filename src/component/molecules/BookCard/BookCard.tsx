@@ -5,7 +5,7 @@ import { BookCover, Button, List } from '~/component/atoms';
 
 import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
 
-import { cx } from '~/Utils';
+import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
 import { type IAuthor } from '~/Store/Slicers/ProductSlicer.interface';
@@ -69,7 +69,7 @@ function BookCard({
 
             <div className={cx(styles.meta, isList ? 'flex-col' : '')}>
                 {isList ? <p className={styles.meta__title}>{productTitle}</p> : null}
-                <p className={styles.meta__author}>{authors.map((a) => a.name).join(', ')}</p>
+                <p className={styles.meta__author}>{formatAuthors(authors)}</p>
                 {isAuthenticated ? (
                     <List
                         data={statuses}

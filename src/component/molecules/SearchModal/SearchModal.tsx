@@ -5,6 +5,8 @@ import { List } from '~/component/atoms';
 
 import { getSearchCoverGradient, MODAL_NAMES, ROUT_NAMES, TEXTS } from '~/constants';
 
+import { formatAuthors } from '~/Utils';
+
 import { useStoreZ } from '~/hooks';
 import { type IProduct, type IProductEmailType, type IProductWithState } from '~/Store/Slicers/ProductSlicer.interface';
 
@@ -125,9 +127,7 @@ function SearchModal() {
                                         />
                                         <span className={`flex-col ${styles.bookInfo}`}>
                                             <span className={styles.bookTitle}>{book.productTitle}</span>
-                                            <span className={styles.bookAuthor}>
-                                                {book.authors.map((a) => a.name).join(', ')}
-                                            </span>
+                                            <span className={styles.bookAuthor}>{formatAuthors(book.authors)}</span>
                                         </span>
                                         <span className={styles.addLabel}>{TEXTS.SEARCH_ADD}</span>
                                     </button>

@@ -5,6 +5,8 @@ import { Badge, BookCover, Button, List, StarRating } from '~/component/atoms';
 
 import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
 
+import { formatAuthors } from '~/Utils';
+
 import { useStatuses, useStoreZ } from '~/hooks';
 
 import { getProductDetailStats } from './_DetailsForProduct.config';
@@ -94,7 +96,7 @@ const DetailsForProduct = () => {
                             {productById?.productType || TEXTS.COMMON_PLACEHOLDER_VALUE}
                         </p>
                         <h1 className={styles.info__title}>{productById?.productTitle}</h1>
-                        <p className={styles.info__author}>{productById?.authors?.map((a) => a.name).join(', ')}</p>
+                        <p className={styles.info__author}>{formatAuthors(productById?.authors)}</p>
 
                         <List
                             data={getProductDetailStats({
