@@ -20,6 +20,14 @@ interface ICreateProductChipsFieldConfig {
     required?: boolean;
 }
 
+interface ICreateProductSelectFieldConfig {
+    kind: 'select';
+    id: string;
+    key: 'authorsSeparator';
+    label: string;
+    options: { value: string; label: string }[];
+}
+
 interface ICreateProductFileFieldConfig {
     kind: 'file';
     id: string;
@@ -30,14 +38,24 @@ interface ICreateProductFileFieldConfig {
 export type TCreateProductFieldConfig =
     | ICreateProductTextFieldConfig
     | ICreateProductChipsFieldConfig
+    | ICreateProductSelectFieldConfig
     | ICreateProductFileFieldConfig;
 
 export interface ICreateProductValues {
     authors: string[];
+    authorsSeparator: string;
     productTitle: string;
     genre: string;
     fileName: string;
 }
+
+export const AUTHORS_SEPARATOR_OPTIONS: { value: string; label: string }[] = [
+    { value: ',', label: ', (comma)' },
+    { value: ' & ', label: ' & (and)' },
+    { value: ' • ', label: ' • (bullet)' },
+    { value: ' / ', label: ' / (slash)' },
+    { value: '; ', label: '; (semicolon)' },
+];
 
 export const CREATE_PRODUCT_FIELDS: TCreateProductFieldConfig[] = [
     {
@@ -47,6 +65,13 @@ export const CREATE_PRODUCT_FIELDS: TCreateProductFieldConfig[] = [
         label: TEXTS.CREATE_LABEL_AUTHOR,
         placeholder: TEXTS.CREATE_PLACEHOLDER_AUTHOR,
         required: true,
+    },
+    {
+        kind: 'select',
+        id: 'create-authors-separator',
+        key: 'authorsSeparator',
+        label: TEXTS.CREATE_LABEL_AUTHORS_SEPARATOR,
+        options: AUTHORS_SEPARATOR_OPTIONS,
     },
     {
         kind: 'text',
@@ -79,6 +104,7 @@ export const CREATE_PRODUCT_FIELDS: TCreateProductFieldConfig[] = [
 
 export const CREATE_PRODUCT_INITIAL_VALUES: ICreateProductValues = {
     authors: [],
+    authorsSeparator: ',',
     productTitle: '',
     genre: '',
     fileName: '',

@@ -137,6 +137,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         ratingAverage: 0,
         ratingCount: 0,
         authors: [],
+        authorsSeparator: ',',
         fileUrl: '',
         fileId: 0,
         fileSrc: '',

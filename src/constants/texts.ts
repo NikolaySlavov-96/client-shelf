@@ -101,6 +101,7 @@ export const TEXTS = {
     CREATE_TITLE: 'Add new book',
     CREATE_BTN: 'Create book',
     CREATE_LABEL_AUTHOR: 'Authors',
+    CREATE_LABEL_AUTHORS_SEPARATOR: 'Authors separator',
     CREATE_LABEL_TITLE: 'Book title',
     CREATE_LABEL_GENRE: 'Genre',
     CREATE_LABEL_IMAGE: 'Cover image',

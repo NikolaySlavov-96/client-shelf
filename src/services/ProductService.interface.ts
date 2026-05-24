@@ -14,6 +14,7 @@ interface IProduct {
     ratingAverage?: number;
     ratingCount?: number;
     authors: IAuthor[];
+    authorsSeparator: string;
     fileUrl: string;
     fileId: number;
     fileSrc: string;
@@ -57,6 +58,7 @@ export interface IGetProductsResponse {
 
 export interface ICreateProductRequest {
     authors: string[];
+    authorsSeparator?: string;
     productTitle: string;
     genre: string;
     filesId?: number[];

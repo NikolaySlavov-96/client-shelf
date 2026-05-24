@@ -96,7 +96,9 @@ const DetailsForProduct = () => {
                             {productById?.productType || TEXTS.COMMON_PLACEHOLDER_VALUE}
                         </p>
                         <h1 className={styles.info__title}>{productById?.productTitle}</h1>
-                        <p className={styles.info__author}>{formatAuthors(productById?.authors)}</p>
+                        <p className={styles.info__author}>
+                            {formatAuthors(productById?.authors, productById?.authorsSeparator)}
+                        </p>
 
                         <List
                             data={getProductDetailStats({

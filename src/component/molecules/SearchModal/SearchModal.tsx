@@ -127,7 +127,9 @@ function SearchModal() {
                                         />
                                         <span className={`flex-col ${styles.bookInfo}`}>
                                             <span className={styles.bookTitle}>{book.productTitle}</span>
-                                            <span className={styles.bookAuthor}>{formatAuthors(book.authors)}</span>
+                                            <span className={styles.bookAuthor}>
+                                                {formatAuthors(book.authors, book.authorsSeparator)}
+                                            </span>
                                         </span>
                                         <span className={styles.addLabel}>{TEXTS.SEARCH_ADD}</span>
                                     </button>

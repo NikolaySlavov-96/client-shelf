@@ -32,6 +32,10 @@ const CreateProduct = () => {
         setValues((prev) => ({ ...prev, authors: next }));
     }, []);
 
+    const handleSeparatorChange = useCallback((value: string) => {
+        setValues((prev) => ({ ...prev, authorsSeparator: value }));
+    }, []);
+
     const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const { target } = e;
         if (target.files && target.files[0]) {
@@ -43,8 +47,8 @@ const CreateProduct = () => {
         (e: FormEvent) => {
             e.preventDefault();
             if (!file) return;
-            const { authors, productTitle, genre, fileName } = values;
-            addProductWithImage({ authors, productTitle, genre }, { file, name: fileName });
+            const { authors, authorsSeparator, productTitle, genre, fileName } = values;
+            addProductWithImage({ authors, authorsSeparator, productTitle, genre }, { file, name: fileName });
         },
         [values, file, addProductWithImage],
     );
@@ -94,6 +98,19 @@ const CreateProduct = () => {
                                         placeholder={field.placeholder}
                                         ariaLabel={field.label}
                                     />
+                                ) : field.kind === 'select' ? (
+                                    <select
+                                        id={field.id}
+                                        className={styles.field__input}
+                                        value={values[field.key]}
+                                        onChange={(e) => handleSeparatorChange(e.target.value)}
+                                    >
+                                        {field.options.map((opt) => (
+                                            <option key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                 ) : (
                                     <input
                                         id={field.id}

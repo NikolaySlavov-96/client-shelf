@@ -21,6 +21,7 @@ export interface IProduct {
     ratingAverage?: number;
     ratingCount?: number;
     authors: IAuthor[];
+    authorsSeparator: string;
     fileUrl: string;
     fileId: number;
     fileSrc: string;
@@ -66,6 +67,7 @@ export interface IFetchQueryParams extends IFetchSearchParams {
 export interface IAddProductWithImage {
     data: {
         authors: string[];
+        authorsSeparator?: string;
         productTitle: string;
         genre: string;
     };

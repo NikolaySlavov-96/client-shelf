@@ -17,6 +17,7 @@ interface IBookCardProps {
     productId: number;
     productTitle: string;
     authors: IAuthor[];
+    authorsSeparator?: string;
     productType: string;
     fileUrl?: string;
     fileSrc?: string;
@@ -31,6 +32,7 @@ function BookCard({
     productId,
     productTitle,
     authors,
+    authorsSeparator,
     fileUrl,
     fileSrc,
     statusId,
@@ -69,7 +71,7 @@ function BookCard({
 
             <div className={cx(styles.meta, isList ? 'flex-col' : '')}>
                 {isList ? <p className={styles.meta__title}>{productTitle}</p> : null}
-                <p className={styles.meta__author}>{formatAuthors(authors)}</p>
+                <p className={styles.meta__author}>{formatAuthors(authors, authorsSeparator)}</p>
                 {isAuthenticated ? (
                     <List
                         data={statuses}

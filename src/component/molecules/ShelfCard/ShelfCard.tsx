@@ -17,6 +17,7 @@ interface IShelfCardProps {
     productId: number;
     productTitle: string;
     authors: IAuthor[];
+    authorsSeparator?: string;
     statusId: number;
     fileUrl?: string;
     fileSrc?: string;
@@ -29,6 +30,7 @@ function ShelfCard({
     productId,
     productTitle,
     authors,
+    authorsSeparator,
     statusId,
     fileUrl,
     fileSrc,
@@ -75,7 +77,7 @@ function ShelfCard({
             />
 
             <div className={styles.body}>
-                <p className={styles.author}>{formatAuthors(authors)}</p>
+                <p className={styles.author}>{formatAuthors(authors, authorsSeparator)}</p>
                 <div className={`flex-between ${styles.footer}`}>
                     <Badge statusId={statusId} badgeStyle="light" />
                     {onRemove ? (
