@@ -24,14 +24,14 @@ const ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
     const { onPress, roomName } = props;
 
     const messageEndRef = useRef<HTMLDivElement | null>(null);
-    const { connectId, welcomeMessage, messages } = useStoreZ();
+    const { welcomeMessage, messages } = useStoreZ();
 
     const roomMessages = messages[roomName] || [];
 
     const onClose = useCallback(() => {
         onPress((s) => !s);
-        SocketService.sendData(ESendEvents.SUPPORT_CHAT_USER_LEAVE, { roomName, connectId });
-    }, [onPress, roomName, connectId]);
+        SocketService.sendData(ESendEvents.SUPPORT_CHAT_USER_LEAVE, { roomName });
+    }, [onPress, roomName]);
 
     const onVerifyChoice = useCallback(async () => {
         const result = await ToastWithButton(SUPPORT_TOAST);
@@ -40,12 +40,9 @@ const ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
         }
     }, [onClose]);
 
-    const renderItem = useCallback(
-        ({ item }: { item: IMessage }) => {
-            return <MessageLine {...item} connectId={connectId} />;
-        },
-        [connectId],
-    );
+    const renderItem = useCallback(({ item }: { item: IMessage }) => {
+        return <MessageLine {...item} />;
+    }, []);
 
     const scrollToBottom = () => {
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -68,7 +65,7 @@ const ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
             </div>
             {roomName ? (
                 <div className={style['input__container']}>
-                    <MessageForm roomName={roomName} connectId={connectId} />
+                    <MessageForm roomName={roomName} />
                 </div>
             ) : null}
         </>

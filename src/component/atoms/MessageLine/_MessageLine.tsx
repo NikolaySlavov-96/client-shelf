@@ -2,20 +2,18 @@ import { memo } from 'react';
 
 import { convertDateTime } from '~/Helpers';
 
+import { useStoreZ } from '~/hooks';
 import { type IMessage } from '~/Store/Slicers/SupportSlicer';
 
 import style from './_MessageLine.module.css';
 
-interface IMessageLine extends IMessage {
-    connectId: string;
-}
+const _MessageLine = (props: IMessage) => {
+    const { message, senderId, createdAt } = props;
 
-const _MessageLine = (props: IMessageLine) => {
-    const { message, senderId, connectId, createdAt } = props;
-
+    const principal = useStoreZ((s) => s.principal);
     const currentTime = convertDateTime(createdAt);
 
-    const isSender = senderId === connectId;
+    const isSender = !!senderId && !!principal && senderId === principal;
 
     if (!senderId) {
         return <p className={style['message__center']}>{message}</p>;

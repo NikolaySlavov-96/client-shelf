@@ -6,15 +6,11 @@ import { useGetUserAddress, useStoreZ } from '~/hooks';
 import { SocketService } from '~/services';
 import { type IMessage } from '~/Store/Slicers/SupportSlicer';
 
-const onUnsubscribe = () => {
-    console.log('Unsubscribe');
-};
-
 const Socket = () => {
     const { userRole, token } = useStoreZ();
 
     const {
-        connectId,
+        rooms,
         openModal,
         setModalName,
         setContent,
@@ -22,6 +18,7 @@ const Socket = () => {
         setRooms,
         setSelectedRoom,
         setWelcomeMessage,
+        setPrincipal,
         addMessage,
         resetRooms,
         removeRoom,
@@ -29,7 +26,7 @@ const Socket = () => {
 
     const userAddressData = useGetUserAddress();
 
-    const result = useCallback(
+    const onNewProductAdded = useCallback(
         (data: { dailyUsers: number; uncialUsers: number; isNewUser: boolean }) => {
             setModalName(MODAL_NAMES.NEW_PRODUCT);
             setContent(data);
@@ -38,30 +35,35 @@ const Socket = () => {
         [setModalName, setContent, openModal],
     );
 
-    const updateCountOfVisitors = (data: any) => {
-        console.log(data);
-    };
+    const onError = useCallback((data: unknown) => {
+        console.log('socket error:', data);
+    }, []);
 
-    const notifyForCreatedRoom = (data: IMessage) => {
-        setRooms({ roomName: data.roomName });
-        addMessage(data);
-        if (userRole !== 'support') {
-            localStorage.setItem(STORAGE_KEYS.ISSUE_ROOMS, JSON.stringify(data.roomName));
-            SocketService.sendData(ESendEvents.USER_ACCEPT_JOIN_TO_ROOM, { roomName: data.roomName });
-        }
-    };
+    const onJoinAcknowledgment = useCallback(
+        (data: { message: string; principal: string }) => {
+            setWelcomeMessage(data.message);
+            setPrincipal(data.principal);
+        },
+        [setWelcomeMessage, setPrincipal],
+    );
 
-    useEffect(() => {
-        SocketService.connect(token);
+    const onNotifyForCreatedRoom = useCallback(
+        (data: IMessage) => {
+            const exists = rooms.some((r) => r.roomName === data.roomName);
+            if (!exists) {
+                setRooms({ roomName: data.roomName });
+            }
+            addMessage(data);
+            if (userRole !== 'support') {
+                localStorage.setItem(STORAGE_KEYS.ISSUE_ROOMS, JSON.stringify(data.roomName));
+                SocketService.sendData(ESendEvents.USER_ACCEPT_JOIN_TO_ROOM, { roomName: data.roomName });
+            }
+        },
+        [rooms, setRooms, addMessage, userRole],
+    );
 
-        SocketService.subscribeToEvent(EReceiveEvents.ERROR, (data) => console.log(data));
-        SocketService.subscribeToEvent(EReceiveEvents.NEW_PRODUCT_ADDED, result);
-        SocketService.subscribeToEvent(EReceiveEvents.USER_CONNECT, updateCountOfVisitors);
-        SocketService.subscribeToEvent(EReceiveEvents.SUPPORT_CHAT_USER_JOIN_ACKNOWLEDGMENT, setWelcomeMessage);
-        SocketService.subscribeToEvent(EReceiveEvents.NOTIFY_FOR_CREATE_ROOM, notifyForCreatedRoom);
-        SocketService.subscribeToEvent(EReceiveEvents.NOTIFY_ADMINS_OF_NEW_USER, setUsers);
-
-        SocketService.subscribeToEvent(EReceiveEvents.COMPLETE_ISSUE, (data: { message: string; issue: string }) => {
+    const onCompleteIssue = useCallback(
+        (data: { message: string; issue: string }) => {
             if (userRole === 'support') {
                 setSelectedRoom('');
                 removeRoom(data.issue);
@@ -69,29 +71,59 @@ const Socket = () => {
             }
             resetRooms();
             localStorage.removeItem(STORAGE_KEYS.ISSUE_ROOMS);
-        });
+        },
+        [userRole, setSelectedRoom, removeRoom, resetRooms],
+    );
 
+    useEffect(() => {
+        SocketService.connect(token);
+
+        SocketService.subscribeToEvent(EReceiveEvents.ERROR, onError);
+        SocketService.subscribeToEvent(EReceiveEvents.NEW_PRODUCT_ADDED, onNewProductAdded);
+        SocketService.subscribeToEvent(EReceiveEvents.SUPPORT_CHAT_USER_JOIN_ACKNOWLEDGMENT, onJoinAcknowledgment);
+        SocketService.subscribeToEvent(EReceiveEvents.NOTIFY_FOR_CREATE_ROOM, onNotifyForCreatedRoom);
+        SocketService.subscribeToEvent(EReceiveEvents.NOTIFY_ADMINS_OF_NEW_USER, setUsers);
+        SocketService.subscribeToEvent(EReceiveEvents.COMPLETE_ISSUE, onCompleteIssue);
         SocketService.subscribeToEvent(EReceiveEvents.SUPPORT_MESSAGE, addMessage);
 
         return () => {
-            SocketService.unsubscribeFromEvent(EReceiveEvents.NEW_PRODUCT_ADDED, onUnsubscribe);
-            SocketService.unsubscribeFromEvent(EReceiveEvents.ERROR, onUnsubscribe);
-            SocketService.unsubscribeFromEvent(EReceiveEvents.COMPLETE_ISSUE, onUnsubscribe);
-            SocketService.unsubscribeFromEvent(EReceiveEvents.USER_CONNECT, onUnsubscribe);
-            SocketService.unsubscribeFromEvent(EReceiveEvents.SUPPORT_CHAT_USER_JOIN_ACKNOWLEDGMENT, onUnsubscribe);
-            SocketService.unsubscribeFromEvent(EReceiveEvents.NOTIFY_FOR_CREATE_ROOM, onUnsubscribe);
-            SocketService.unsubscribeFromEvent(EReceiveEvents.NOTIFY_ADMINS_OF_NEW_USER, onUnsubscribe);
-            SocketService.unsubscribeFromEvent(EReceiveEvents.SUPPORT_MESSAGE, onUnsubscribe);
+            SocketService.unsubscribeFromEvent(EReceiveEvents.ERROR, onError);
+            SocketService.unsubscribeFromEvent(EReceiveEvents.NEW_PRODUCT_ADDED, onNewProductAdded);
+            SocketService.unsubscribeFromEvent(
+                EReceiveEvents.SUPPORT_CHAT_USER_JOIN_ACKNOWLEDGMENT,
+                onJoinAcknowledgment,
+            );
+            SocketService.unsubscribeFromEvent(EReceiveEvents.NOTIFY_FOR_CREATE_ROOM, onNotifyForCreatedRoom);
+            SocketService.unsubscribeFromEvent(EReceiveEvents.NOTIFY_ADMINS_OF_NEW_USER, setUsers);
+            SocketService.unsubscribeFromEvent(EReceiveEvents.COMPLETE_ISSUE, onCompleteIssue);
+            SocketService.unsubscribeFromEvent(EReceiveEvents.SUPPORT_MESSAGE, addMessage);
             SocketService.disconnect();
         };
-    }, [token, userRole]);
+    }, [
+        token,
+        userRole,
+        onError,
+        onNewProductAdded,
+        onJoinAcknowledgment,
+        onNotifyForCreatedRoom,
+        setUsers,
+        onCompleteIssue,
+        addMessage,
+    ]);
 
     useEffect(() => {
         const persist = localStorage.getItem(STORAGE_KEYS.ISSUE_ROOMS);
-        if (persist) {
+        if (!persist) return;
+        try {
             const roomName = JSON.parse(persist);
+            if (typeof roomName !== 'string' || !roomName) {
+                localStorage.removeItem(STORAGE_KEYS.ISSUE_ROOMS);
+                return;
+            }
             setRooms({ roomName });
             SocketService.sendData(ESendEvents.USER_ACCEPT_JOIN_TO_ROOM, { roomName });
+        } catch {
+            localStorage.removeItem(STORAGE_KEYS.ISSUE_ROOMS);
         }
     }, [setRooms]);
 

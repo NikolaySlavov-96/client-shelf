@@ -42,8 +42,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
 
     onSubmitLogin: async ({ email, password }: { email: string; password: string }) => {
         try {
-            const { connectId } = get();
-            const result = await getAuthService().login({ email, password, connectId });
+            const result = await getAuthService().login({ email, password });
             if (result.messageCode === ServerError.SUCCESSFULLY_LOGIN.messageCode) {
                 const { userInfo } = result;
                 set({
@@ -80,7 +79,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
             });
             resetRooms();
             resetMessages();
-            setWelcomeMessage({ message: '' });
+            setWelcomeMessage('');
             SocketService.disconnect();
             SocketService.connect();
         } catch (_err) {

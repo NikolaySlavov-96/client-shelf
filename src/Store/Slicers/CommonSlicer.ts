@@ -12,8 +12,6 @@ type FormData = {
 export interface ICommonSlicer {
     pageLimit: number;
     setPageLimit: (limit: number) => void;
-    connectId: string;
-    setConnectId: (id: string) => void;
 
     viewType: TViewType;
     setViewType: (viewType: TViewType) => void;
@@ -26,9 +24,6 @@ export interface ICommonSlicer {
 const createCommonSlicer: StateCreator<ICommonSlicer> = (set) => ({
     pageLimit: 12,
     setPageLimit: (limit) => set({ pageLimit: limit }),
-
-    connectId: '',
-    setConnectId: (id) => set({ connectId: id }),
 
     viewType: 'grid',
     setViewType: (viewType) => set({ viewType }),

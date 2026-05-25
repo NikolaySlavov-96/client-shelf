@@ -12,28 +12,25 @@ import style from './_Support.module.css';
 
 const DEFAULT_TITLE = 'Support Chat - ';
 
-const keyExtractorUser = (item: IUserQueue) => item.connectId.toString();
+const keyExtractorUser = (item: IUserQueue) => item.principal;
 const keyExtractorRoom = (item: IRoom) => item.roomName.toString();
 const keyExtractorMessage = (item: IMessage) => item.message.toString();
 
 const Support = () => {
-    const { rooms, connectId, users, messages, selectedRoom, setSelectedRoom, email } = useStoreZ();
+    const { rooms, users, messages, selectedRoom, setSelectedRoom, email } = useStoreZ();
 
     const messageEndRef = useRef<HTMLDivElement | null>(null);
     const currentRoomMessages = messages[selectedRoom] || [];
 
-    const renderItemUser = useCallback(
-        ({ item }: { item: IUserQueue }) => {
-            const onClick = () => {
-                SocketService.sendData(ESendEvents.SUPPORT_ACCEPT_USER, {
-                    supportId: connectId,
-                    acceptUserId: item.connectId,
-                });
-            };
-            return <button onClick={onClick}>{item.connectId}</button>;
-        },
-        [connectId],
-    );
+    const renderItemUser = useCallback(({ item }: { item: IUserQueue }) => {
+        const onClick = () => {
+            // Server resolves support identity from the socket itself
+            SocketService.sendData(ESendEvents.SUPPORT_ACCEPT_USER, {
+                acceptUserPrincipal: item.principal,
+            });
+        };
+        return <button onClick={onClick}>{item.name || item.principal}</button>;
+    }, []);
 
     const renderItemRoom = useCallback(
         ({ item }: { item: IRoom }) => {
@@ -47,14 +44,11 @@ const Support = () => {
         [setSelectedRoom],
     );
 
-    const renderItemMessage = useCallback(
-        ({ item }: { item: IMessage }) => <MessageLine {...item} connectId={connectId} />,
-        [connectId],
-    );
+    const renderItemMessage = useCallback(({ item }: { item: IMessage }) => <MessageLine {...item} />, []);
 
     useEffect(() => {
-        SocketService.sendData(ESendEvents.SUPPORT_CHAT_USER_JOIN, { connectId });
-    }, [connectId]);
+        SocketService.sendOnlySignal(ESendEvents.SUPPORT_CHAT_USER_JOIN);
+    }, []);
 
     const scrollToBottom = () => {
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -94,7 +88,7 @@ const Support = () => {
                     />
                     <div ref={messageEndRef} />
                 </div>
-                {selectedRoom !== '' ? <MessageForm roomName={selectedRoom} connectId={connectId} /> : null}
+                {selectedRoom !== '' ? <MessageForm roomName={selectedRoom} /> : null}
             </div>
         </section>
     );

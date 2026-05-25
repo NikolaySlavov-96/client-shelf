@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useRef } from 'react';
 
 import { ESendEvents } from '~/constants';
 
@@ -7,15 +7,22 @@ import { SocketService } from '~/services';
 import { InputForm } from '..';
 
 const DEFAUlT_BUTTON_LABEL = 'Send';
+const MAX_MESSAGE_LENGTH = 255;
+const ACTIVITY_DEBOUNCE_MS = 2000;
 
 const MessageForm = (props: any) => {
-    const { buttonLabel = DEFAUlT_BUTTON_LABEL, roomName, connectId } = props;
+    const { buttonLabel = DEFAUlT_BUTTON_LABEL, roomName } = props;
+
+    const lastActivitySentAt = useRef(0);
 
     const sendMessage = useCallback(
         (data: { message: string }) => {
+            const trimmed = (data.message ?? '').trim();
+            if (!trimmed) return;
+            if (trimmed.length > MAX_MESSAGE_LENGTH) return;
             SocketService.sendData(ESendEvents.SUPPORT_MESSAGE, {
                 roomName,
-                message: data.message,
+                message: trimmed,
             });
         },
         [roomName],
@@ -34,18 +41,17 @@ const MessageForm = (props: any) => {
     const activityHandler = useCallback(
         (e: any) => {
             changeHandler(e);
-            // add debounce from 2 second before send event again
-            SocketService.sendData(ESendEvents.SUPPORT_ACTIVITY, { roomName, connectId });
+            const now = Date.now();
+            if (now - lastActivitySentAt.current > ACTIVITY_DEBOUNCE_MS) {
+                lastActivitySentAt.current = now;
+                SocketService.sendData(ESendEvents.SUPPORT_ACTIVITY, { roomName });
+            }
         },
-        [changeHandler, connectId, roomName],
+        [changeHandler, roomName],
     );
 
     return (
-        <InputForm
-            buttonLabel={buttonLabel}
-            // formStyles={containerStyles // style['send__input-button']}
-            onSubmit={onSubmit}
-        >
+        <InputForm buttonLabel={buttonLabel} onSubmit={onSubmit}>
             <input
                 type="text"
                 name="message"
@@ -54,6 +60,7 @@ const MessageForm = (props: any) => {
                 value={values.message}
                 onChange={activityHandler}
                 onBlur={activityHandler}
+                maxLength={MAX_MESSAGE_LENGTH}
             />
         </InputForm>
     );
