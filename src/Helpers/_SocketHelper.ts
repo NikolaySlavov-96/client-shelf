@@ -40,13 +40,14 @@ const onNotifyAdminsOfNewUser: Parameters<typeof SocketService.subscribeToEvent>
 };
 
 const onCompleteIssue = (data: { message: string; issue: string }) => {
-    const { userRole, setSelectedRoom, removeRoom, resetRooms } = useStoreZ.getState();
+    const { userRole, setSelectedRoom, removeRoom, resetRooms, resetMessages } = useStoreZ.getState();
     if (userRole === 'support') {
         setSelectedRoom('');
         removeRoom(data.issue);
         return;
     }
     resetRooms();
+    resetMessages();
     localStorage.removeItem(STORAGE_KEYS.ISSUE_ROOMS);
 };
 

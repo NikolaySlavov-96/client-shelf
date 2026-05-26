@@ -6,6 +6,8 @@ import { useForm } from '~/hooks';
 import { SocketService } from '~/services';
 import { InputForm } from '..';
 
+import style from './_MessageForm.module.css';
+
 const DEFAUlT_BUTTON_LABEL = 'Send';
 const ACTIVITY_DEBOUNCE_MS = 2000;
 
@@ -49,15 +51,22 @@ const MessageForm = (props: any) => {
     );
 
     return (
-        <InputForm buttonLabel={buttonLabel} onSubmit={onSubmit}>
+        <InputForm
+            buttonLabel={buttonLabel}
+            onSubmit={onSubmit}
+            formStyles={`flex-align ${style['form']}`}
+            buttonStyles={style['button']}
+        >
             <input
                 type="text"
                 name="message"
                 id="message"
-                placeholder={DEFAUlT_BUTTON_LABEL}
+                placeholder={'Type a message...'}
                 value={values.message}
                 onChange={activityHandler}
                 onBlur={activityHandler}
+                className={style['input']}
+                autoComplete="off"
             />
         </InputForm>
     );

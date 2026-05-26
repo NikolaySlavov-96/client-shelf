@@ -80,6 +80,10 @@
   overflow-y: auto;
 }
 
+.input__container {
+  padding: var(--spacing-12) var(--spacing-4) var(--spacing-4);
+}
+
 @media (max-width: 768px) {
   .container {
     flex-direction: column;

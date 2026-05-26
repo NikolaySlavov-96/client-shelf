@@ -101,7 +101,11 @@ const Support = () => {
                     />
                     <div ref={messageEndRef} />
                 </div>
-                {selectedRoom !== '' ? <MessageForm roomName={selectedRoom} /> : null}
+                {selectedRoom !== '' ? (
+                    <div className={style['input__container']}>
+                        <MessageForm roomName={selectedRoom} />
+                    </div>
+                ) : null}
             </div>
         </section>
     );

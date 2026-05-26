@@ -45,8 +45,7 @@ const _InputForm: FC<IInputFormProps> = (props) => {
 
             {afterChildren}
 
-            <button>{buttonLabel}</button>
-            {/* <button style={buttonStyles}>{buttonLabel}</button> */}
+            <button className={buttonStyles}>{buttonLabel}</button>
 
             {addSeparatorAfterButton ? <Separator /> : null}
 
