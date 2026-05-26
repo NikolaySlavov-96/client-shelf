@@ -7,7 +7,6 @@ import { SocketService } from '~/services';
 import { InputForm } from '..';
 
 const DEFAUlT_BUTTON_LABEL = 'Send';
-const MAX_MESSAGE_LENGTH = 255;
 const ACTIVITY_DEBOUNCE_MS = 2000;
 
 const MessageForm = (props: any) => {
@@ -19,7 +18,6 @@ const MessageForm = (props: any) => {
         (data: { message: string }) => {
             const trimmed = (data.message ?? '').trim();
             if (!trimmed) return;
-            if (trimmed.length > MAX_MESSAGE_LENGTH) return;
             SocketService.sendData(ESendEvents.SUPPORT_MESSAGE, {
                 roomName,
                 message: trimmed,
@@ -60,7 +58,6 @@ const MessageForm = (props: any) => {
                 value={values.message}
                 onChange={activityHandler}
                 onBlur={activityHandler}
-                maxLength={MAX_MESSAGE_LENGTH}
             />
         </InputForm>
     );
