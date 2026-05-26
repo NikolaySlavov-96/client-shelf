@@ -31,8 +31,8 @@
 
 .status {
   margin-left: var(--spacing-2);
-  font-size: 0.85em;
-  opacity: 0.75;
+  font-size: var(--text-sm);
+  opacity: var(--opacity-muted);
 }
 
 .status__sent {
@@ -41,7 +41,7 @@
 
 .status__delivered {
   color: inherit;
-  opacity: 0.9;
+  opacity: var(--opacity-high);
 }
 
 .status__seen {
