@@ -17,7 +17,7 @@ const keyExtractorRoom = (item: IRoom) => item.roomName.toString();
 const keyExtractorMessage = (item: IMessage) => item.message.toString();
 
 const Support = () => {
-    const { rooms, users, messages, selectedRoom, setSelectedRoom, email } = useStoreZ();
+    const { rooms, users, messages, selectedRoom, setSelectedRoom, email, principal } = useStoreZ();
 
     const messageEndRef = useRef<HTMLDivElement | null>(null);
     const currentRoomMessages = messages[selectedRoom] || [];
@@ -57,6 +57,19 @@ const Support = () => {
     useEffect(() => {
         if (selectedRoom) scrollToBottom();
     }, [selectedRoom, currentRoomMessages.length]);
+
+    useEffect(() => {
+        if (!selectedRoom || !principal) return;
+        for (const msg of currentRoomMessages) {
+            if (typeof msg.id !== 'number') continue;
+            if (!msg.senderId || msg.senderId === principal) continue;
+            if (msg.status === 'seen') continue;
+            SocketService.sendData(ESendEvents.SUPPORT_MESSAGE_SEEN, {
+                roomName: selectedRoom,
+                messageId: msg.id,
+            });
+        }
+    }, [selectedRoom, principal, currentRoomMessages]);
 
     return (
         <section className={style.container}>

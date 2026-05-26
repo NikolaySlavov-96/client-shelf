@@ -28,3 +28,23 @@
 .message {
   margin-right: var(--spacing-4);
 }
+
+.status {
+  margin-left: var(--spacing-2);
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+
+.status__sent {
+  color: inherit;
+}
+
+.status__delivered {
+  color: inherit;
+  opacity: 0.9;
+}
+
+.status__seen {
+  color: #2196f3;
+  opacity: 1;
+}

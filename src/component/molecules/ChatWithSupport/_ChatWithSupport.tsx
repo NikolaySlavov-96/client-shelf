@@ -52,6 +52,21 @@ const ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
         scrollToBottom();
     }, [roomMessages.length]);
 
+    const principal = useStoreZ((s) => s.principal);
+
+    useEffect(() => {
+        if (!roomName || !principal) return;
+        for (const msg of roomMessages) {
+            if (typeof msg.id !== 'number') continue;
+            if (!msg.senderId || msg.senderId === principal) continue;
+            if (msg.status === 'seen') continue;
+            SocketService.sendData(ESendEvents.SUPPORT_MESSAGE_SEEN, {
+                roomName,
+                messageId: msg.id,
+            });
+        }
+    }, [roomName, principal, roomMessages]);
+
     return (
         <>
             <ChatHeader>
