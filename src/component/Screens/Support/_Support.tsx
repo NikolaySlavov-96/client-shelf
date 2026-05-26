@@ -92,14 +92,15 @@ const Support = () => {
                     style={style['room__header']}
                 />
                 <div className={`flex-col ${style['message__container']}`}>
-                    <List
-                        data={currentRoomMessages}
-                        renderItem={renderItemMessage}
-                        keyExtractor={keyExtractorMessage}
-                        EmptyComponent={() => null}
-                        style={style['chat__window']}
-                    />
-                    <div ref={messageEndRef} />
+                    <div className={style['chat__window']}>
+                        <List
+                            data={currentRoomMessages}
+                            renderItem={renderItemMessage}
+                            keyExtractor={keyExtractorMessage}
+                            EmptyComponent={() => null}
+                        />
+                        <div ref={messageEndRef} />
+                    </div>
                 </div>
                 {selectedRoom !== '' ? (
                     <div className={style['input__container']}>
