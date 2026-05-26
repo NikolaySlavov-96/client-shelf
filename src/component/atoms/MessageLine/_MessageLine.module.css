@@ -45,6 +45,6 @@
 }
 
 .status__seen {
-  color: var(--accent);
+  color: var(--white);
   opacity: 1;
 }
