@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { createLogger } from '~/Utils';
+
+const log = createLogger('useGetUserAddress');
+
 const DOMAIN = 'https://geolocation-db.com/json/';
 // https://api.ipify.org/?format=json
 
@@ -12,7 +16,7 @@ const useGetUserAddress = () => {
             const result = await test.json();
             setUserData(result);
         } catch (err) {
-            console.error(err);
+            log.error('checkUserAddress failed', err);
         }
     }, []);
 

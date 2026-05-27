@@ -41,9 +41,7 @@ const _MessageLine = (props: IMessage) => {
                     {currentTime}
                     {isSender ? (
                         <span
-                            className={`${style['status']} ${
-                                style[`status__${effectiveStatus}`] ?? ''
-                            }`}
+                            className={`${style['status']} ${style[`status__${effectiveStatus}`] ?? ''}`}
                             aria-label={STATUS_LABEL[effectiveStatus]}
                             title={STATUS_LABEL[effectiveStatus]}
                         >

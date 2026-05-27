@@ -11,6 +11,7 @@ import style from './_MessageForm.module.css';
 const DEFAUlT_BUTTON_LABEL = 'Send';
 const ACTIVITY_DEBOUNCE_MS = 2000;
 
+// TODO(lint): introduce a proper props interface (buttonLabel, roomName) (no-explicit-any).
 const MessageForm = (props: any) => {
     const { buttonLabel = DEFAUlT_BUTTON_LABEL, roomName } = props;
 
@@ -39,6 +40,7 @@ const MessageForm = (props: any) => {
     );
 
     const activityHandler = useCallback(
+        // TODO(lint): type `e` as React.ChangeEvent<HTMLInputElement> (no-explicit-any).
         (e: any) => {
             changeHandler(e);
             const now = Date.now();

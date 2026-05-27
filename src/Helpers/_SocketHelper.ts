@@ -2,12 +2,16 @@ import { useEffect } from 'react';
 
 import { EReceiveEvents, ESendEvents, MODAL_NAMES, STORAGE_KEYS } from '~/constants';
 
+import { createLogger } from '~/Utils';
+
 import { useGetUserAddress, useStoreZ } from '~/hooks';
 import { SocketService } from '~/services';
 import { type IMessage, type IMessageStatusUpdate } from '~/Store/Slicers/SupportSlicer';
 
+const log = createLogger('Socket');
+
 const onError = (data: unknown) => {
-    console.log('socket error:', data);
+    log.error('socket error:', data);
 };
 
 const onNewProductAdded = (data: { dailyUsers: number; uncialUsers: number; isNewUser: boolean }) => {

@@ -3,6 +3,7 @@ import { useState } from 'react';
 type TData = { [key: string]: string };
 type TError = { [key: string]: [string, number?] };
 
+// TODO(lint): type `onSubmitHandler` data parameter as TData (no-explicit-any).
 const useForm = (
     initialValue: TData,
     onSubmitHandler: (data: any) => void,
@@ -12,6 +13,7 @@ const useForm = (
     const [values, setValue] = useState(initialValue);
     const [errors, setErrors] = useState(initialValue);
 
+    // TODO(lint): type `e` as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> (no-explicit-any).
     const changeHandler = (e: any) => {
         setValue((state) => ({ ...state, [e.target.name]: e.target.value }));
 
@@ -29,6 +31,7 @@ const useForm = (
         }
     };
 
+    // TODO(lint): type `e` as React.FormEvent<HTMLFormElement> (no-explicit-any).
     const onSubmit = (e: any) => {
         e.preventDefault();
 
@@ -38,6 +41,7 @@ const useForm = (
         }
     };
 
+    // TODO(lint): type `newValue` as TData (no-explicit-any).
     const changeValue = (newValue: any) => {
         setValue(newValue);
     };

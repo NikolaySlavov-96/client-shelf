@@ -1,5 +1,6 @@
 import { type StateCreator } from 'zustand';
 
+// TODO(lint): tighten the `any` types — content/newData should use proper modal payload types (no-explicit-any x3).
 export interface IModalSlicer {
     modalName: string;
     setModalName: (data: string) => void;

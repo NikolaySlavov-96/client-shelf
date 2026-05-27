@@ -11,6 +11,7 @@ const options: Partial<ManagerOptions & SocketOptions> = {
 };
 
 const generateClientId = (): string => {
+    // TODO(lint): use `Crypto` type instead of casting globalThis (no-explicit-any).
     const cryptoObj = (typeof globalThis !== 'undefined' && (globalThis as any).crypto) as
         | { randomUUID?: () => string; getRandomValues?: (a: Uint8Array) => Uint8Array }
         | undefined;
@@ -53,12 +54,14 @@ const disconnect = () => {
     }
 };
 
+// TODO(lint): introduce a typed event-to-payload map so `callback` isn't `(data: any)` (no-explicit-any).
 const subscribeToEvent = (event: EReceiveEvents, callback: (data: any) => void) => {
     if (socket) {
         socket.on(event, callback);
     }
 };
 
+// TODO(lint): introduce a typed event-to-payload map so `callback` isn't `(data: any)` (no-explicit-any).
 const unsubscribeFromEvent = (event: EReceiveEvents, callback: (data: any) => void) => {
     if (socket) {
         socket.off(event, callback);
@@ -76,12 +79,4 @@ const sendOnlySignal = (event: ESendEvents) => {
     }
 };
 
-export {
-    connect,
-    disconnect,
-    getOrCreateClientId,
-    sendData,
-    sendOnlySignal,
-    subscribeToEvent,
-    unsubscribeFromEvent,
-};
+export { connect, disconnect, getOrCreateClientId, sendData, sendOnlySignal, subscribeToEvent, unsubscribeFromEvent };

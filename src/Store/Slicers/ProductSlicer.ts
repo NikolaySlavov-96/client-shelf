@@ -2,9 +2,13 @@ import { type StateCreator } from 'zustand';
 
 import { TEXTS } from '~/constants';
 
+import { createLogger } from '~/Utils';
+
 import { FileService as fileService, ProductService as productService } from '~/services';
 import { Toast } from '~/Toasts';
 import { ESwalIcon } from '~/Types/Swal';
+
+const log = createLogger('ProductSlicer');
 
 const showActionError = (err: unknown) => {
     const message = (err as { message?: string })?.message;
@@ -94,7 +98,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const result = await productService.getAllStatus();
             set({ productStates: result });
         } catch (err) {
-            console.log('fetchAllProductStates error --->: ', err);
+            log.error('fetchAllProductStates error --->: ', err);
         }
     },
 
@@ -105,7 +109,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const result = await productService.searchProductByEmailOnUser(data);
             set({ productByEmail: result });
         } catch (err) {
-            console.log('fetchProductsForEmail error --->: ', err);
+            log.error('fetchProductsForEmail error --->: ', err);
         } finally {
             set({ isLoadingProductByEmails: false });
         }
@@ -119,7 +123,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const result = await productService.getProducts(data);
             set({ products: result });
         } catch (err) {
-            console.log('fetchProducts error --->: ', err);
+            log.error('fetchProducts error --->: ', err);
             // set({ error: error.message })
         } finally {
             set({ isLoadingProducts: false });
@@ -154,7 +158,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const resultFromRequest = await productService.getProduct(id);
             set({ productById: resultFromRequest });
         } catch (err) {
-            console.log('fetchProductById error --->: ', err);
+            log.error('fetchProductById error --->: ', err);
         } finally {
             set({ isLoadingProduct: false });
         }
@@ -167,7 +171,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const result = await productService.getProductStatus(id);
             set({ productState: { stateId: result.statusId } });
         } catch (err) {
-            console.log('fetchProductState error --->: ', err);
+            log.error('fetchProductState error --->: ', err);
         } finally {
             set({ isLoadingProductState: false });
         }
@@ -202,7 +206,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
                 productState: { stateId: nextStatusId },
             });
         } catch (err) {
-            console.log('addingProductState error --->: ', err);
+            log.error('addingProductState error --->: ', err);
             showActionError(err);
         } finally {
             set({ isAddingProductState: false });
@@ -215,7 +219,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const result = await productService.getProductRating(id);
             set({ productRating: result });
         } catch (err) {
-            console.log('fetchProductRating error --->: ', err);
+            log.error('fetchProductRating error --->: ', err);
         }
     },
     rateProduct: async (id, rating) => {
@@ -228,7 +232,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const result = await productService.rateProduct(id, rating);
             set({ productRating: result });
         } catch (err) {
-            console.log('rateProduct error --->: ', err);
+            log.error('rateProduct error --->: ', err);
             showActionError(err);
             set({ productRating: previous });
         }
@@ -241,7 +245,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const result = await productService.getAllProductStatus(data);
             set({ productCollection: result });
         } catch (err) {
-            console.log('fetchProductCollection error --->: ', err);
+            log.error('fetchProductCollection error --->: ', err);
         } finally {
             set({ isLoadingProductCollection: false });
         }
@@ -253,7 +257,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             const result = await productService.getStatusCounts();
             set({ statusCounts: result });
         } catch (err) {
-            console.log('fetchStatusCounts error --->: ', err);
+            log.error('fetchStatusCounts error --->: ', err);
         }
     },
 
@@ -273,7 +277,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             await productService.removeStatusFromProduct(productId);
             get().fetchStatusCounts();
         } catch (err) {
-            console.log('removeProductState error --->: ', err);
+            log.error('removeProductState error --->: ', err);
             showActionError(err);
             set({ productCollection: { count: productCollection.count, rows: previousRows } });
         }
@@ -304,7 +308,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         try {
             await productService.addStatusOnProduct({ productId: String(productId), statusId: String(nextStatusId) });
         } catch (err) {
-            console.log('updateShelfStatus error --->: ', err);
+            log.error('updateShelfStatus error --->: ', err);
             showActionError(err);
             // rollback both the rows and the counts
             set({
@@ -330,7 +334,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
             set({ isProductAdded: true });
         } catch (err) {
-            console.log('addProductWithImage --->: ', err);
+            log.error('addProductWithImage --->: ', err);
             showActionError(err);
         } finally {
             set({ isLoadingProductAddition: false });

@@ -61,6 +61,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
         }
     },
 
+    // TODO(lint): drop `async` since logout() is fire-and-forget with .catch (require-await).
     onSubmitLogout: async () => {
         try {
             const { resetRooms, resetMessages, setWelcomeMessage, refreshToken } = get();

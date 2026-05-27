@@ -17,8 +17,7 @@ const CustomerSupportChat = () => {
     const roomName = rooms[0]?.roomName;
 
     const containerStyle = useMemo(
-        () =>
-            `${style['container']} ${isOpenChat ? `${style['border__open']} ${style['container__open']}` : ''}`,
+        () => `${style['container']} ${isOpenChat ? `${style['border__open']} ${style['container__open']}` : ''}`,
         [isOpenChat],
     );
 
