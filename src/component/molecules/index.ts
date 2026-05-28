@@ -2,6 +2,7 @@ export { default as AuthCardHeader } from './AuthCardHeader/AuthCardHeader';
 export { default as AuthTabs } from './AuthTabs/AuthTabs';
 export { default as BookCard } from './BookCard/BookCard';
 export { default as BookSpinesPanel } from './BookSpinesPanel/BookSpinesPanel';
+export { default as BrowseModeToggle } from './BrowseModeToggle/BrowseModeToggle';
 export { default as ChatWindowCloser } from './ChatWindowCloser/_ChatWindowCloser';
 export { default as ChatWithSupport } from './ChatWithSupport/_ChatWithSupport';
 export { default as ChipsInput } from './ChipsInput/ChipsInput';

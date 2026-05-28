@@ -1,14 +1,14 @@
-import { memo, useCallback, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
-import { FilterPills, LayoutIcon, Pagination } from '~/component/molecules';
+import { BrowseModeToggle, FilterPills, LayoutIcon, Pagination } from '~/component/molecules';
 
 import { BookGrid } from '~/component/organisms';
 
-import { SEARCH_NAME, TEXTS } from '~/constants';
+import { ROUT_NAMES, SEARCH_NAME, TEXTS } from '~/constants';
 
-import { useStoreZ } from '~/hooks';
-import { type TViewType } from '~/Types/Components';
+import { useInfiniteScroll, useStoreZ } from '~/hooks';
+import { type TBrowseMode, type TViewType } from '~/Types/Components';
 
 import styles from './_Products.module.css';
 
@@ -17,6 +17,9 @@ const ALL_FILTER = 'all';
 const normalizeLayout = (raw: string | null, fallback: TViewType): TViewType =>
     raw === 'list' || raw === 'grid' ? raw : fallback;
 
+const normalizeMode = (raw: string | null, fallback: TBrowseMode): TBrowseMode =>
+    raw === 'infinite' || raw === 'paged' ? raw : fallback;
+
 const normalizePage = (raw: string | null): number => {
     const n = Number(raw);
     return Number.isInteger(n) && n > 0 ? n : 1;
@@ -24,6 +27,7 @@ const normalizePage = (raw: string | null): number => {
 
 const Products = () => {
     const [searchParams, setSearchParams] = useSearchParams();
+    const { pathname } = useLocation();
     const {
         products,
         fetchProducts,
@@ -35,12 +39,33 @@ const Products = () => {
         fetchAllProductStates,
         viewType,
         setViewType,
+        browseMode,
+        setBrowseMode,
     } = useStoreZ();
 
+    const [infinitePage, setInfinitePage] = useState(1);
+    const lastQueryKeyRef = useRef<string | null>(null);
+
     const layout = normalizeLayout(searchParams.get(SEARCH_NAME.VIEW), viewType);
-    const page = normalizePage(searchParams.get(SEARCH_NAME.PAGE));
+    const urlPage = normalizePage(searchParams.get(SEARCH_NAME.PAGE));
     const searchContent = searchParams.get(SEARCH_NAME.CONTENT) ?? '';
     const activeFilter = searchParams.get(SEARCH_NAME.STATUS) ?? ALL_FILTER;
+
+    // Infinite scroll is the home default; other routes (e.g. /book) stay paginated.
+    const isHome = pathname === ROUT_NAMES.HOME;
+    const mode = isHome ? normalizeMode(searchParams.get(SEARCH_NAME.MODE), browseMode) : 'paged';
+    const isInfinite = mode === 'infinite';
+
+    const statusId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
+    const queryKey = `${searchContent}|${statusId}|${isInfinite}`;
+
+    const page = isInfinite ? infinitePage : urlPage;
+    const pageCount = Math.ceil(products.count / pageLimit) || 0;
+    const hasMore = isInfinite && products.rows.length < products.count;
+
+    const isInitialLoad = isLoadingProducts && products.rows.length === 0;
+    const showGridLoader = isInfinite ? isInitialLoad : isLoadingProducts;
+    const isLoadingMore = isInfinite && isLoadingProducts && products.rows.length > 0;
 
     const updateParams = useCallback(
         (mutate: (params: URLSearchParams) => void, options?: { replace?: boolean }) => {
@@ -61,34 +86,13 @@ const Products = () => {
         [updateParams, setViewType],
     );
 
-    const count = Math.ceil(products.count / pageLimit) || 0;
-
-    useEffect(() => {
-        if (!searchParams.get(SEARCH_NAME.VIEW)) {
-            updateParams((p) => p.set(SEARCH_NAME.VIEW, layout), { replace: true });
-        }
-    }, []);
-
-    // The status filters are data: the list comes from the API, not the client
-    useEffect(() => {
-        fetchAllProductStates();
-    }, [fetchAllProductStates]);
-
-    const filterOptions = isAuthenticated
-        ? [
-              { value: ALL_FILTER, label: TEXTS.CATALOG_FILTER_ALL },
-              ...productStates.map((s) => ({
-                  value: String(s.id),
-                  label: s.stateName,
-              })),
-          ]
-        : [{ value: ALL_FILTER, label: TEXTS.CATALOG_FILTER_ALL }];
-
-    const statusId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
-
-    useEffect(() => {
-        fetchProducts({ page, limit: pageLimit, searchContent, statusId });
-    }, [fetchProducts, page, pageLimit, searchContent, statusId]);
+    const handleModeChange = useCallback(
+        (next: TBrowseMode) => {
+            setBrowseMode(next);
+            updateParams((p) => p.set(SEARCH_NAME.MODE, next));
+        },
+        [updateParams, setBrowseMode],
+    );
 
     const handleFilterChange = useCallback(
         (value: string) => {
@@ -117,6 +121,8 @@ const Products = () => {
         [updateParams],
     );
 
+    const handleLoadMore = useCallback(() => setInfinitePage((prev) => prev + 1), []);
+
     const handleStatusChange = useCallback(
         (productId: number, newStatusId: number) => {
             const activeFilterId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
@@ -124,6 +130,52 @@ const Products = () => {
         },
         [addingProductState, isAuthenticated, activeFilter],
     );
+
+    const sentinelRef = useInfiniteScroll({ hasMore, isLoading: isLoadingProducts, onLoadMore: handleLoadMore });
+
+    useEffect(() => {
+        const needsView = !searchParams.get(SEARCH_NAME.VIEW);
+        const needsMode = isHome && !searchParams.get(SEARCH_NAME.MODE) && (mode === 'infinite' || mode === 'paged');
+        if (needsView || needsMode) {
+            updateParams(
+                (p) => {
+                    if (needsView) p.set(SEARCH_NAME.VIEW, layout);
+                    if (needsMode) p.set(SEARCH_NAME.MODE, mode);
+                },
+                { replace: true },
+            );
+        }
+    }, []);
+
+    // The status filters are data: the list comes from the API, not the client
+    useEffect(() => {
+        fetchAllProductStates();
+    }, [fetchAllProductStates]);
+
+    // A changed query (search, status or mode) restarts the infinite list at page 1 before any
+    // fetch fires, so a freshly chosen filter never appends onto the previous result set.
+    useEffect(() => {
+        const queryChanged = lastQueryKeyRef.current !== queryKey;
+        lastQueryKeyRef.current = queryKey;
+
+        if (isInfinite && queryChanged && infinitePage !== 1) {
+            setInfinitePage(1);
+            return;
+        }
+
+        const append = isInfinite && page > 1;
+        fetchProducts({ page, limit: pageLimit, searchContent, statusId, append });
+    }, [fetchProducts, queryKey, isInfinite, page, infinitePage, pageLimit, searchContent, statusId]);
+
+    const filterOptions = isAuthenticated
+        ? [
+              { value: ALL_FILTER, label: TEXTS.CATALOG_FILTER_ALL },
+              ...productStates.map((s) => ({
+                  value: String(s.id),
+                  label: s.stateName,
+              })),
+          ]
+        : [{ value: ALL_FILTER, label: TEXTS.CATALOG_FILTER_ALL }];
 
     return (
         <section className={styles.wrap}>
@@ -139,10 +191,13 @@ const Products = () => {
                     onSelect={handleFilterChange}
                     className={styles.filters}
                 />
-                <LayoutIcon typeView={layout} onChange={handleLayoutChange} />
+                <div className="flex-align gap-3 flex-shrink-0">
+                    {isHome ? <BrowseModeToggle mode={mode} onChange={handleModeChange} /> : null}
+                    <LayoutIcon typeView={layout} onChange={handleLayoutChange} />
+                </div>
             </div>
 
-            {isLoadingProducts ? (
+            {showGridLoader ? (
                 <div className={styles.loading} aria-live="polite">
                     {TEXTS.COMMON_LOADING}
                 </div>
@@ -155,7 +210,18 @@ const Products = () => {
                 />
             )}
 
-            <Pagination count={count} page={page} onSubmit={handlePageChange} />
+            {isInfinite ? (
+                <div className={styles.infinite}>
+                    <div ref={sentinelRef} aria-hidden="true" />
+                    {isLoadingMore ? (
+                        <div className={styles.loading} aria-live="polite">
+                            {TEXTS.COMMON_LOADING}
+                        </div>
+                    ) : null}
+                </div>
+            ) : (
+                <Pagination count={pageCount} page={urlPage} onSubmit={handlePageChange} />
+            )}
         </section>
     );
 };

@@ -68,6 +68,13 @@ export interface IProductSlicer {
     addProductWithImage: (data: IAddProductWithImage['data'], fileData: IAddProductWithImage['fileDate']) => void;
 }
 
+// Infinite scroll appends pages onto the existing list — dedupe by productId so a row that
+// shifted across the page boundary (e.g. after a status change removed one) can't collide keys.
+const mergeProductRows = (existing: IProduct[], incoming: IProduct[]): IProduct[] => {
+    const seen = new Set(existing.map((p) => p.productId));
+    return [...existing, ...incoming.filter((p) => !seen.has(p.productId))];
+};
+
 // Recompute per-status counts after a single book moves: -1 from its old status (if any),
 // +1 to the new one. Keeps the profile shelf tallies in sync without an extra request.
 const recountStatuses = (
@@ -117,14 +124,16 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
     products: { count: 0, rows: [] },
     fetchProducts: async (data) => {
-        // set({ error: null, loading: true })
         set({ isLoadingProducts: true });
         try {
             const result = await productService.getProducts(data);
-            set({ products: result });
+            set((state) =>
+                data.append
+                    ? { products: { count: result.count, rows: mergeProductRows(state.products.rows, result.rows) } }
+                    : { products: result },
+            );
         } catch (err) {
             log.error('fetchProducts error --->: ', err);
-            // set({ error: error.message })
         } finally {
             set({ isLoadingProducts: false });
         }

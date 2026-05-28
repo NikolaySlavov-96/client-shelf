@@ -39,6 +39,9 @@ export const TEXTS = {
     CATALOG_SUBTITLE: 'Find your next favourite book',
     CATALOG_EMPTY: 'No books found.',
     CATALOG_FILTER_ALL: 'All',
+    CATALOG_MODE_LABEL: 'Browse mode',
+    CATALOG_MODE_INFINITE: 'Infinite',
+    CATALOG_MODE_PAGED: 'Pages',
     // Book Detail
     DETAIL_BACK: '← Back to catalog',
     DETAIL_PAGES: 'Pages',

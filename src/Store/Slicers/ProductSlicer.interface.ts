@@ -58,6 +58,7 @@ export interface IFetchSearchParams {
     limit: number;
     searchContent: string;
     statusId?: number | null;
+    append?: boolean;
 }
 
 export interface IFetchQueryParams extends IFetchSearchParams {

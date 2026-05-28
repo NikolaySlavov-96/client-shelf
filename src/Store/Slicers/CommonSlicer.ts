@@ -2,7 +2,7 @@ import { type StateCreator } from 'zustand';
 
 import { type E_FORM_NAMES } from '~/constants';
 
-import { type TViewType } from '~/Types/Components';
+import { type TBrowseMode, type TViewType } from '~/Types/Components';
 
 type FormFiled = Map<string, string>;
 type FormData = {
@@ -16,6 +16,9 @@ export interface ICommonSlicer {
     viewType: TViewType;
     setViewType: (viewType: TViewType) => void;
 
+    browseMode: TBrowseMode;
+    setBrowseMode: (browseMode: TBrowseMode) => void;
+
     search: Map<string, FormData>;
     setSearch: (formName: E_FORM_NAMES, field: string, value: string) => void;
 }
@@ -26,6 +29,9 @@ const createCommonSlicer: StateCreator<ICommonSlicer> = (set) => ({
 
     viewType: 'grid',
     setViewType: (viewType) => set({ viewType }),
+
+    browseMode: 'infinite',
+    setBrowseMode: (browseMode) => set({ browseMode }),
 
     search: new Map(),
     setSearch: (formName, field, value) => {

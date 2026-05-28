@@ -32,6 +32,10 @@
   flex: 1;
 }
 
+.infinite {
+  margin-top: var(--spacing-24);
+}
+
 .loading {
   text-align: center;
   padding: var(--spacing-48) 0;
