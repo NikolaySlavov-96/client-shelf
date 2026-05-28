@@ -2,12 +2,14 @@ import { memo } from 'react';
 
 import { LinkedParagraph } from '~/component/molecules';
 
+import { TEXTS } from '~/constants';
+
 import style from './_Footer.module.css';
 
 const FOOTED_CONTENT = {
     LINK: 'https://nnsn.pro',
-    BUTTON_LABEL: 'NNSN',
-    CONTENT: 'Designed and Implement from ',
+    BUTTON_LABEL: TEXTS.FOOTER_AUTHOR,
+    CONTENT: TEXTS.FOOTER_CONTENT,
 };
 
 const _Footer = () => {

@@ -1,1 +1,4 @@
-export type TBrowseMode = 'infinite' | 'paged';
+export enum EBrowseMode {
+    INFINITE = 'infinite',
+    PAGED = 'paged',
+}

@@ -2,15 +2,13 @@ import { memo, useCallback, useEffect, useRef } from 'react';
 
 import { ChatHeader, List, MessageForm, MessageLine } from '~/component/atoms';
 
-import { ESendEvents } from '~/constants';
+import { ESendEvents, TEXTS } from '~/constants';
 
 import { useStoreZ } from '~/hooks';
 import { SocketService } from '~/services';
 import { type IMessage, type IRoom, type IUserQueue } from '~/Store/Slicers/SupportSlicer';
 
 import style from './_Support.module.css';
-
-const DEFAULT_TITLE = 'Support Chat - ';
 
 const keyExtractorUser = (item: IUserQueue) => item.principal;
 const keyExtractorRoom = (item: IRoom) => item.roomName.toString();
@@ -76,7 +74,7 @@ const Support = () => {
         <section className={style.container}>
             <div className={style['chat__container']}>
                 <ChatHeader>
-                    <p>{`${DEFAULT_TITLE}${email.split('@')[0]}`}</p>
+                    <p>{`${TEXTS.SUPPORT_ROOM_TITLE_PREFIX}${email.split('@')[0]}`}</p>
                 </ChatHeader>
                 <List
                     data={users}

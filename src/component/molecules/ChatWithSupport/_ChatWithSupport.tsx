@@ -2,7 +2,7 @@ import { type Dispatch, type FC, memo, type SetStateAction, useCallback, useEffe
 
 import { ChatHeader, List, MessageForm, MessageLine } from '~/component/atoms';
 
-import { ESendEvents } from '~/constants';
+import { ESendEvents, TEXTS } from '~/constants';
 
 import { SUPPORT_TOAST } from '~/Configuration';
 import { useStoreZ } from '~/hooks';
@@ -11,8 +11,6 @@ import { type IMessage } from '~/Store/Slicers/SupportSlicer';
 import { ToastWithButton } from '~/Toasts';
 
 import style from './_ChatWithSupport.module.css';
-
-const DEFAULT_TITLE = 'Support Chat';
 
 const keyExtractor = (item: IMessage, index: number) => index.toString();
 
@@ -70,7 +68,7 @@ const ChatWithSupport: FC<IChatWihSupportProps> = (props) => {
     return (
         <>
             <ChatHeader>
-                <p>{roomName ? roomName : DEFAULT_TITLE}</p>
+                <p>{roomName ? roomName : TEXTS.SUPPORT_TITLE}</p>
                 <button onClick={onVerifyChoice}>{'X'}</button>
             </ChatHeader>
             <div className={style['chat__container']}>

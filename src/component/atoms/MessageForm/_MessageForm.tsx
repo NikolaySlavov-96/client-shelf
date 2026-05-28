@@ -1,6 +1,6 @@
 import { memo, useCallback, useRef } from 'react';
 
-import { ESendEvents } from '~/constants';
+import { ESendEvents, TEXTS } from '~/constants';
 
 import { useForm } from '~/hooks';
 import { SocketService } from '~/services';
@@ -8,12 +8,11 @@ import { InputForm } from '..';
 
 import style from './_MessageForm.module.css';
 
-const DEFAUlT_BUTTON_LABEL = 'Send';
 const ACTIVITY_DEBOUNCE_MS = 2000;
 
 // TODO(lint): introduce a proper props interface (buttonLabel, roomName) (no-explicit-any).
 const MessageForm = (props: any) => {
-    const { buttonLabel = DEFAUlT_BUTTON_LABEL, roomName } = props;
+    const { buttonLabel = TEXTS.SUPPORT_SEND, roomName } = props;
 
     const lastActivitySentAt = useRef(0);
 
@@ -63,7 +62,7 @@ const MessageForm = (props: any) => {
                 type="text"
                 name="message"
                 id="message"
-                placeholder={'Type a message...'}
+                placeholder={TEXTS.SUPPORT_MESSAGE_PLACEHOLDER}
                 value={values.message}
                 onChange={activityHandler}
                 onBlur={activityHandler}

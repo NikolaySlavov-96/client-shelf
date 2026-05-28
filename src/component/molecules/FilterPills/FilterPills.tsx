@@ -2,6 +2,8 @@ import { memo } from 'react';
 
 import { List } from '~/component/atoms';
 
+import { TEXTS } from '~/constants';
+
 import { cx } from '~/Utils';
 
 import styles from './FilterPills.module.css';
@@ -25,7 +27,7 @@ function FilterPills({ options, activeValue, onSelect, className }: IFilterPills
             keyExtractor={(opt) => opt.value}
             style={cx(styles.container, className)}
             role="group"
-            aria-label="Filter options"
+            aria-label={TEXTS.FILTER_ARIA}
             renderItem={({ item: opt }) => (
                 <button
                     className={cx(styles.pill, activeValue === opt.value ? styles['pill--active'] : '')}

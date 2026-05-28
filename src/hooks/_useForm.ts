@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { TEXTS } from '~/constants';
+
 type TData = { [key: string]: string };
 type TError = { [key: string]: [string, number?] };
 
@@ -19,11 +21,11 @@ const useForm = (
 
         if (errorTarget[e.target.name] && errorTarget[e.target.name][0] === 'required') {
             if (values[e.target.name].length <= 1) {
-                setErrors((state) => ({ ...state, [e.target.name]: `${e.target.name} is required` }));
+                setErrors((state) => ({ ...state, [e.target.name]: `${e.target.name} ${TEXTS.VALIDATION_REQUIRED}` }));
             } else if ((errorTarget[e.target.name][1] ?? 0) > values[e.target.name].length) {
                 setErrors((state) => ({
                     ...state,
-                    [e.target.name]: `Minimal length is ${errorTarget[e.target.name][1]}`,
+                    [e.target.name]: `${TEXTS.VALIDATION_MIN_LENGTH} ${errorTarget[e.target.name][1]}`,
                 }));
             } else {
                 setErrors((state) => ({ ...state, [e.target.name]: '' }));

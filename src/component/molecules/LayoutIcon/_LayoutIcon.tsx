@@ -2,6 +2,8 @@ import { type FC, memo } from 'react';
 
 import { Button } from '~/component/atoms';
 
+import { TEXTS } from '~/constants';
+
 import { type TViewType } from '~/Types/Components';
 
 import style from './_LayoutIcon.module.css';
@@ -43,12 +45,12 @@ const _LayoutIcon: FC<ISelectProps> = (props) => {
     const { typeView, onChange } = props;
 
     return (
-        <div className={`${style['container']}`} role="group" aria-label="View layout">
+        <div className={`${style['container']}`} role="group" aria-label={TEXTS.LAYOUT_ARIA}>
             <Button
                 variant="text"
                 onClick={() => onChange('list')}
                 aria-pressed={typeView === 'list'}
-                ariaLabel="List view"
+                ariaLabel={TEXTS.LAYOUT_LIST_ARIA}
             >
                 <List isSelected={typeView === 'list'} />
             </Button>
@@ -56,7 +58,7 @@ const _LayoutIcon: FC<ISelectProps> = (props) => {
                 variant="text"
                 onClick={() => onChange('grid')}
                 aria-pressed={typeView === 'grid'}
-                ariaLabel="Grid view"
+                ariaLabel={TEXTS.LAYOUT_GRID_ARIA}
             >
                 <Grid isSelected={typeView === 'grid'} />
             </Button>

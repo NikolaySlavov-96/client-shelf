@@ -8,7 +8,7 @@ import { BookGrid } from '~/component/organisms';
 import { ROUT_NAMES, SEARCH_NAME, TEXTS } from '~/constants';
 
 import { useInfiniteScroll, useStoreZ } from '~/hooks';
-import { type TBrowseMode, type TViewType } from '~/Types/Components';
+import { EBrowseMode, type TViewType } from '~/Types/Components';
 
 import styles from './_Products.module.css';
 
@@ -17,8 +17,8 @@ const ALL_FILTER = 'all';
 const normalizeLayout = (raw: string | null, fallback: TViewType): TViewType =>
     raw === 'list' || raw === 'grid' ? raw : fallback;
 
-const normalizeMode = (raw: string | null, fallback: TBrowseMode): TBrowseMode =>
-    raw === 'infinite' || raw === 'paged' ? raw : fallback;
+const normalizeMode = (raw: string | null, fallback: EBrowseMode): EBrowseMode =>
+    raw === EBrowseMode.INFINITE || raw === EBrowseMode.PAGED ? (raw as EBrowseMode) : fallback;
 
 const normalizePage = (raw: string | null): number => {
     const n = Number(raw);
@@ -53,8 +53,8 @@ const Products = () => {
 
     // Infinite scroll is the home default; other routes (e.g. /book) stay paginated.
     const isHome = pathname === ROUT_NAMES.HOME;
-    const mode = isHome ? normalizeMode(searchParams.get(SEARCH_NAME.MODE), browseMode) : 'paged';
-    const isInfinite = mode === 'infinite';
+    const mode = isHome ? normalizeMode(searchParams.get(SEARCH_NAME.MODE), browseMode) : EBrowseMode.PAGED;
+    const isInfinite = mode === EBrowseMode.INFINITE;
 
     const statusId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
     const queryKey = `${searchContent}|${statusId}|${isInfinite}`;
@@ -87,7 +87,7 @@ const Products = () => {
     );
 
     const handleModeChange = useCallback(
-        (next: TBrowseMode) => {
+        (next: EBrowseMode) => {
             setBrowseMode(next);
             updateParams((p) => p.set(SEARCH_NAME.MODE, next));
         },
@@ -135,7 +135,10 @@ const Products = () => {
 
     useEffect(() => {
         const needsView = !searchParams.get(SEARCH_NAME.VIEW);
-        const needsMode = isHome && !searchParams.get(SEARCH_NAME.MODE) && (mode === 'infinite' || mode === 'paged');
+        const needsMode =
+            isHome &&
+            !searchParams.get(SEARCH_NAME.MODE) &&
+            (mode === EBrowseMode.INFINITE || mode === EBrowseMode.PAGED);
         if (needsView || needsMode) {
             updateParams(
                 (p) => {
