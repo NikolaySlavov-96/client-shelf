@@ -100,7 +100,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
     verifyAccountWithToken: async (token) => {
         if (!token) return;
         try {
-            await getAuthService().verifyToken({ token });
+            await getAuthService().verifyToken(token);
         } catch (_err) {
             // silent
         }

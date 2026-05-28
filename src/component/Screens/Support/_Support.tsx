@@ -14,7 +14,8 @@ const DEFAULT_TITLE = 'Support Chat - ';
 
 const keyExtractorUser = (item: IUserQueue) => item.principal;
 const keyExtractorRoom = (item: IRoom) => item.roomName.toString();
-const keyExtractorMessage = (item: IMessage) => item.message.toString();
+const keyExtractorMessage = (item: IMessage, index: number) =>
+    item.id !== undefined ? String(item.id) : `tmp-${item.createdAt}-${index}`;
 
 const Support = () => {
     const { rooms, users, messages, selectedRoom, setSelectedRoom, email, principal } = useStoreZ();

@@ -18,7 +18,6 @@ export interface ICommonSlicer {
 
     search: Map<string, FormData>;
     setSearch: (formName: E_FORM_NAMES, field: string, value: string) => void;
-    clearSearch: () => void;
 }
 
 const createCommonSlicer: StateCreator<ICommonSlicer> = (set) => ({
@@ -43,8 +42,6 @@ const createCommonSlicer: StateCreator<ICommonSlicer> = (set) => ({
             return { search: new Map(searchData) };
         });
     },
-    clearSearch: () => {},
-
     // getFormData: (formName) => {
     //     const data = get().data;
     //     return data.has(formName) ? data.get(formName).fields : new Map();

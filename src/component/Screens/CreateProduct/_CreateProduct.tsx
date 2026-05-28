@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FormEvent, memo, useCallback, useEffect, useState } from 'react';
+import { type ChangeEvent, type FormEvent, memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, List } from '~/component/atoms';
 
@@ -53,14 +53,16 @@ const CreateProduct = () => {
         [values, file, addProductWithImage],
     );
 
+    const wasAdding = useRef(false);
     useEffect(() => {
-        if (!isLoadingProductAddition) {
-            if (!isProductAdded) {
-                InformationToast({ title: TEXTS.TOAST_GENERIC_ERROR, typeIcon: ESwalIcon.ERROR });
-                return;
-            }
-            InformationToast({ title: TEXTS.TOAST_IMAGE_SUCCESS, typeIcon: ESwalIcon.SUCCESS });
+        if (wasAdding.current && !isLoadingProductAddition) {
+            InformationToast(
+                isProductAdded
+                    ? { title: TEXTS.TOAST_IMAGE_SUCCESS, typeIcon: ESwalIcon.SUCCESS }
+                    : { title: TEXTS.TOAST_GENERIC_ERROR, typeIcon: ESwalIcon.ERROR },
+            );
         }
+        wasAdding.current = isLoadingProductAddition;
     }, [isLoadingProductAddition, isProductAdded]);
 
     return (

@@ -40,10 +40,6 @@ export interface ILogOutRequest {
 
 export type ILogOutResponse = Record<string, never>;
 
-export interface IVerifyTokeRequest {
-    token: string;
-}
-
 export interface IVerifyTokenResponse {
     userInfo: Record<string, unknown>;
     message: string;
