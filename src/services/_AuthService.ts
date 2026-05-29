@@ -37,7 +37,6 @@ const _AuthServiceFactory = () => {
         register,
         login,
         logout,
-        checkField,
         verifyToken,
         requestMagicLink,
         verifyMagicLink,
