@@ -13,7 +13,6 @@ export interface IRegisterResponse {
 export interface ILoginRequest {
     email: string;
     password: string;
-    connectId?: string;
 }
 
 // Identity claims returned by login. Profile data (year, goal, ...) is fetched
@@ -35,16 +34,11 @@ export interface ILoginResponse {
 }
 
 export interface ILogOutRequest {
-    connectId?: string;
     token?: string;
     refreshToken?: string;
 }
 
 export type ILogOutResponse = Record<string, never>;
-
-export interface IVerifyTokeRequest {
-    token: string;
-}
 
 export interface IVerifyTokenResponse {
     userInfo: Record<string, unknown>;

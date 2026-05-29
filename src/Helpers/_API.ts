@@ -4,6 +4,7 @@ import useStoreZ from '../hooks/_useStoreZ';
 
 export type TMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+// TODO(lint): type `headers` as Record<string, string> and `body` as BodyInit (no-explicit-any).
 export interface IOptions {
     method: TMethod;
     headers: any;

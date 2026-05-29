@@ -38,7 +38,8 @@ function BookGrid({ books, isAuthenticated = false, layout = 'grid', onStatusCha
                 <BookCard
                     productId={book.productId}
                     productTitle={book.productTitle}
-                    authorName={book.authorName}
+                    authors={book.authors}
+                    authorsSeparator={book.authorsSeparator}
                     productType={book.productType}
                     statusId={book.statusId ?? undefined}
                     fileUrl={book.fileUrl}

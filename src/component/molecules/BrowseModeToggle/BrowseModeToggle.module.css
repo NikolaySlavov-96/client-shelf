@@ -1,0 +1,19 @@
+.option {
+  padding: var(--spacing-6) var(--spacing-12);
+  font-size: var(--text-sm);
+  color: var(--ink-2);
+  transition: var(--transition-fast);
+}
+
+.option:hover {
+  color: var(--accent);
+}
+
+.option--active {
+  background: var(--accent);
+  color: var(--white);
+}
+
+.option--active:hover {
+  color: var(--white);
+}

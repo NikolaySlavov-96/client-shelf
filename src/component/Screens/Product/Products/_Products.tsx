@@ -1,21 +1,25 @@
-import { memo, useCallback, useEffect } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { FilterPills, LayoutIcon, Pagination } from '~/component/molecules';
+import { BrowseModeToggle, FilterPills, LayoutIcon, Pagination } from '~/component/molecules';
 
 import { BookGrid } from '~/component/organisms';
 
 import { SEARCH_NAME, TEXTS } from '~/constants';
 
-import { useStoreZ } from '~/hooks';
-import { type TViewType } from '~/Types/Components';
+import { useInfiniteScroll, useStoreZ } from '~/hooks';
+import { EBrowseMode, type TViewType } from '~/Types/Components';
 
 import styles from './_Products.module.css';
 
 const ALL_FILTER = 'all';
+const SCROLL_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' ', 'Spacebar']);
 
 const normalizeLayout = (raw: string | null, fallback: TViewType): TViewType =>
     raw === 'list' || raw === 'grid' ? raw : fallback;
+
+const normalizeMode = (raw: string | null, fallback: EBrowseMode): EBrowseMode =>
+    raw === EBrowseMode.INFINITE || raw === EBrowseMode.PAGED ? (raw as EBrowseMode) : fallback;
 
 const normalizePage = (raw: string | null): number => {
     const n = Number(raw);
@@ -27,6 +31,7 @@ const Products = () => {
     const {
         products,
         fetchProducts,
+        fetchProductsThrough,
         pageLimit,
         isLoadingProducts,
         isAuthenticated,
@@ -35,12 +40,39 @@ const Products = () => {
         fetchAllProductStates,
         viewType,
         setViewType,
+        browseMode,
+        setBrowseMode,
     } = useStoreZ();
 
+    const lastQueryKeyRef = useRef<string | null>(null);
+    const loadedThroughRef = useRef(0);
+    const pendingScrollPageRef = useRef<number | null>(null);
+    const wasLoadingRef = useRef(false);
+    const gridRef = useRef<HTMLDivElement | null>(null);
+
+    // A deep jump (switching from pagination or opening a shared deep link) scrolls programmatically to
+    // the target page, which can drag the sentinel into view and auto-fetch the next page before the
+    // reader has scrolled at all. Disarm the loader for that navigation and re-arm on the first genuine
+    // scroll input, so paging resumes only when the reader actually moves.
+    const [loaderArmed, setLoaderArmed] = useState(true);
+
     const layout = normalizeLayout(searchParams.get(SEARCH_NAME.VIEW), viewType);
-    const page = normalizePage(searchParams.get(SEARCH_NAME.PAGE));
+    const urlPage = normalizePage(searchParams.get(SEARCH_NAME.PAGE));
     const searchContent = searchParams.get(SEARCH_NAME.CONTENT) ?? '';
     const activeFilter = searchParams.get(SEARCH_NAME.STATUS) ?? ALL_FILTER;
+
+    const mode = normalizeMode(searchParams.get(SEARCH_NAME.MODE), browseMode);
+    const isInfinite = mode === EBrowseMode.INFINITE;
+
+    const statusId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
+    const queryKey = `${searchContent}|${statusId}|${isInfinite}`;
+
+    const pageCount = Math.ceil(products.count / pageLimit) || 0;
+    const hasMore = isInfinite && pageCount > 0 && loadedThroughRef.current < pageCount;
+
+    const isInitialLoad = isLoadingProducts && products.rows.length === 0;
+    const showGridLoader = isInfinite ? isInitialLoad : isLoadingProducts;
+    const isLoadingMore = isInfinite && isLoadingProducts && products.rows.length > 0;
 
     const updateParams = useCallback(
         (mutate: (params: URLSearchParams) => void, options?: { replace?: boolean }) => {
@@ -61,34 +93,13 @@ const Products = () => {
         [updateParams, setViewType],
     );
 
-    const count = Math.ceil(products.count / pageLimit) || 0;
-
-    useEffect(() => {
-        if (!searchParams.get(SEARCH_NAME.VIEW)) {
-            updateParams((p) => p.set(SEARCH_NAME.VIEW, layout), { replace: true });
-        }
-    }, []);
-
-    // The status filters are data: the list comes from the API, not the client
-    useEffect(() => {
-        fetchAllProductStates();
-    }, [fetchAllProductStates]);
-
-    const filterOptions = isAuthenticated
-        ? [
-              { value: ALL_FILTER, label: TEXTS.CATALOG_FILTER_ALL },
-              ...productStates.map((s) => ({
-                  value: String(s.id),
-                  label: s.stateName,
-              })),
-          ]
-        : [{ value: ALL_FILTER, label: TEXTS.CATALOG_FILTER_ALL }];
-
-    const statusId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
-
-    useEffect(() => {
-        fetchProducts({ page, limit: pageLimit, searchContent, statusId });
-    }, [fetchProducts, page, pageLimit, searchContent, statusId]);
+    const handleModeChange = useCallback(
+        (next: EBrowseMode) => {
+            setBrowseMode(next);
+            updateParams((p) => p.set(SEARCH_NAME.MODE, next));
+        },
+        [updateParams, setBrowseMode],
+    );
 
     const handleFilterChange = useCallback(
         (value: string) => {
@@ -117,6 +128,10 @@ const Products = () => {
         [updateParams],
     );
 
+    const handleLoadMore = useCallback(() => {
+        updateParams((p) => p.set(SEARCH_NAME.PAGE, String(urlPage + 1)), { replace: true });
+    }, [updateParams, urlPage]);
+
     const handleStatusChange = useCallback(
         (productId: number, newStatusId: number) => {
             const activeFilterId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
@@ -124,6 +139,100 @@ const Products = () => {
         },
         [addingProductState, isAuthenticated, activeFilter],
     );
+
+    const sentinelRef = useInfiniteScroll({
+        hasMore: hasMore && loaderArmed,
+        isLoading: isLoadingProducts,
+        onLoadMore: handleLoadMore,
+    });
+
+    useEffect(() => {
+        if (loaderArmed) return;
+        const arm = () => setLoaderArmed(true);
+        const armOnKey = (e: KeyboardEvent) => {
+            if (SCROLL_KEYS.has(e.key)) arm();
+        };
+        window.addEventListener('wheel', arm, { passive: true, once: true });
+        window.addEventListener('touchmove', arm, { passive: true, once: true });
+        window.addEventListener('keydown', armOnKey);
+        return () => {
+            window.removeEventListener('wheel', arm);
+            window.removeEventListener('touchmove', arm);
+            window.removeEventListener('keydown', armOnKey);
+        };
+    }, [loaderArmed]);
+
+    useEffect(() => {
+        const needsView = !searchParams.get(SEARCH_NAME.VIEW);
+        const needsMode =
+            !searchParams.get(SEARCH_NAME.MODE) && (mode === EBrowseMode.INFINITE || mode === EBrowseMode.PAGED);
+        if (needsView || needsMode) {
+            updateParams(
+                (p) => {
+                    if (needsView) p.set(SEARCH_NAME.VIEW, layout);
+                    if (needsMode) p.set(SEARCH_NAME.MODE, mode);
+                },
+                { replace: true },
+            );
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchAllProductStates();
+    }, [fetchAllProductStates]);
+
+    useEffect(() => {
+        const queryChanged = lastQueryKeyRef.current !== queryKey;
+        lastQueryKeyRef.current = queryKey;
+
+        if (!isInfinite) {
+            fetchProducts({ page: urlPage, limit: pageLimit, searchContent, statusId, append: false });
+            return;
+        }
+        loadedThroughRef.current = urlPage;
+        if (queryChanged) {
+            const willJump = urlPage > 1;
+            pendingScrollPageRef.current = willJump ? urlPage : null;
+            setLoaderArmed(!willJump);
+            fetchProductsThrough({ throughPage: urlPage, limit: pageLimit, searchContent, statusId });
+        } else if (urlPage > loadedThroughRef.current && (pageCount === 0 || urlPage <= pageCount)) {
+            fetchProducts({ page: urlPage, limit: pageLimit, searchContent, statusId, append: true });
+        }
+    }, [
+        fetchProducts,
+        fetchProductsThrough,
+        queryKey,
+        isInfinite,
+        urlPage,
+        pageLimit,
+        searchContent,
+        statusId,
+        pageCount,
+    ]);
+
+    useEffect(() => {
+        const justFinishedLoading = wasLoadingRef.current && !isLoadingProducts;
+        wasLoadingRef.current = isLoadingProducts;
+
+        const targetPage = pendingScrollPageRef.current;
+        if (!isInfinite || !targetPage || !justFinishedLoading || products.rows.length === 0) return;
+
+        pendingScrollPageRef.current = null;
+        const grid = gridRef.current?.firstElementChild;
+        const index = Math.min((targetPage - 1) * pageLimit, products.rows.length - 1);
+        const target = grid?.children?.[index] as HTMLElement | undefined;
+        if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    }, [isInfinite, isLoadingProducts, products.rows.length, pageLimit]);
+
+    const filterOptions = isAuthenticated
+        ? [
+              { value: ALL_FILTER, label: TEXTS.CATALOG_FILTER_ALL },
+              ...productStates.map((s) => ({
+                  value: String(s.id),
+                  label: s.stateName,
+              })),
+          ]
+        : [{ value: ALL_FILTER, label: TEXTS.CATALOG_FILTER_ALL }];
 
     return (
         <section className={styles.wrap}>
@@ -139,23 +248,39 @@ const Products = () => {
                     onSelect={handleFilterChange}
                     className={styles.filters}
                 />
-                <LayoutIcon typeView={layout} onChange={handleLayoutChange} />
+                <div className="flex-align gap-3 flex-shrink-0">
+                    <BrowseModeToggle mode={mode} onChange={handleModeChange} />
+                    <LayoutIcon typeView={layout} onChange={handleLayoutChange} />
+                </div>
             </div>
 
-            {isLoadingProducts ? (
+            {showGridLoader ? (
                 <div className={styles.loading} aria-live="polite">
                     {TEXTS.COMMON_LOADING}
                 </div>
             ) : (
-                <BookGrid
-                    books={products.rows}
-                    isAuthenticated={isAuthenticated}
-                    layout={layout}
-                    onStatusChange={handleStatusChange}
-                />
+                <div ref={gridRef}>
+                    <BookGrid
+                        books={products.rows}
+                        isAuthenticated={isAuthenticated}
+                        layout={layout}
+                        onStatusChange={handleStatusChange}
+                    />
+                </div>
             )}
 
-            <Pagination count={count} page={page} onSubmit={handlePageChange} />
+            {isInfinite ? (
+                <div className={styles.infinite}>
+                    <div ref={sentinelRef} aria-hidden="true" />
+                    {isLoadingMore ? (
+                        <div className={styles.loading} aria-live="polite">
+                            {TEXTS.COMMON_LOADING}
+                        </div>
+                    ) : null}
+                </div>
+            ) : (
+                <Pagination count={pageCount} page={urlPage} onSubmit={handlePageChange} />
+            )}
         </section>
     );
 };

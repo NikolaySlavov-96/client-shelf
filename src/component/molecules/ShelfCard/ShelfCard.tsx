@@ -4,9 +4,10 @@ import { Badge, BookCover, Button, List } from '~/component/atoms';
 
 import { getStatusLabel, TEXTS } from '~/constants';
 
-import { cx } from '~/Utils';
+import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
+import { type IAuthor } from '~/Store/Slicers/ProductSlicer.interface';
 import { Toast, ToastWithButton } from '~/Toasts';
 import { ESwalIcon } from '~/Types/Swal';
 
@@ -15,7 +16,8 @@ import styles from './ShelfCard.module.css';
 interface IShelfCardProps {
     productId: number;
     productTitle: string;
-    authorName: string;
+    authors: IAuthor[];
+    authorsSeparator?: string;
     statusId: number;
     fileUrl?: string;
     fileSrc?: string;
@@ -27,7 +29,8 @@ interface IShelfCardProps {
 function ShelfCard({
     productId,
     productTitle,
-    authorName,
+    authors,
+    authorsSeparator,
     statusId,
     fileUrl,
     fileSrc,
@@ -74,7 +77,7 @@ function ShelfCard({
             />
 
             <div className={styles.body}>
-                <p className={styles.author}>{authorName}</p>
+                <p className={styles.author}>{formatAuthors(authors, authorsSeparator)}</p>
                 <div className={`flex-between ${styles.footer}`}>
                     <Badge statusId={statusId} badgeStyle="light" />
                     {onRemove ? (

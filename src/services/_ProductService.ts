@@ -29,7 +29,8 @@ export const getAllStatus = (): Promise<IGetStatesResponse[]> => api.get(`${PREF
 // Product Services
 export const getProducts = (data: IGetProductsRequest): Promise<IGetProductsResponse> => {
     const statusQuery = data?.statusId ? `&status=${data.statusId}` : '';
-    return api.get(`${PREFIX}?limit=${data?.limit}&page=${data?.page}&search=${data?.searchContent}${statusQuery}`);
+    const search = encodeURIComponent(data?.searchContent ?? '');
+    return api.get(`${PREFIX}?limit=${data?.limit}&page=${data?.page}&search=${search}${statusQuery}`);
 };
 
 export const getProduct = (id: string): Promise<IGetProductResponse> => api.get(`${PREFIX}/` + id);
@@ -47,11 +48,13 @@ export const searchProductByEmailOnUser = ({
     page,
     limit,
 }: ISearchProductByEmailRequest): Promise<ISearchProductByEmailResponse> =>
-    api.get(`${SEARCH}/email?email=${searchContent}&limit=${limit}&page=${page}`);
+    api.get(`${SEARCH}/email?email=${encodeURIComponent(searchContent)}&limit=${limit}&page=${page}`);
 
 // ProductState Services
-export const getAllProductStatus = (data: IGetAllProductByStateRequest): Promise<IGetAllProductByStateResponse> =>
-    api.get(`${PREFIX}/status/${data?.type}?limit=${data?.limit}&page=${data?.page}&search=${data?.searchContent}`);
+export const getAllProductStatus = (data: IGetAllProductByStateRequest): Promise<IGetAllProductByStateResponse> => {
+    const search = encodeURIComponent(data?.searchContent ?? '');
+    return api.get(`${PREFIX}/status/${data?.type}?limit=${data?.limit}&page=${data?.page}&search=${search}`);
+};
 
 export const getStatusCounts = (): Promise<IGetStatusCountsResponse> => api.get(`${PREFIX}/status/counts`);
 

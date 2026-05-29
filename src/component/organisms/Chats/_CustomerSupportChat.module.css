@@ -1,6 +1,5 @@
 .container {
   max-width: var(--chat-float-max-width);
-  max-height: var(--chat-panel-height);
   min-width: var(--chat-float-min-width);
   background: var(--white);
   border: var(--border-default);
@@ -11,6 +10,12 @@
   bottom: var(--spacing-12);
   overflow: hidden;
   z-index: var(--z-chat);
+}
+
+.container__open {
+  height: var(--chat-panel-height);
+  display: flex;
+  flex-direction: column;
 }
 
 .border__open {

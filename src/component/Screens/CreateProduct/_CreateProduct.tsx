@@ -1,6 +1,8 @@
-import { type ChangeEvent, type FormEvent, memo, useCallback, useEffect, useState } from 'react';
+import { type ChangeEvent, type FormEvent, memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Button, List } from '~/component/atoms';
+
+import { ChipsInput } from '~/component/molecules';
 
 import { TEXTS } from '~/constants';
 
@@ -11,6 +13,7 @@ import { ESwalIcon } from '~/Types/Swal';
 import {
     CREATE_PRODUCT_FIELDS,
     CREATE_PRODUCT_INITIAL_VALUES,
+    type ICreateProductValues,
     type TCreateProductTextField,
 } from './_CreateProduct.config';
 import styles from './_CreateProduct.module.css';
@@ -18,11 +21,19 @@ import styles from './_CreateProduct.module.css';
 const CreateProduct = () => {
     const { addProductWithImage, isProductAdded, isLoadingProductAddition } = useStoreZ();
 
-    const [values, setValues] = useState(CREATE_PRODUCT_INITIAL_VALUES);
+    const [values, setValues] = useState<ICreateProductValues>(CREATE_PRODUCT_INITIAL_VALUES);
     const [file, setFile] = useState<File | undefined>(undefined);
 
     const handleTextChange = useCallback((key: TCreateProductTextField, value: string) => {
         setValues((prev) => ({ ...prev, [key]: value }));
+    }, []);
+
+    const handleAuthorsChange = useCallback((next: string[]) => {
+        setValues((prev) => ({ ...prev, authors: next }));
+    }, []);
+
+    const handleSeparatorChange = useCallback((value: string) => {
+        setValues((prev) => ({ ...prev, authorsSeparator: value }));
     }, []);
 
     const handleFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -36,20 +47,22 @@ const CreateProduct = () => {
         (e: FormEvent) => {
             e.preventDefault();
             if (!file) return;
-            const { author, productTitle, genre, fileName } = values;
-            addProductWithImage({ author, productTitle, genre }, { file, name: fileName });
+            const { authors, authorsSeparator, productTitle, genre, fileName } = values;
+            addProductWithImage({ authors, authorsSeparator, productTitle, genre }, { file, name: fileName });
         },
         [values, file, addProductWithImage],
     );
 
+    const wasAdding = useRef(false);
     useEffect(() => {
-        if (!isLoadingProductAddition) {
-            if (!isProductAdded) {
-                InformationToast({ title: TEXTS.TOAST_GENERIC_ERROR, typeIcon: ESwalIcon.ERROR });
-                return;
-            }
-            InformationToast({ title: TEXTS.TOAST_IMAGE_SUCCESS, typeIcon: ESwalIcon.SUCCESS });
+        if (wasAdding.current && !isLoadingProductAddition) {
+            InformationToast(
+                isProductAdded
+                    ? { title: TEXTS.TOAST_IMAGE_SUCCESS, typeIcon: ESwalIcon.SUCCESS }
+                    : { title: TEXTS.TOAST_GENERIC_ERROR, typeIcon: ESwalIcon.ERROR },
+            );
         }
+        wasAdding.current = isLoadingProductAddition;
     }, [isLoadingProductAddition, isProductAdded]);
 
     return (
@@ -79,6 +92,27 @@ const CreateProduct = () => {
                                         onChange={(e) => handleTextChange(field.key, e.target.value)}
                                         required={field.required}
                                     />
+                                ) : field.kind === 'chips' ? (
+                                    <ChipsInput
+                                        id={field.id}
+                                        values={values.authors}
+                                        onChange={handleAuthorsChange}
+                                        placeholder={field.placeholder}
+                                        ariaLabel={field.label}
+                                    />
+                                ) : field.kind === 'select' ? (
+                                    <select
+                                        id={field.id}
+                                        className={styles.field__input}
+                                        value={values[field.key]}
+                                        onChange={(e) => handleSeparatorChange(e.target.value)}
+                                    >
+                                        {field.options.map((opt) => (
+                                            <option key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                 ) : (
                                     <input
                                         id={field.id}
@@ -98,7 +132,7 @@ const CreateProduct = () => {
                         size="full"
                         type="submit"
                         isLoading={isLoadingProductAddition}
-                        isDisabled={!values.author || !values.productTitle || !file}
+                        isDisabled={values.authors.length === 0 || !values.productTitle || !file}
                     />
                 </form>
             </div>

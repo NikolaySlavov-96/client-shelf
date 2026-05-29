@@ -2,6 +2,8 @@ import { memo } from 'react';
 
 import { List } from '~/component/atoms';
 
+import { TEXTS } from '~/constants';
+
 import { cx } from '~/Utils';
 
 import styles from './ShelfTabs.module.css';
@@ -26,7 +28,7 @@ function ShelfTabs({ tabs, activeValue, onSelect, className }: IShelfTabsProps) 
             keyExtractor={(tab) => tab.value}
             style={cx(styles.container, className)}
             role="tablist"
-            aria-label="Shelf categories"
+            aria-label={TEXTS.SHELF_ARIA_TABS}
             renderItem={({ item: tab }) => (
                 <button
                     role="tab"

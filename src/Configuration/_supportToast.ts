@@ -1,8 +1,10 @@
+import { TEXTS } from '~/constants';
+
 export const SUPPORT_TOAST = {
-    title: 'Support Chat',
-    subContent: 'Are you sure you want to close the chat?',
+    title: TEXTS.SUPPORT_TITLE,
+    subContent: TEXTS.SUPPORT_CLOSE_CONFIRM,
     isCancelButton: true,
     isConfirmButton: true,
-    confirmButtonTitle: 'Ok',
-    cancelButtonTitle: 'Cancel',
+    confirmButtonTitle: TEXTS.SUPPORT_CONFIRM_OK,
+    cancelButtonTitle: TEXTS.SUPPORT_CONFIRM_CANCEL,
 };

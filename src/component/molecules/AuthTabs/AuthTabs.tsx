@@ -28,7 +28,7 @@ function AuthTabs({ activeTab, onSwitch, className }: IAuthTabsProps) {
             keyExtractor={(tab) => tab.value}
             style={cx(styles.tabs, className)}
             role="tablist"
-            aria-label="Authentication"
+            aria-label={TEXTS.AUTH_ARIA_TABS}
             renderItem={({ item: tab }) => (
                 <button
                     role="tab"

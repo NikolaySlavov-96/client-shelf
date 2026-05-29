@@ -12,24 +12,20 @@ import style from './_CustomerSupportChat.module.css';
 const CustomerSupportChat = () => {
     const [isOpenChat, setIsOpenChat] = useState(false);
 
-    const { rooms, connectId } = useStoreZ();
+    const { rooms } = useStoreZ();
 
     const roomName = rooms[0]?.roomName;
 
     const containerStyle = useMemo(
-        () => `${style['container']} ${isOpenChat ? style['border__open'] : ''}`,
+        () => `${style['container']} ${isOpenChat ? `${style['border__open']} ${style['container__open']}` : ''}`,
         [isOpenChat],
     );
 
     useEffect(() => {
         if (!rooms?.length && isOpenChat) {
-            if (connectId) {
-                SocketService.sendData(ESendEvents.SUPPORT_CHAT_USER_JOIN, { connectId });
-            } else {
-                SocketService.sendOnlySignal(ESendEvents.SUPPORT_CHAT_USER_JOIN);
-            }
+            SocketService.sendOnlySignal(ESendEvents.SUPPORT_CHAT_USER_JOIN);
         }
-    }, [connectId, isOpenChat, rooms.length]);
+    }, [isOpenChat, rooms.length]);
 
     return (
         <div className={containerStyle}>

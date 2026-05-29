@@ -2,7 +2,7 @@ import { type StateCreator } from 'zustand';
 
 import { type E_FORM_NAMES } from '~/constants';
 
-import { type TViewType } from '~/Types/Components';
+import { EBrowseMode, type TViewType } from '~/Types/Components';
 
 type FormFiled = Map<string, string>;
 type FormData = {
@@ -12,26 +12,26 @@ type FormData = {
 export interface ICommonSlicer {
     pageLimit: number;
     setPageLimit: (limit: number) => void;
-    connectId: string;
-    setConnectId: (id: string) => void;
 
     viewType: TViewType;
     setViewType: (viewType: TViewType) => void;
 
+    browseMode: EBrowseMode;
+    setBrowseMode: (browseMode: EBrowseMode) => void;
+
     search: Map<string, FormData>;
     setSearch: (formName: E_FORM_NAMES, field: string, value: string) => void;
-    clearSearch: () => void;
 }
 
 const createCommonSlicer: StateCreator<ICommonSlicer> = (set) => ({
     pageLimit: 12,
     setPageLimit: (limit) => set({ pageLimit: limit }),
 
-    connectId: '',
-    setConnectId: (id) => set({ connectId: id }),
-
     viewType: 'grid',
     setViewType: (viewType) => set({ viewType }),
+
+    browseMode: EBrowseMode.INFINITE,
+    setBrowseMode: (browseMode) => set({ browseMode }),
 
     search: new Map(),
     setSearch: (formName, field, value) => {
@@ -48,8 +48,6 @@ const createCommonSlicer: StateCreator<ICommonSlicer> = (set) => ({
             return { search: new Map(searchData) };
         });
     },
-    clearSearch: () => {},
-
     // getFormData: (formName) => {
     //     const data = get().data;
     //     return data.has(formName) ? data.get(formName).fields : new Map();

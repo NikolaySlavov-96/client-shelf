@@ -1,21 +1,28 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useRef } from 'react';
 
-import { ESendEvents } from '~/constants';
+import { ESendEvents, TEXTS } from '~/constants';
 
 import { useForm } from '~/hooks';
 import { SocketService } from '~/services';
 import { InputForm } from '..';
 
-const DEFAUlT_BUTTON_LABEL = 'Send';
+import style from './_MessageForm.module.css';
 
+const ACTIVITY_DEBOUNCE_MS = 2000;
+
+// TODO(lint): introduce a proper props interface (buttonLabel, roomName) (no-explicit-any).
 const MessageForm = (props: any) => {
-    const { buttonLabel = DEFAUlT_BUTTON_LABEL, roomName, connectId } = props;
+    const { buttonLabel = TEXTS.SUPPORT_SEND, roomName } = props;
+
+    const lastActivitySentAt = useRef(0);
 
     const sendMessage = useCallback(
         (data: { message: string }) => {
+            const trimmed = (data.message ?? '').trim();
+            if (!trimmed) return;
             SocketService.sendData(ESendEvents.SUPPORT_MESSAGE, {
                 roomName,
-                message: data.message,
+                message: trimmed,
             });
         },
         [roomName],
@@ -32,28 +39,35 @@ const MessageForm = (props: any) => {
     );
 
     const activityHandler = useCallback(
+        // TODO(lint): type `e` as React.ChangeEvent<HTMLInputElement> (no-explicit-any).
         (e: any) => {
             changeHandler(e);
-            // add debounce from 2 second before send event again
-            SocketService.sendData(ESendEvents.SUPPORT_ACTIVITY, { roomName, connectId });
+            const now = Date.now();
+            if (now - lastActivitySentAt.current > ACTIVITY_DEBOUNCE_MS) {
+                lastActivitySentAt.current = now;
+                SocketService.sendData(ESendEvents.SUPPORT_ACTIVITY, { roomName });
+            }
         },
-        [changeHandler, connectId, roomName],
+        [changeHandler, roomName],
     );
 
     return (
         <InputForm
             buttonLabel={buttonLabel}
-            // formStyles={containerStyles // style['send__input-button']}
             onSubmit={onSubmit}
+            formStyles={`flex-align ${style['form']}`}
+            buttonStyles={style['button']}
         >
             <input
                 type="text"
                 name="message"
                 id="message"
-                placeholder={DEFAUlT_BUTTON_LABEL}
+                placeholder={TEXTS.SUPPORT_MESSAGE_PLACEHOLDER}
                 value={values.message}
                 onChange={activityHandler}
                 onBlur={activityHandler}
+                className={style['input']}
+                autoComplete="off"
             />
         </InputForm>
     );

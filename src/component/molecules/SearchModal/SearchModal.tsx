@@ -5,6 +5,8 @@ import { List } from '~/component/atoms';
 
 import { getSearchCoverGradient, MODAL_NAMES, ROUT_NAMES, TEXTS } from '~/constants';
 
+import { formatAuthors } from '~/Utils';
+
 import { useStoreZ } from '~/hooks';
 import { type IProduct, type IProductEmailType, type IProductWithState } from '~/Store/Slicers/ProductSlicer.interface';
 
@@ -68,7 +70,9 @@ function SearchModal() {
     const trimmed = query.trim().toLowerCase();
     const filtered = trimmed
         ? source.filter(
-              (b) => b.productTitle.toLowerCase().includes(trimmed) || b.authorName.toLowerCase().includes(trimmed),
+              (b) =>
+                  b.productTitle.toLowerCase().includes(trimmed) ||
+                  b.authors.some((a) => a.name.toLowerCase().includes(trimmed)),
           )
         : source.slice(0, 6);
 
@@ -123,7 +127,9 @@ function SearchModal() {
                                         />
                                         <span className={`flex-col ${styles.bookInfo}`}>
                                             <span className={styles.bookTitle}>{book.productTitle}</span>
-                                            <span className={styles.bookAuthor}>{book.authorName}</span>
+                                            <span className={styles.bookAuthor}>
+                                                {formatAuthors(book.authors, book.authorsSeparator)}
+                                            </span>
                                         </span>
                                         <span className={styles.addLabel}>{TEXTS.SEARCH_ADD}</span>
                                     </button>

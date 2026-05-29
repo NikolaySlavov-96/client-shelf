@@ -4,6 +4,7 @@ const _SEARCH_NAME = {
     PAGE: 'page',
     CONTENT: 'content',
     VIEW: 'view',
+    MODE: 'mode',
     STATUS: 'status',
 };
 

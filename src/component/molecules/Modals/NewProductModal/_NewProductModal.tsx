@@ -2,7 +2,7 @@ import { memo, useEffect } from 'react';
 
 import { Link } from '~/component/atoms';
 
-import { ROUT_NAMES } from '~/constants';
+import { ROUT_NAMES, TEXTS } from '~/constants';
 
 import { useStoreZ } from '~/hooks';
 
@@ -32,11 +32,11 @@ const NewProductModal = () => {
             to={`${ROUT_NAMES.PRODUCT}/${currentProductData?.id}`}
             className={`shadow ${style['container']} ${!isVisible ? '' : style['visible']}`}
         >
-            <h3>Lastly added books</h3>
+            <h3>{TEXTS.NEW_PRODUCT_HEADING}</h3>
             <div>
                 <h1>{currentProductData?.productTitle}</h1>
             </div>
-            <p>Added before 10 second</p>
+            <p>{TEXTS.NEW_PRODUCT_HINT}</p>
         </Link>
     );
 };

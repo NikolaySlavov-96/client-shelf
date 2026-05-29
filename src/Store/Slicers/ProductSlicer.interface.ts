@@ -4,6 +4,11 @@ export interface IState {
     symbol: string;
 }
 
+export interface IAuthor {
+    id: number;
+    name: string;
+}
+
 export interface IProduct {
     productId: number;
     productType: string;
@@ -15,10 +20,8 @@ export interface IProduct {
     statusId?: number | null;
     ratingAverage?: number;
     ratingCount?: number;
-    authorName: string;
-    authorImage: string;
-    authorGenre: string;
-    authorStatus: boolean;
+    authors: IAuthor[];
+    authorsSeparator: string;
     fileUrl: string;
     fileId: number;
     fileSrc: string;
@@ -55,6 +58,7 @@ export interface IFetchSearchParams {
     limit: number;
     searchContent: string;
     statusId?: number | null;
+    append?: boolean;
 }
 
 export interface IFetchQueryParams extends IFetchSearchParams {
@@ -63,7 +67,8 @@ export interface IFetchQueryParams extends IFetchSearchParams {
 
 export interface IAddProductWithImage {
     data: {
-        author: string;
+        authors: string[];
+        authorsSeparator?: string;
         productTitle: string;
         genre: string;
     };

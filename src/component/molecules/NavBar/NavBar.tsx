@@ -97,12 +97,12 @@ function NavBar({ className }: INavBarProps) {
                 className={styles.nav__toggle}
                 onClick={handleToggleMenu}
                 aria-expanded={isMenuOpen}
-                aria-label="Toggle navigation"
+                aria-label={TEXTS.NAV_ARIA_TOGGLE}
             >
                 ☰
             </button>
 
-            <nav className={linksClass} aria-label="Main navigation">
+            <nav className={linksClass} aria-label={TEXTS.NAV_ARIA_MAIN}>
                 {isAuthenticated ? (
                     <>
                         <button className={cx(styles.nav__user, 'flex-align')} onClick={handleProfileClick}>

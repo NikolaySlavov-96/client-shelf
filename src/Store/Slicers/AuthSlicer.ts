@@ -42,8 +42,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
 
     onSubmitLogin: async ({ email, password }: { email: string; password: string }) => {
         try {
-            const { connectId } = get();
-            const result = await getAuthService().login({ email, password, connectId });
+            const result = await getAuthService().login({ email, password });
             if (result.messageCode === ServerError.SUCCESSFULLY_LOGIN.messageCode) {
                 const { userInfo } = result;
                 set({
@@ -62,6 +61,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
         }
     },
 
+    // TODO(lint): drop `async` since logout() is fire-and-forget with .catch (require-await).
     onSubmitLogout: async () => {
         try {
             const { resetRooms, resetMessages, setWelcomeMessage, refreshToken } = get();
@@ -80,7 +80,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
             });
             resetRooms();
             resetMessages();
-            setWelcomeMessage({ message: '' });
+            setWelcomeMessage('');
             SocketService.disconnect();
             SocketService.connect();
         } catch (_err) {
@@ -100,7 +100,7 @@ const createAuthSlicer: StateCreator<TFullStore, [], [], IAuthSlicer> = (set, ge
     verifyAccountWithToken: async (token) => {
         if (!token) return;
         try {
-            await getAuthService().verifyToken({ token });
+            await getAuthService().verifyToken(token);
         } catch (_err) {
             // silent
         }

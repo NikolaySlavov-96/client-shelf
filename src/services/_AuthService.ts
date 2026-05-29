@@ -9,7 +9,6 @@ import {
     type IRegisterResponse,
     type IVerifyMagicResponse,
     type IVerifyTokenResponse,
-    type IVerifyTokeRequest,
 } from '~/Types/services/AuthService';
 
 import api from './_api';
@@ -25,10 +24,8 @@ const _AuthServiceFactory = () => {
     const logout = (data: ILogOutRequest): Promise<ILogOutResponse> =>
         api.post(`${PREFIX}/logout`, { inputData: data });
 
-    const checkField = () => api.get(`${PREFIX}/check`);
-
-    const verifyToken = (verifyToken: IVerifyTokeRequest): Promise<IVerifyTokenResponse> =>
-        api.post(`${PREFIX}/verify`, { inputData: { verifyToken } });
+    const verifyToken = (token: string): Promise<IVerifyTokenResponse> =>
+        api.post(`${PREFIX}/verify`, { inputData: { verifyToken: token } });
 
     const requestMagicLink = (data: IMagicLinkRequest): Promise<IMagicLinkResponse> =>
         api.post(`${PREFIX}/magic-link`, { inputData: data });

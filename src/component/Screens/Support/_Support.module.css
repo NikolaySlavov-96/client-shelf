@@ -65,19 +65,23 @@
 }
 
 .message__container {
-  flex: 1;
   background: var(--white);
   border: var(--border-default);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  min-height: var(--chat-panel-height);
+  height: var(--chat-panel-height);
 }
 
 .chat__window {
   flex: 1;
+  min-height: 0;
   background: var(--cream);
   padding: var(--spacing-12);
   overflow-y: auto;
+}
+
+.input__container {
+  padding: var(--spacing-12) var(--spacing-4) var(--spacing-4);
 }
 
 @media (max-width: 768px) {

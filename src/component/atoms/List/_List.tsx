@@ -6,6 +6,7 @@ const List = <ItemT,>(props: IListProps<ItemT>) => {
     const { data, renderItem, keyExtractor, EmptyComponent, style, ...rest } = props;
 
     const _renderItem = useCallback(
+        // TODO(lint): type `item` as ItemT (no-explicit-any).
         (item: any, index: number) => (
             <Fragment key={keyExtractor(item, index)}>
                 {renderItem({

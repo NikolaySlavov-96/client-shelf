@@ -5,9 +5,10 @@ import { BookCover, Button, List } from '~/component/atoms';
 
 import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
 
-import { cx } from '~/Utils';
+import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
+import { type IAuthor } from '~/Store/Slicers/ProductSlicer.interface';
 import type { TViewType } from '~/Types/Components';
 
 import styles from './BookCard.module.css';
@@ -15,7 +16,8 @@ import styles from './BookCard.module.css';
 interface IBookCardProps {
     productId: number;
     productTitle: string;
-    authorName: string;
+    authors: IAuthor[];
+    authorsSeparator?: string;
     productType: string;
     fileUrl?: string;
     fileSrc?: string;
@@ -29,7 +31,8 @@ interface IBookCardProps {
 function BookCard({
     productId,
     productTitle,
-    authorName,
+    authors,
+    authorsSeparator,
     fileUrl,
     fileSrc,
     statusId,
@@ -68,7 +71,7 @@ function BookCard({
 
             <div className={cx(styles.meta, isList ? 'flex-col' : '')}>
                 {isList ? <p className={styles.meta__title}>{productTitle}</p> : null}
-                <p className={styles.meta__author}>{authorName}</p>
+                <p className={styles.meta__author}>{formatAuthors(authors, authorsSeparator)}</p>
                 {isAuthenticated ? (
                     <List
                         data={statuses}

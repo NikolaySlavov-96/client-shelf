@@ -12,6 +12,8 @@ export const TEXTS = {
     NAV_CHAT: 'Support Chat',
     NAV_SEARCH_TRIGGER: 'Search book or author...',
     NAV_GUEST: 'Guest',
+    NAV_ARIA_TOGGLE: 'Toggle navigation',
+    NAV_ARIA_MAIN: 'Main navigation',
     // Auth
     AUTH_LOGIN_HEADING: 'Welcome back',
     AUTH_LOGIN_SUBTITLE: 'Sign in to your bookshelf',
@@ -39,6 +41,9 @@ export const TEXTS = {
     CATALOG_SUBTITLE: 'Find your next favourite book',
     CATALOG_EMPTY: 'No books found.',
     CATALOG_FILTER_ALL: 'All',
+    CATALOG_MODE_LABEL: 'Browse mode',
+    CATALOG_MODE_INFINITE: 'Infinite',
+    CATALOG_MODE_PAGED: 'Pages',
     // Book Detail
     DETAIL_BACK: '← Back to catalog',
     DETAIL_PAGES: 'Pages',
@@ -100,18 +105,42 @@ export const TEXTS = {
     // Create Product
     CREATE_TITLE: 'Add new book',
     CREATE_BTN: 'Create book',
-    CREATE_LABEL_AUTHOR: 'Author name',
+    CREATE_LABEL_AUTHOR: 'Authors',
+    CREATE_LABEL_AUTHORS_SEPARATOR: 'Authors separator',
     CREATE_LABEL_TITLE: 'Book title',
     CREATE_LABEL_GENRE: 'Genre',
     CREATE_LABEL_IMAGE: 'Cover image',
     CREATE_LABEL_SRC: 'Image name',
-    CREATE_PLACEHOLDER_AUTHOR: 'Author name',
+    CREATE_PLACEHOLDER_AUTHOR: 'Type a name and press Enter',
     CREATE_PLACEHOLDER_TITLE: 'Book title',
     CREATE_PLACEHOLDER_GENRE: 'Genre',
     // Support Chat
     SUPPORT_TITLE: 'Support Chat',
+    SUPPORT_MESSAGE_PLACEHOLDER: 'Type a message...',
+    SUPPORT_SEND: 'Send',
+    SUPPORT_HELP_PROMPT: 'Press if you need a help',
+    SUPPORT_ROOM_TITLE_PREFIX: 'Support Chat - ',
+    SUPPORT_CLOSE_CONFIRM: 'Are you sure you want to close the chat?',
+    SUPPORT_CONFIRM_OK: 'Ok',
+    SUPPORT_CONFIRM_CANCEL: 'Cancel',
     // Search By Email
     SEARCH_EMAIL_TITLE: 'Viewing shelf for',
+    // New Product Modal
+    NEW_PRODUCT_HEADING: 'Lastly added books',
+    NEW_PRODUCT_HINT: 'Added before 10 second',
+    // Accessibility (aria-labels)
+    LAYOUT_ARIA: 'View layout',
+    LAYOUT_LIST_ARIA: 'List view',
+    LAYOUT_GRID_ARIA: 'Grid view',
+    FILTER_ARIA: 'Filter options',
+    AUTH_ARIA_TABS: 'Authentication',
+    SHELF_ARIA_TABS: 'Shelf categories',
+    // Footer
+    FOOTER_CONTENT: 'Designed and Implement from ',
+    FOOTER_AUTHOR: 'NNSN',
+    // Validation
+    VALIDATION_REQUIRED: 'is required',
+    VALIDATION_MIN_LENGTH: 'Minimal length is',
     // Common
     COMMON_LOADING: 'Loading...',
     COMMON_COMING_SOON: 'Coming soon',

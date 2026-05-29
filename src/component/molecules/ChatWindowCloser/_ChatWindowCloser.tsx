@@ -2,16 +2,16 @@ import { type Dispatch, type FC, memo, type SetStateAction, useCallback } from '
 
 import { ChatHeader } from '~/component/atoms';
 
-import style from './_ChatWindowCloser.module.css';
+import { TEXTS } from '~/constants';
 
-const DEFAULT_TITLE = 'Press if you need a help';
+import style from './_ChatWindowCloser.module.css';
 
 interface IChatWindowCloserProps {
     onPress: Dispatch<SetStateAction<boolean>>;
     title?: string;
 }
 const ChatWindowCloser: FC<IChatWindowCloserProps> = (props) => {
-    const { onPress, title = DEFAULT_TITLE } = props;
+    const { onPress, title = TEXTS.SUPPORT_HELP_PROMPT } = props;
 
     const onClick = useCallback(() => onPress((s) => !s), [onPress]);
     return (

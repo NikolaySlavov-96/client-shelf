@@ -1,3 +1,8 @@
+export interface IAuthor {
+    id: number;
+    name: string;
+}
+
 interface IProduct {
     productId: number;
     productType: string;
@@ -8,10 +13,8 @@ interface IProduct {
     description: string | null;
     ratingAverage?: number;
     ratingCount?: number;
-    authorName: string;
-    authorImage: string;
-    authorGenre: string;
-    authorStatus: boolean;
+    authors: IAuthor[];
+    authorsSeparator: string;
     fileUrl: string;
     fileId: number;
     fileSrc: string;
@@ -54,7 +57,8 @@ export interface IGetProductsResponse {
 }
 
 export interface ICreateProductRequest {
-    author: string;
+    authors: string[];
+    authorsSeparator?: string;
     productTitle: string;
     genre: string;
     filesId?: number[];

@@ -32,6 +32,7 @@ const _useStoreZ = create<TStoreState>()(
                 isAuthenticated: state.isAuthenticated,
                 isVerifyUser: state.isVerifyUser,
                 viewType: state.viewType,
+                browseMode: state.browseMode,
             }),
         },
     ),
