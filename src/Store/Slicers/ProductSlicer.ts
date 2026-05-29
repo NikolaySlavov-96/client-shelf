@@ -44,6 +44,12 @@ export interface IProductSlicer {
 
     products: { count: number; rows: IProduct[] };
     fetchProducts: (data: IFetchSearchParams) => void;
+    fetchProductsThrough: (data: {
+        throughPage: number;
+        limit: number;
+        searchContent: string;
+        statusId?: number | null;
+    }) => void;
 
     productById: IProduct;
     fetchProductById: (id: string) => void;
@@ -74,6 +80,15 @@ const mergeProductRows = (existing: IProduct[], incoming: IProduct[]): IProduct[
     const seen = new Set(existing.map((p) => p.productId));
     return [...existing, ...incoming.filter((p) => !seen.has(p.productId))];
 };
+
+// Toggling paged <-> infinite (or rapid filter changes) fires overlapping getProducts calls with
+// different limits. Responses can resolve out of order, so a stale short page would otherwise
+// overwrite a fresh deep load and leave the list truncated. Apply only the latest dispatched call.
+let latestProductsFetchId = 0;
+
+// The API caps a single request at 140 rows (Helpers/_queryParsers.maxLimit). Asking for more in one
+// shot silently truncates, so a deep infinite prefix must be assembled from several capped requests.
+const SERVER_MAX_LIMIT = 140;
 
 // Recompute per-status counts after a single book moves: -1 from its old status (if any),
 // +1 to the new one. Keeps the profile shelf tallies in sync without an extra request.
@@ -124,9 +139,11 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
     products: { count: 0, rows: [] },
     fetchProducts: async (data) => {
+        const requestId = ++latestProductsFetchId;
         set({ isLoadingProducts: true });
         try {
             const result = await productService.getProducts(data);
+            if (requestId !== latestProductsFetchId) return; // a newer fetch superseded this one
             set((state) =>
                 data.append
                     ? { products: { count: result.count, rows: mergeProductRows(state.products.rows, result.rows) } }
@@ -135,7 +152,40 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         } catch (err) {
             log.error('fetchProducts error --->: ', err);
         } finally {
-            set({ isLoadingProducts: false });
+            if (requestId === latestProductsFetchId) set({ isLoadingProducts: false });
+        }
+    },
+
+    // Load the contiguous 1..throughPage prefix for infinite scroll (switching from pagination or
+    // opening a shared deep link). A single getProducts({ limit: throughPage * pageLimit }) would be
+    // clamped to SERVER_MAX_LIMIT and return a short list — landing the reader on the wrong row — so
+    // fetch in cap-respecting chunks aligned to the pageLimit grid and merge them into one list.
+    fetchProductsThrough: async ({ throughPage, limit, searchContent, statusId }) => {
+        const requestId = ++latestProductsFetchId;
+        set({ isLoadingProducts: true });
+        try {
+            const targetRows = throughPage * limit;
+            // Largest whole number of pageLimit-sized pages that fits under the server cap, capped at
+            // what the prefix actually needs. A fixed per-request limit keeps the offsets contiguous,
+            // and aligning to the pageLimit grid lets the load-more path keep appending without gaps.
+            const chunkPages = Math.max(1, Math.floor(SERVER_MAX_LIMIT / limit));
+            const chunkLimit = Math.min(chunkPages * limit, targetRows);
+
+            let rows: IProduct[] = [];
+            let count = 0;
+            for (let page = 1; rows.length < targetRows; page++) {
+                const result = await productService.getProducts({ page, limit: chunkLimit, searchContent, statusId });
+                if (requestId !== latestProductsFetchId) return; // a newer fetch superseded this one
+                count = result.count;
+                rows = mergeProductRows(rows, result.rows);
+                if (result.rows.length < chunkLimit) break; // reached the end of the catalog
+            }
+
+            if (requestId === latestProductsFetchId) set({ products: { count, rows } });
+        } catch (err) {
+            log.error('fetchProductsThrough error --->: ', err);
+        } finally {
+            if (requestId === latestProductsFetchId) set({ isLoadingProducts: false });
         }
     },
 

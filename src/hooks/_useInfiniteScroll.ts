@@ -17,9 +17,12 @@ const useInfiniteScroll = (params: IUseInfiniteScrollParams): RefObject<HTMLDivE
         const node = sentinelRef.current;
         if (!node || !hasMore || isLoading) return;
 
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0]?.isIntersecting) onLoadMoreRef.current();
-        });
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0]?.isIntersecting) onLoadMoreRef.current();
+            },
+            { rootMargin: '200px' },
+        );
         observer.observe(node);
 
         return () => observer.disconnect();

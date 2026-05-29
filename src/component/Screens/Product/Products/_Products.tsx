@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 import { BrowseModeToggle, FilterPills, LayoutIcon, Pagination } from '~/component/molecules';
@@ -31,6 +31,7 @@ const Products = () => {
     const {
         products,
         fetchProducts,
+        fetchProductsThrough,
         pageLimit,
         isLoadingProducts,
         isAuthenticated,
@@ -43,8 +44,11 @@ const Products = () => {
         setBrowseMode,
     } = useStoreZ();
 
-    const [infinitePage, setInfinitePage] = useState(1);
     const lastQueryKeyRef = useRef<string | null>(null);
+    const loadedThroughRef = useRef(0);
+    const pendingScrollPageRef = useRef<number | null>(null);
+    const wasLoadingRef = useRef(false);
+    const gridRef = useRef<HTMLDivElement | null>(null);
 
     const layout = normalizeLayout(searchParams.get(SEARCH_NAME.VIEW), viewType);
     const urlPage = normalizePage(searchParams.get(SEARCH_NAME.PAGE));
@@ -59,9 +63,10 @@ const Products = () => {
     const statusId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
     const queryKey = `${searchContent}|${statusId}|${isInfinite}`;
 
-    const page = isInfinite ? infinitePage : urlPage;
     const pageCount = Math.ceil(products.count / pageLimit) || 0;
-    const hasMore = isInfinite && products.rows.length < products.count;
+    // Stop at the last real page. Counting loaded pages against the authoritative total is dedupe-proof
+    // (rows.length drifts below count when a row is deduped) and never walks onto an empty page past the end.
+    const hasMore = isInfinite && pageCount > 0 && loadedThroughRef.current < pageCount;
 
     const isInitialLoad = isLoadingProducts && products.rows.length === 0;
     const showGridLoader = isInfinite ? isInitialLoad : isLoadingProducts;
@@ -121,7 +126,9 @@ const Products = () => {
         [updateParams],
     );
 
-    const handleLoadMore = useCallback(() => setInfinitePage((prev) => prev + 1), []);
+    const handleLoadMore = useCallback(() => {
+        updateParams((p) => p.set(SEARCH_NAME.PAGE, String(urlPage + 1)), { replace: true });
+    }, [updateParams, urlPage]);
 
     const handleStatusChange = useCallback(
         (productId: number, newStatusId: number) => {
@@ -155,20 +162,66 @@ const Products = () => {
         fetchAllProductStates();
     }, [fetchAllProductStates]);
 
-    // A changed query (search, status or mode) restarts the infinite list at page 1 before any
-    // fetch fires, so a freshly chosen filter never appends onto the previous result set.
+    // The URL page is the source of truth in both modes. Paginated mode fetches that page directly.
+    // Infinite mode treats the page as a depth marker: a fresh query (search/status/mode change, or a
+    // shared link) loads every page up to it so the list matches the URL, while scrolling further
+    // appends the next page and bumps the URL so the position can be shared and restored.
     useEffect(() => {
         const queryChanged = lastQueryKeyRef.current !== queryKey;
         lastQueryKeyRef.current = queryKey;
 
-        if (isInfinite && queryChanged && infinitePage !== 1) {
-            setInfinitePage(1);
+        if (!isInfinite) {
+            fetchProducts({ page: urlPage, limit: pageLimit, searchContent, statusId, append: false });
             return;
         }
 
-        const append = isInfinite && page > 1;
-        fetchProducts({ page, limit: pageLimit, searchContent, statusId, append });
-    }, [fetchProducts, queryKey, isInfinite, page, infinitePage, pageLimit, searchContent, statusId]);
+        if (queryChanged) {
+            loadedThroughRef.current = urlPage;
+            pendingScrollPageRef.current = urlPage > 1 ? urlPage : null;
+            // The prefix can span more rows than one request may return, so let the store stitch it
+            // together from cap-respecting chunks instead of asking for pageLimit * urlPage at once.
+            fetchProductsThrough({ throughPage: urlPage, limit: pageLimit, searchContent, statusId });
+        } else if (urlPage > loadedThroughRef.current && (pageCount === 0 || urlPage <= pageCount)) {
+            loadedThroughRef.current = urlPage;
+            fetchProducts({ page: urlPage, limit: pageLimit, searchContent, statusId, append: true });
+        }
+    }, [
+        fetchProducts,
+        fetchProductsThrough,
+        queryKey,
+        isInfinite,
+        urlPage,
+        pageLimit,
+        searchContent,
+        statusId,
+        pageCount,
+    ]);
+
+    // Once a deep infinite load resolves, jump to the first item of the requested page so switching
+    // from pagination — or opening a shared link — lands the reader where that page begins.
+    useEffect(() => {
+        // Fire only on the loading -> idle transition, i.e. once the 1..targetPage deep fetch has
+        // actually resolved. Switching from pagination keeps the previous page's rows mounted while
+        // that fetch is in flight, and the store flips isLoadingProducts only on the next render — so
+        // without this guard the effect runs in the same commit as the dispatch, reads the stale
+        // (still-false) loading flag, consumes the pending page and scrolls into the carried-over rows,
+        // leaving nothing to restore when the real rows arrive. The deep fetch always toggles loading,
+        // so keying off the transition is reliable even when the API caps the page size.
+        const justFinishedLoading = wasLoadingRef.current && !isLoadingProducts;
+        wasLoadingRef.current = isLoadingProducts;
+
+        const targetPage = pendingScrollPageRef.current;
+        if (!isInfinite || !targetPage || !justFinishedLoading || products.rows.length === 0) return;
+
+        pendingScrollPageRef.current = null;
+        const grid = gridRef.current?.firstElementChild;
+        const index = Math.min((targetPage - 1) * pageLimit, products.rows.length - 1);
+        const target = grid?.children?.[index] as HTMLElement | undefined;
+        // Defer one frame so the just-committed rows are laid out. No cleanup-bound cancel here:
+        // book cards have a fixed cover height, so a single jump lands accurately, and a React-cleanup
+        // cancel would abort this in StrictMode's setup -> cleanup -> setup cycle and never restore.
+        if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    }, [isInfinite, isLoadingProducts, products.rows.length, pageLimit]);
 
     const filterOptions = isAuthenticated
         ? [
@@ -205,12 +258,14 @@ const Products = () => {
                     {TEXTS.COMMON_LOADING}
                 </div>
             ) : (
-                <BookGrid
-                    books={products.rows}
-                    isAuthenticated={isAuthenticated}
-                    layout={layout}
-                    onStatusChange={handleStatusChange}
-                />
+                <div ref={gridRef}>
+                    <BookGrid
+                        books={products.rows}
+                        isAuthenticated={isAuthenticated}
+                        layout={layout}
+                        onStatusChange={handleStatusChange}
+                    />
+                </div>
             )}
 
             {isInfinite ? (
