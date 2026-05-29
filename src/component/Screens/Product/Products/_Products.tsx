@@ -189,13 +189,14 @@ const Products = () => {
             fetchProducts({ page: urlPage, limit: pageLimit, searchContent, statusId, append: false });
             return;
         }
-        loadedThroughRef.current = urlPage;
         if (queryChanged) {
+            loadedThroughRef.current = urlPage;
             const willJump = urlPage > 1;
             pendingScrollPageRef.current = willJump ? urlPage : null;
             setLoaderArmed(!willJump);
             fetchProductsThrough({ throughPage: urlPage, limit: pageLimit, searchContent, statusId });
         } else if (urlPage > loadedThroughRef.current && (pageCount === 0 || urlPage <= pageCount)) {
+            loadedThroughRef.current = urlPage;
             fetchProducts({ page: urlPage, limit: pageLimit, searchContent, statusId, append: true });
         }
     }, [
