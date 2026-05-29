@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 import { BrowseModeToggle, FilterPills, LayoutIcon, Pagination } from '~/component/molecules';
@@ -49,6 +49,12 @@ const Products = () => {
     const pendingScrollPageRef = useRef<number | null>(null);
     const wasLoadingRef = useRef(false);
     const gridRef = useRef<HTMLDivElement | null>(null);
+
+    // A deep jump (switching from pagination or opening a shared deep link) scrolls programmatically to
+    // the target page, which can drag the sentinel into view and auto-fetch the next page before the
+    // reader has scrolled at all. Disarm the loader for that navigation and re-arm on the first genuine
+    // scroll input, so paging resumes only when the reader actually moves.
+    const [loaderArmed, setLoaderArmed] = useState(true);
 
     const layout = normalizeLayout(searchParams.get(SEARCH_NAME.VIEW), viewType);
     const urlPage = normalizePage(searchParams.get(SEARCH_NAME.PAGE));
@@ -138,7 +144,32 @@ const Products = () => {
         [addingProductState, isAuthenticated, activeFilter],
     );
 
-    const sentinelRef = useInfiniteScroll({ hasMore, isLoading: isLoadingProducts, onLoadMore: handleLoadMore });
+    const sentinelRef = useInfiniteScroll({
+        hasMore: hasMore && loaderArmed,
+        isLoading: isLoadingProducts,
+        onLoadMore: handleLoadMore,
+    });
+
+    // Re-arm the loader on the first real scroll gesture after a deep jump. wheel/touch/key come only
+    // from the reader — unlike 'scroll', which the programmatic scrollIntoView also fires. Rebuilding
+    // the observer on re-arm re-checks the sentinel, so normal infinite paging picks up from there.
+    useEffect(() => {
+        if (loaderArmed) return;
+        const arm = () => setLoaderArmed(true);
+        // Only scroll-driving keys count; an unrelated keystroke shouldn't resume paging.
+        const SCROLL_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' ', 'Spacebar']);
+        const armOnKey = (e: KeyboardEvent) => {
+            if (SCROLL_KEYS.has(e.key)) arm();
+        };
+        window.addEventListener('wheel', arm, { passive: true, once: true });
+        window.addEventListener('touchmove', arm, { passive: true, once: true });
+        window.addEventListener('keydown', armOnKey);
+        return () => {
+            window.removeEventListener('wheel', arm);
+            window.removeEventListener('touchmove', arm);
+            window.removeEventListener('keydown', armOnKey);
+        };
+    }, [loaderArmed]);
 
     useEffect(() => {
         const needsView = !searchParams.get(SEARCH_NAME.VIEW);
@@ -177,7 +208,11 @@ const Products = () => {
 
         if (queryChanged) {
             loadedThroughRef.current = urlPage;
-            pendingScrollPageRef.current = urlPage > 1 ? urlPage : null;
+            const willJump = urlPage > 1;
+            pendingScrollPageRef.current = willJump ? urlPage : null;
+            // Hold off auto-loading while we deep-load and jump to the target page; the reader re-arms it
+            // by scrolling. A page-1 query has no jump, so it stays armed for normal infinite scrolling.
+            setLoaderArmed(!willJump);
             // The prefix can span more rows than one request may return, so let the store stitch it
             // together from cap-respecting chunks instead of asking for pageLimit * urlPage at once.
             fetchProductsThrough({ throughPage: urlPage, limit: pageLimit, searchContent, statusId });
