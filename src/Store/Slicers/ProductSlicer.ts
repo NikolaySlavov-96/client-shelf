@@ -74,24 +74,15 @@ export interface IProductSlicer {
     addProductWithImage: (data: IAddProductWithImage['data'], fileData: IAddProductWithImage['fileDate']) => void;
 }
 
-// Infinite scroll appends pages onto the existing list — dedupe by productId so a row that
-// shifted across the page boundary (e.g. after a status change removed one) can't collide keys.
 const mergeProductRows = (existing: IProduct[], incoming: IProduct[]): IProduct[] => {
     const seen = new Set(existing.map((p) => p.productId));
     return [...existing, ...incoming.filter((p) => !seen.has(p.productId))];
 };
 
-// Toggling paged <-> infinite (or rapid filter changes) fires overlapping getProducts calls with
-// different limits. Responses can resolve out of order, so a stale short page would otherwise
-// overwrite a fresh deep load and leave the list truncated. Apply only the latest dispatched call.
 let latestProductsFetchId = 0;
 
-// The API caps a single request at 140 rows (Helpers/_queryParsers.maxLimit). Asking for more in one
-// shot silently truncates, so a deep infinite prefix must be assembled from several capped requests.
 const SERVER_MAX_LIMIT = 140;
 
-// Recompute per-status counts after a single book moves: -1 from its old status (if any),
-// +1 to the new one. Keeps the profile shelf tallies in sync without an extra request.
 const recountStatuses = (
     counts: IStatusCount[],
     previousStatusId: number | null,
@@ -156,18 +147,11 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         }
     },
 
-    // Load the contiguous 1..throughPage prefix for infinite scroll (switching from pagination or
-    // opening a shared deep link). A single getProducts({ limit: throughPage * pageLimit }) would be
-    // clamped to SERVER_MAX_LIMIT and return a short list — landing the reader on the wrong row — so
-    // fetch in cap-respecting chunks aligned to the pageLimit grid and merge them into one list.
     fetchProductsThrough: async ({ throughPage, limit, searchContent, statusId }) => {
         const requestId = ++latestProductsFetchId;
         set({ isLoadingProducts: true });
         try {
             const targetRows = throughPage * limit;
-            // Largest whole number of pageLimit-sized pages that fits under the server cap, capped at
-            // what the prefix actually needs. A fixed per-request limit keeps the offsets contiguous,
-            // and aligning to the pageLimit grid lets the load-more path keep appending without gaps.
             const chunkPages = Math.max(1, Math.floor(SERVER_MAX_LIMIT / limit));
             const chunkLimit = Math.min(chunkPages * limit, targetRows);
 
