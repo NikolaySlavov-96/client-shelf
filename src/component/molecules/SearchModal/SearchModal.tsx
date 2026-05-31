@@ -21,9 +21,20 @@ export interface ISearchModalPayload {
 
 function SearchModal() {
     const navigate = useNavigate();
-    const { modalName, isVisible, modalPayload, closeModal, products, productCollection, productByEmail } = useStoreZ();
+    const {
+        modalName,
+        isVisible,
+        modalPayload,
+        closeModal,
+        products,
+        productCollection,
+        productByEmail,
+        fetchProducts,
+        pageLimit,
+    } = useStoreZ();
 
     const [query, setQuery] = useState('');
+    const [debouncedQuery, setDebouncedQuery] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
 
     const isOpen = isVisible && modalName === MODAL_NAMES.SEARCH;
@@ -57,6 +68,16 @@ function SearchModal() {
         return () => document.removeEventListener('keydown', handleKey);
     }, [isOpen, closeModal]);
 
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedQuery(query.trim()), 300);
+        return () => clearTimeout(timer);
+    }, [query]);
+
+    useEffect(() => {
+        if (!isOpen || scope !== 'catalog') return;
+        fetchProducts({ page: 1, limit: pageLimit, searchContent: debouncedQuery, append: false });
+    }, [isOpen, debouncedQuery, scope, fetchProducts, pageLimit]);
+
     const handleSelect = useCallback(
         (book: TAnyBook) => {
             navigate(`${ROUT_NAMES.PRODUCT}/${book.productId}`);
@@ -68,13 +89,15 @@ function SearchModal() {
     if (!isOpen) return null;
 
     const trimmed = query.trim().toLowerCase();
-    const filtered = trimmed
-        ? source.filter(
-              (b) =>
-                  b.productTitle.toLowerCase().includes(trimmed) ||
-                  b.authors.some((a) => a.name.toLowerCase().includes(trimmed)),
-          )
-        : source.slice(0, 6);
+    const filtered = !trimmed
+        ? source.slice(0, 6)
+        : scope === 'catalog'
+          ? source
+          : source.filter(
+                (b) =>
+                    b.productTitle.toLowerCase().includes(trimmed) ||
+                    b.authors.some((a) => a.name.toLowerCase().includes(trimmed)),
+            );
 
     const sectionLabel = trimmed ? TEXTS.SEARCH_RESULTS_LABEL : TEXTS.SEARCH_SUGGESTED_LABEL;
 
