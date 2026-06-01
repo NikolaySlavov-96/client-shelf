@@ -63,6 +63,7 @@
 .results {
   max-height: var(--search-modal-results-height);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sectionLabel {

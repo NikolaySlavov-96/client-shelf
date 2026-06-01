@@ -74,6 +74,15 @@ function SearchModal() {
     }, [isOpen, closeModal]);
 
     useEffect(() => {
+        if (!isOpen) return;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = previousOverflow;
+        };
+    }, [isOpen]);
+
+    useEffect(() => {
         const timer = setTimeout(() => setDebouncedQuery(query.trim()), 300);
         return () => clearTimeout(timer);
     }, [query]);
