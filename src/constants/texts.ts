@@ -101,7 +101,6 @@ export const TEXTS = {
     SEARCH_SUGGESTED_LABEL: 'Suggested',
     SEARCH_RESULTS_LABEL: 'Results',
     SEARCH_EMPTY: 'No results found.',
-    SEARCH_ADD: '+ Add',
     // Create Product
     CREATE_TITLE: 'Add new book',
     CREATE_BTN: 'Create book',

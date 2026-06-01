@@ -35,6 +35,7 @@ export interface IProductSlicer {
     isLoadingProductCollection: boolean;
     isLoadingProductAddition: boolean;
     isAddingProductState: boolean;
+    isLoadingProductSearch: boolean;
 
     productStates: IState[];
     fetchAllProductStates: () => void;
@@ -44,6 +45,9 @@ export interface IProductSlicer {
 
     products: { count: number; rows: IProduct[] };
     fetchProducts: (data: IFetchSearchParams) => void;
+
+    productSearch: { count: number; rows: IProduct[] };
+    fetchProductSearch: (data: IFetchSearchParams) => void;
     fetchProductsThrough: (data: {
         throughPage: number;
         limit: number;
@@ -80,6 +84,7 @@ const mergeProductRows = (existing: IProduct[], incoming: IProduct[]): IProduct[
 };
 
 let latestProductsFetchId = 0;
+let latestProductSearchFetchId = 0;
 
 const SERVER_MAX_LIMIT = 140;
 
@@ -104,6 +109,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
     isLoadingProductCollection: false,
     isLoadingProductAddition: false,
     isAddingProductState: false,
+    isLoadingProductSearch: false,
 
     productStates: [],
     fetchAllProductStates: async () => {
@@ -144,6 +150,21 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             log.error('fetchProducts error --->: ', err);
         } finally {
             if (requestId === latestProductsFetchId) set({ isLoadingProducts: false });
+        }
+    },
+
+    productSearch: { count: 0, rows: [] },
+    fetchProductSearch: async (data) => {
+        const requestId = ++latestProductSearchFetchId;
+        set({ isLoadingProductSearch: true });
+        try {
+            const result = await productService.getProducts(data);
+            if (requestId !== latestProductSearchFetchId) return; // a newer search superseded this one
+            set({ productSearch: result });
+        } catch (err) {
+            log.error('fetchProductSearch error --->: ', err);
+        } finally {
+            if (requestId === latestProductSearchFetchId) set({ isLoadingProductSearch: false });
         }
     },
 
