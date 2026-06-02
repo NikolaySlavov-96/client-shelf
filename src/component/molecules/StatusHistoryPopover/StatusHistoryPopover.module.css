@@ -1,0 +1,32 @@
+.wrap {
+    display: inline-flex;
+}
+
+.popover {
+    position: fixed;
+    z-index: var(--z-tooltip);
+
+    gap: var(--spacing-6);
+
+    width: max-content;
+    max-width: 260px;
+    padding: var(--spacing-10) var(--spacing-12);
+
+    background: var(--ink);
+    color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+
+    font-size: var(--text-xs);
+    line-height: 1.4;
+
+    pointer-events: none;
+}
+
+.title {
+    font-weight: var(--font-weight-bold);
+}
+
+.changed {
+    color: var(--white-muted);
+}

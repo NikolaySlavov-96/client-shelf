@@ -43,6 +43,7 @@ function ShelfGrid({ books, onRemove, onStatusChange, className }: IShelfGridPro
                     authors={book.authors}
                     authorsSeparator={book.authorsSeparator}
                     statusId={getStatusId(book)}
+                    statusHistory={book.statusHistory}
                     fileUrl={book.fileUrl}
                     fileSrc={book.fileSrc}
                     onRemove={onRemove}

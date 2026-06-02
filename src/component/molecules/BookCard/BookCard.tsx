@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { BookCover, Button, List } from '~/component/atoms';
 
-import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
+import { getStatusIntervals, isSameStatus, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
 
 import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
-import { type IAuthor } from '~/Store/Slicers/ProductSlicer.interface';
+import { type IAuthor, type IStatusHistoryEntry } from '~/Store/Slicers/ProductSlicer.interface';
 import type { TViewType } from '~/Types/Components';
+import StatusHistoryPopover from '../StatusHistoryPopover/StatusHistoryPopover';
 
 import styles from './BookCard.module.css';
 
@@ -22,6 +23,7 @@ interface IBookCardProps {
     fileUrl?: string;
     fileSrc?: string;
     statusId?: number;
+    statusHistory?: IStatusHistoryEntry[];
     layout?: TViewType;
     isAuthenticated?: boolean;
     onStatusChange?: (productId: number, statusId: number) => void;
@@ -36,6 +38,7 @@ function BookCard({
     fileUrl,
     fileSrc,
     statusId,
+    statusHistory,
     layout = 'grid',
     isAuthenticated = false,
     onStatusChange,
@@ -51,9 +54,10 @@ function BookCard({
     const handleStatusClick = useCallback(
         (e: MouseEvent<HTMLButtonElement>, sid: number) => {
             e.stopPropagation();
+            if (isSameStatus(statusId, sid)) return;
             onStatusChange?.(productId, sid);
         },
-        [onStatusChange, productId],
+        [onStatusChange, productId, statusId],
     );
 
     const isList = layout === 'list';
@@ -78,14 +82,16 @@ function BookCard({
                         keyExtractor={(s) => String(s.id)}
                         style={styles.meta__actions}
                         renderItem={({ item: s }) => (
-                            <Button
-                                label={getStatusLabel(s)}
-                                size="sm"
-                                variant={statusId === s.id ? 'primary' : 'outline'}
-                                onClick={(e) => handleStatusClick(e, s.id)}
-                                aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
-                                aria-pressed={statusId === s.id}
-                            />
+                            <StatusHistoryPopover intervals={getStatusIntervals(statusHistory, s.id)}>
+                                <Button
+                                    label={statusLabelWithCount(s, statusHistory, s.id)}
+                                    size="sm"
+                                    variant={statusId === s.id ? 'primary' : 'outline'}
+                                    onClick={(e) => handleStatusClick(e, s.id)}
+                                    aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
+                                    aria-pressed={statusId === s.id}
+                                />
+                            </StatusHistoryPopover>
                         )}
                     />
                 ) : null}

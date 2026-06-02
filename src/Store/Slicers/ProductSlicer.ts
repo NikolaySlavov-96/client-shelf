@@ -1,6 +1,6 @@
 import { type StateCreator } from 'zustand';
 
-import { TEXTS } from '~/constants';
+import { isSameStatus, TEXTS } from '~/constants';
 
 import { createLogger } from '~/Utils';
 
@@ -25,6 +25,7 @@ import {
     type IProductWithState,
     type IState,
     type IStatusCount,
+    type IStatusHistoryEntry,
 } from './ProductSlicer.interface';
 
 export interface IProductSlicer {
@@ -58,7 +59,7 @@ export interface IProductSlicer {
     productById: IProduct;
     fetchProductById: (id: string) => void;
 
-    productState: { stateId: number };
+    productState: { stateId: number; statusHistory: IStatusHistoryEntry[] };
     fetchProductState: (id: string) => void;
     addingProductState: (id: string, state: string, activeFilterId?: number | null) => void;
 
@@ -85,6 +86,9 @@ const mergeProductRows = (existing: IProduct[], incoming: IProduct[]): IProduct[
 
 let latestProductsFetchId = 0;
 let latestProductSearchFetchId = 0;
+let loadedProductsQuerySignature: string | null = null;
+const buildProductsQuerySignature = (searchContent: string, statusId?: number | null) =>
+    `${searchContent}|${statusId ?? ''}`;
 
 const SERVER_MAX_LIMIT = 140;
 
@@ -137,15 +141,18 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
     products: { count: 0, rows: [] },
     fetchProducts: async (data) => {
         const requestId = ++latestProductsFetchId;
+        const querySignature = buildProductsQuerySignature(data.searchContent, data.statusId);
         set({ isLoadingProducts: true });
         try {
             const result = await productService.getProducts(data);
             if (requestId !== latestProductsFetchId) return; // a newer fetch superseded this one
+            if (data.append && loadedProductsQuerySignature !== querySignature) return; // never append onto a different query's rows
             set((state) =>
                 data.append
                     ? { products: { count: result.count, rows: mergeProductRows(state.products.rows, result.rows) } }
                     : { products: result },
             );
+            loadedProductsQuerySignature = querySignature;
         } catch (err) {
             log.error('fetchProducts error --->: ', err);
         } finally {
@@ -170,6 +177,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
     fetchProductsThrough: async ({ throughPage, limit, searchContent, statusId }) => {
         const requestId = ++latestProductsFetchId;
+        const querySignature = buildProductsQuerySignature(searchContent, statusId);
         set({ isLoadingProducts: true });
         try {
             const targetRows = throughPage * limit;
@@ -186,7 +194,10 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
                 if (result.rows.length < chunkLimit) break; // reached the end of the catalog
             }
 
-            if (requestId === latestProductsFetchId) set({ products: { count, rows } });
+            if (requestId === latestProductsFetchId) {
+                set({ products: { count, rows } });
+                loadedProductsQuerySignature = querySignature;
+            }
         } catch (err) {
             log.error('fetchProductsThrough error --->: ', err);
         } finally {
@@ -228,12 +239,17 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         }
     },
 
-    productState: { stateId: 0 },
+    productState: { stateId: 0, statusHistory: [] },
     fetchProductState: async (id) => {
         set({ isLoadingProductState: true });
         try {
             const result = await productService.getProductStatus(id);
-            set({ productState: { stateId: result.statusId } });
+            set({
+                productState: {
+                    stateId: result.statusId ?? 0,
+                    statusHistory: result.statusHistory ?? [],
+                },
+            });
         } catch (err) {
             log.error('fetchProductState error --->: ', err);
         } finally {
@@ -244,20 +260,23 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         const productId = Number(id);
         const nextStatusId = Number(state);
 
-        const { products, statusCounts } = get();
+        const { products, statusCounts, productState } = get();
         const currentRow = products.rows.find((p) => p.productId === productId);
         const previousStatusId = currentRow?.statusId ?? null;
 
-        if (previousStatusId === nextStatusId) {
-            set({ productState: { stateId: nextStatusId } });
-            return;
-        }
+        if (isSameStatus(previousStatusId, nextStatusId)) return;
 
         const leavesCurrentSection = activeFilterId !== null && activeFilterId !== 0 && nextStatusId !== activeFilterId;
 
+        const historyEntry = { statusId: nextStatusId, createdAt: new Date().toISOString() };
+
         const nextRows = leavesCurrentSection
             ? products.rows.filter((p) => p.productId !== productId)
-            : products.rows.map((p) => (p.productId === productId ? { ...p, statusId: nextStatusId } : p));
+            : products.rows.map((p) =>
+                  p.productId === productId
+                      ? { ...p, statusId: nextStatusId, statusHistory: [...(p.statusHistory ?? []), historyEntry] }
+                      : p,
+              );
 
         const nextCount = leavesCurrentSection ? Math.max(0, products.count - 1) : products.count;
 
@@ -267,7 +286,10 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             set({
                 products: { count: nextCount, rows: nextRows },
                 statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
-                productState: { stateId: nextStatusId },
+                productState: {
+                    stateId: nextStatusId,
+                    statusHistory: [...productState.statusHistory, historyEntry],
+                },
             });
         } catch (err) {
             log.error('addingProductState error --->: ', err);
@@ -352,16 +374,26 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         const currentRow = productCollection.rows.find((p) => p.productId === productId);
         const previousStatusId = currentRow?.productStateId ?? null;
 
-        if (previousStatusId === nextStatusId) return;
+        if (isSameStatus(previousStatusId, nextStatusId)) return;
 
         const leavesCurrentSection = activeStatusId !== null && activeStatusId !== 0 && nextStatusId !== activeStatusId;
 
         const previousRows = productCollection.rows;
         const previousCount = productCollection.count;
 
+        const historyEntry = { statusId: nextStatusId, createdAt: new Date().toISOString() };
+
         const nextRows = leavesCurrentSection
             ? previousRows.filter((p) => p.productId !== productId)
-            : previousRows.map((p) => (p.productId === productId ? { ...p, productStateId: nextStatusId } : p));
+            : previousRows.map((p) =>
+                  p.productId === productId
+                      ? {
+                            ...p,
+                            productStateId: nextStatusId,
+                            statusHistory: [...(p.statusHistory ?? []), historyEntry],
+                        }
+                      : p,
+              );
         const nextCount = leavesCurrentSection ? Math.max(0, previousCount - 1) : previousCount;
 
         set({

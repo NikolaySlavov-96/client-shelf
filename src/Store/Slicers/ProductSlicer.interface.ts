@@ -25,6 +25,7 @@ export interface IProduct {
     fileUrl: string;
     fileId: number;
     fileSrc: string;
+    statusHistory?: IStatusHistoryEntry[];
 }
 
 export interface IProductRating {
@@ -36,6 +37,11 @@ export interface IProductRating {
 export interface IStatusCount {
     statusId: number;
     count: number;
+}
+
+export interface IStatusHistoryEntry {
+    statusId: number;
+    createdAt: string;
 }
 
 export interface IProductWithState extends IProduct {
