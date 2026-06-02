@@ -25,7 +25,7 @@ export interface IProduct {
     fileUrl: string;
     fileId: number;
     fileSrc: string;
-    statusCounts?: IStatusCount[];
+    statusHistory?: IStatusHistoryEntry[];
 }
 
 export interface IProductRating {

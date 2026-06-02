@@ -18,7 +18,7 @@ interface IProduct {
     fileUrl: string;
     fileId: number;
     fileSrc: string;
-    statusCounts?: IStatusCount[];
+    statusHistory?: IStatusHistoryEntry[];
 }
 
 export interface IGetProductRatingResponse {
@@ -112,7 +112,6 @@ export interface IGetAllProductByStateResponse {
 
 export interface IGetStatusResponse {
     statusId: number | null;
-    statusCounts: IStatusCount[];
     statusHistory: IStatusHistoryEntry[];
 }
 

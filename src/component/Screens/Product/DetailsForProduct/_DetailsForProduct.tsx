@@ -5,7 +5,7 @@ import { Badge, BookCover, Button, List, StarRating } from '~/component/atoms';
 
 import { StatusHistoryPopover } from '~/component/molecules';
 
-import { getStatusIntervals, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
+import { isSameStatus, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
 
 import { formatAuthors } from '~/Utils';
 
@@ -41,7 +41,7 @@ const DetailsForProduct = () => {
 
     const handleStatusChange = useCallback(
         (statusId: number) => {
-            if (statusId === currentStatusId) return; // re-selecting the current status does nothing
+            if (isSameStatus(currentStatusId, statusId)) return;
             if (id) addingProductState(id, String(statusId));
         },
         [id, addingProductState, currentStatusId],
@@ -140,11 +140,9 @@ const DetailsForProduct = () => {
                                         keyExtractor={(s) => String(s.id)}
                                         style={styles.actions__btns}
                                         renderItem={({ item: s }) => (
-                                            <StatusHistoryPopover
-                                                intervals={getStatusIntervals(productState?.statusHistory, s.id)}
-                                            >
+                                            <StatusHistoryPopover history={productState?.statusHistory}>
                                                 <Button
-                                                    label={statusLabelWithCount(s, productState?.statusCounts, s.id)}
+                                                    label={statusLabelWithCount(s, productState?.statusHistory, s.id)}
                                                     variant={currentStatusId === s.id ? 'primary' : 'outline'}
                                                     size="md"
                                                     onClick={() => handleStatusChange(s.id)}

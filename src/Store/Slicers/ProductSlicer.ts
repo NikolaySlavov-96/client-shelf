@@ -1,6 +1,6 @@
 import { type StateCreator } from 'zustand';
 
-import { bumpCount, TEXTS } from '~/constants';
+import { isSameStatus, TEXTS } from '~/constants';
 
 import { createLogger } from '~/Utils';
 
@@ -55,7 +55,7 @@ export interface IProductSlicer {
     productById: IProduct;
     fetchProductById: (id: string) => void;
 
-    productState: { stateId: number; statusCounts: IStatusCount[]; statusHistory: IStatusHistoryEntry[] };
+    productState: { stateId: number; statusHistory: IStatusHistoryEntry[] };
     fetchProductState: (id: string) => void;
     addingProductState: (id: string, state: string, activeFilterId?: number | null) => void;
 
@@ -81,8 +81,9 @@ const mergeProductRows = (existing: IProduct[], incoming: IProduct[]): IProduct[
 };
 
 let latestProductsFetchId = 0;
-let loadedProductsSig: string | null = null;
-const productsSig = (searchContent: string, statusId?: number | null) => `${searchContent}|${statusId ?? ''}`;
+let loadedProductsQuerySignature: string | null = null;
+const buildProductsQuerySignature = (searchContent: string, statusId?: number | null) =>
+    `${searchContent}|${statusId ?? ''}`;
 
 const SERVER_MAX_LIMIT = 140;
 
@@ -134,18 +135,18 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
     products: { count: 0, rows: [] },
     fetchProducts: async (data) => {
         const requestId = ++latestProductsFetchId;
-        const sig = productsSig(data.searchContent, data.statusId);
+        const querySignature = buildProductsQuerySignature(data.searchContent, data.statusId);
         set({ isLoadingProducts: true });
         try {
             const result = await productService.getProducts(data);
             if (requestId !== latestProductsFetchId) return; // a newer fetch superseded this one
-            if (data.append && loadedProductsSig !== sig) return; // never append onto a different query's rows
+            if (data.append && loadedProductsQuerySignature !== querySignature) return; // never append onto a different query's rows
             set((state) =>
                 data.append
                     ? { products: { count: result.count, rows: mergeProductRows(state.products.rows, result.rows) } }
                     : { products: result },
             );
-            loadedProductsSig = sig;
+            loadedProductsQuerySignature = querySignature;
         } catch (err) {
             log.error('fetchProducts error --->: ', err);
         } finally {
@@ -155,7 +156,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
     fetchProductsThrough: async ({ throughPage, limit, searchContent, statusId }) => {
         const requestId = ++latestProductsFetchId;
-        const sig = productsSig(searchContent, statusId);
+        const querySignature = buildProductsQuerySignature(searchContent, statusId);
         set({ isLoadingProducts: true });
         try {
             const targetRows = throughPage * limit;
@@ -174,7 +175,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
             if (requestId === latestProductsFetchId) {
                 set({ products: { count, rows } });
-                loadedProductsSig = sig;
+                loadedProductsQuerySignature = querySignature;
             }
         } catch (err) {
             log.error('fetchProductsThrough error --->: ', err);
@@ -217,7 +218,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         }
     },
 
-    productState: { stateId: 0, statusCounts: [], statusHistory: [] },
+    productState: { stateId: 0, statusHistory: [] },
     fetchProductState: async (id) => {
         set({ isLoadingProductState: true });
         try {
@@ -225,7 +226,6 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             set({
                 productState: {
                     stateId: result.statusId ?? 0,
-                    statusCounts: result.statusCounts ?? [],
                     statusHistory: result.statusHistory ?? [],
                 },
             });
@@ -243,15 +243,17 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         const currentRow = products.rows.find((p) => p.productId === productId);
         const previousStatusId = currentRow?.statusId ?? null;
 
-        if (previousStatusId === nextStatusId) return; // re-selecting the current status does nothing
+        if (isSameStatus(previousStatusId, nextStatusId)) return;
 
         const leavesCurrentSection = activeFilterId !== null && activeFilterId !== 0 && nextStatusId !== activeFilterId;
+
+        const historyEntry = { statusId: nextStatusId, createdAt: new Date().toISOString() };
 
         const nextRows = leavesCurrentSection
             ? products.rows.filter((p) => p.productId !== productId)
             : products.rows.map((p) =>
                   p.productId === productId
-                      ? { ...p, statusId: nextStatusId, statusCounts: bumpCount(p.statusCounts, nextStatusId) }
+                      ? { ...p, statusId: nextStatusId, statusHistory: [...(p.statusHistory ?? []), historyEntry] }
                       : p,
               );
 
@@ -265,11 +267,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
                 statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
                 productState: {
                     stateId: nextStatusId,
-                    statusCounts: bumpCount(productState.statusCounts, nextStatusId),
-                    statusHistory: [
-                        ...productState.statusHistory,
-                        { statusId: nextStatusId, createdAt: new Date().toISOString() },
-                    ],
+                    statusHistory: [...productState.statusHistory, historyEntry],
                 },
             });
         } catch (err) {
@@ -355,18 +353,24 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         const currentRow = productCollection.rows.find((p) => p.productId === productId);
         const previousStatusId = currentRow?.productStateId ?? null;
 
-        if (previousStatusId === nextStatusId) return; // re-selecting the current status does nothing
+        if (isSameStatus(previousStatusId, nextStatusId)) return;
 
         const leavesCurrentSection = activeStatusId !== null && activeStatusId !== 0 && nextStatusId !== activeStatusId;
 
         const previousRows = productCollection.rows;
         const previousCount = productCollection.count;
 
+        const historyEntry = { statusId: nextStatusId, createdAt: new Date().toISOString() };
+
         const nextRows = leavesCurrentSection
             ? previousRows.filter((p) => p.productId !== productId)
             : previousRows.map((p) =>
                   p.productId === productId
-                      ? { ...p, productStateId: nextStatusId, statusCounts: bumpCount(p.statusCounts, nextStatusId) }
+                      ? {
+                            ...p,
+                            productStateId: nextStatusId,
+                            statusHistory: [...(p.statusHistory ?? []), historyEntry],
+                        }
                       : p,
               );
         const nextCount = leavesCurrentSection ? Math.max(0, previousCount - 1) : previousCount;

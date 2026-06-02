@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 
 import { BookCover, Button, List } from '~/component/atoms';
 
-import { ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
+import { isSameStatus, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
 
 import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
-import { type IAuthor, type IStatusCount } from '~/Store/Slicers/ProductSlicer.interface';
+import { type IAuthor, type IStatusHistoryEntry } from '~/Store/Slicers/ProductSlicer.interface';
 import type { TViewType } from '~/Types/Components';
+import StatusHistoryPopover from '../StatusHistoryPopover/StatusHistoryPopover';
 
 import styles from './BookCard.module.css';
 
@@ -22,7 +23,7 @@ interface IBookCardProps {
     fileUrl?: string;
     fileSrc?: string;
     statusId?: number;
-    statusCounts?: IStatusCount[];
+    statusHistory?: IStatusHistoryEntry[];
     layout?: TViewType;
     isAuthenticated?: boolean;
     onStatusChange?: (productId: number, statusId: number) => void;
@@ -37,7 +38,7 @@ function BookCard({
     fileUrl,
     fileSrc,
     statusId,
-    statusCounts,
+    statusHistory,
     layout = 'grid',
     isAuthenticated = false,
     onStatusChange,
@@ -53,7 +54,7 @@ function BookCard({
     const handleStatusClick = useCallback(
         (e: MouseEvent<HTMLButtonElement>, sid: number) => {
             e.stopPropagation();
-            if (sid === statusId) return; // re-selecting the current status does nothing
+            if (isSameStatus(statusId, sid)) return;
             onStatusChange?.(productId, sid);
         },
         [onStatusChange, productId, statusId],
@@ -81,14 +82,16 @@ function BookCard({
                         keyExtractor={(s) => String(s.id)}
                         style={styles.meta__actions}
                         renderItem={({ item: s }) => (
-                            <Button
-                                label={statusLabelWithCount(s, statusCounts, s.id)}
-                                size="sm"
-                                variant={statusId === s.id ? 'primary' : 'outline'}
-                                onClick={(e) => handleStatusClick(e, s.id)}
-                                aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
-                                aria-pressed={statusId === s.id}
-                            />
+                            <StatusHistoryPopover history={statusHistory}>
+                                <Button
+                                    label={statusLabelWithCount(s, statusHistory, s.id)}
+                                    size="sm"
+                                    variant={statusId === s.id ? 'primary' : 'outline'}
+                                    onClick={(e) => handleStatusClick(e, s.id)}
+                                    aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
+                                    aria-pressed={statusId === s.id}
+                                />
+                            </StatusHistoryPopover>
                         )}
                     />
                 ) : null}

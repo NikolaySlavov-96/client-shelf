@@ -1,4 +1,4 @@
-import { type IStatusCount, type IStatusHistoryEntry } from '~/Store/Slicers/ProductSlicer.interface';
+import { type IStatusHistoryEntry } from '~/Store/Slicers/ProductSlicer.interface';
 
 export enum EStatusId {
     READ = 1,
@@ -41,41 +41,35 @@ export const getStatusStyle = (id: number): IStatusStyle => STATUS_STYLE[id] ?? 
 export const getStatusLabel = (status: { stateName: string; symbol?: string }): string =>
     status.symbol ? `${status.symbol} ${status.stateName}` : status.stateName;
 
-export const countForStatus = (counts: IStatusCount[] | undefined, statusId: number): number =>
-    counts?.find((c) => c.statusId === statusId)?.count ?? 0;
+export const countForStatus = (history: IStatusHistoryEntry[] | undefined, statusId: number): number =>
+    (history ?? []).reduce((total, entry) => (entry.statusId === statusId ? total + 1 : total), 0);
 
 export const statusLabelWithCount = (
     status: { stateName: string; symbol?: string },
-    counts: IStatusCount[] | undefined,
+    history: IStatusHistoryEntry[] | undefined,
     statusId: number,
 ): string => {
-    const count = countForStatus(counts, statusId);
+    const count = countForStatus(history, statusId);
     const label = getStatusLabel(status);
     return count >= 2 ? `${label} ×${count}` : label;
 };
 
-export const bumpCount = (counts: IStatusCount[] | undefined, statusId: number): IStatusCount[] => {
-    const list = counts ?? [];
-    const existing = list.find((c) => c.statusId === statusId);
-    if (existing) {
-        return list.map((c) => (c.statusId === statusId ? { ...c, count: c.count + 1 } : c));
-    }
-    return [...list, { statusId, count: 1 }];
-};
+export const isSameStatus = (
+    currentStatusId: number | null | undefined,
+    nextStatusId: number | null | undefined,
+): boolean => currentStatusId === nextStatusId;
 
-export interface IStatusInterval {
+export interface IStatusTimelineEntry {
+    statusId: number;
     setAt: string;
     changedAt: string | null;
 }
 
-export const getStatusIntervals = (history: IStatusHistoryEntry[] | undefined, statusId: number): IStatusInterval[] => {
+export const getStatusTimeline = (history: IStatusHistoryEntry[] | undefined): IStatusTimelineEntry[] => {
     const sorted = [...(history ?? [])].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-    const intervals: IStatusInterval[] = [];
-    for (let i = 0; i < sorted.length; i++) {
-        if (sorted[i].statusId !== statusId) {
-            continue;
-        }
-        intervals.push({ setAt: sorted[i].createdAt, changedAt: sorted[i + 1]?.createdAt ?? null });
-    }
-    return intervals;
+    return sorted.map((entry, index) => ({
+        statusId: entry.statusId,
+        setAt: entry.createdAt,
+        changedAt: sorted[index + 1]?.createdAt ?? null,
+    }));
 };

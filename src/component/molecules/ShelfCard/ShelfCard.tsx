@@ -2,14 +2,15 @@ import { memo, useCallback } from 'react';
 
 import { Badge, BookCover, Button, List } from '~/component/atoms';
 
-import { statusLabelWithCount, TEXTS } from '~/constants';
+import { isSameStatus, statusLabelWithCount, TEXTS } from '~/constants';
 
 import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
-import { type IAuthor, type IStatusCount } from '~/Store/Slicers/ProductSlicer.interface';
+import { type IAuthor, type IStatusHistoryEntry } from '~/Store/Slicers/ProductSlicer.interface';
 import { Toast, ToastWithButton } from '~/Toasts';
 import { ESwalIcon } from '~/Types/Swal';
+import StatusHistoryPopover from '../StatusHistoryPopover/StatusHistoryPopover';
 
 import styles from './ShelfCard.module.css';
 
@@ -19,7 +20,7 @@ interface IShelfCardProps {
     authors: IAuthor[];
     authorsSeparator?: string;
     statusId: number;
-    statusCounts?: IStatusCount[];
+    statusHistory?: IStatusHistoryEntry[];
     fileUrl?: string;
     fileSrc?: string;
     onRemove?: (productId: number) => void;
@@ -33,7 +34,7 @@ function ShelfCard({
     authors,
     authorsSeparator,
     statusId,
-    statusCounts,
+    statusHistory,
     fileUrl,
     fileSrc,
     onRemove,
@@ -62,7 +63,7 @@ function ShelfCard({
 
     const handleStatusClick = useCallback(
         (sid: number) => {
-            if (sid === statusId) return; // re-selecting the current status does nothing
+            if (isSameStatus(statusId, sid)) return;
             onStatusChange?.(productId, sid);
         },
         [onStatusChange, productId, statusId],
@@ -99,14 +100,16 @@ function ShelfCard({
                         keyExtractor={(s) => String(s.id)}
                         style={styles.actions}
                         renderItem={({ item: s }) => (
-                            <Button
-                                label={statusLabelWithCount(s, statusCounts, s.id)}
-                                size="sm"
-                                variant={statusId === s.id ? 'primary' : 'outline'}
-                                onClick={() => handleStatusClick(s.id)}
-                                aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
-                                aria-pressed={statusId === s.id}
-                            />
+                            <StatusHistoryPopover history={statusHistory}>
+                                <Button
+                                    label={statusLabelWithCount(s, statusHistory, s.id)}
+                                    size="sm"
+                                    variant={statusId === s.id ? 'primary' : 'outline'}
+                                    onClick={() => handleStatusClick(s.id)}
+                                    aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
+                                    aria-pressed={statusId === s.id}
+                                />
+                            </StatusHistoryPopover>
                         )}
                     />
                 ) : null}
