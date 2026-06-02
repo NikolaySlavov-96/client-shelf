@@ -3,7 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { Badge, BookCover, Button, List, StarRating } from '~/component/atoms';
 
-import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
+import { StatusHistoryPopover } from '~/component/molecules';
+
+import { getStatusIntervals, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
 
 import { formatAuthors } from '~/Utils';
 
@@ -39,9 +41,10 @@ const DetailsForProduct = () => {
 
     const handleStatusChange = useCallback(
         (statusId: number) => {
+            if (statusId === currentStatusId) return; // re-selecting the current status does nothing
             if (id) addingProductState(id, String(statusId));
         },
-        [id, addingProductState],
+        [id, addingProductState, currentStatusId],
     );
 
     const handleRate = useCallback(
@@ -137,13 +140,17 @@ const DetailsForProduct = () => {
                                         keyExtractor={(s) => String(s.id)}
                                         style={styles.actions__btns}
                                         renderItem={({ item: s }) => (
-                                            <Button
-                                                label={getStatusLabel(s)}
-                                                variant={currentStatusId === s.id ? 'primary' : 'outline'}
-                                                size="md"
-                                                onClick={() => handleStatusChange(s.id)}
-                                                ariaLabel={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
-                                            />
+                                            <StatusHistoryPopover
+                                                intervals={getStatusIntervals(productState?.statusHistory, s.id)}
+                                            >
+                                                <Button
+                                                    label={statusLabelWithCount(s, productState?.statusCounts, s.id)}
+                                                    variant={currentStatusId === s.id ? 'primary' : 'outline'}
+                                                    size="md"
+                                                    onClick={() => handleStatusChange(s.id)}
+                                                    ariaLabel={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
+                                                />
+                                            </StatusHistoryPopover>
                                         )}
                                     />
                                 </div>

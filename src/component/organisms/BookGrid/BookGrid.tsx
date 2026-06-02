@@ -42,6 +42,7 @@ function BookGrid({ books, isAuthenticated = false, layout = 'grid', onStatusCha
                     authorsSeparator={book.authorsSeparator}
                     productType={book.productType}
                     statusId={book.statusId ?? undefined}
+                    statusCounts={book.statusCounts}
                     fileUrl={book.fileUrl}
                     fileSrc={book.fileSrc}
                     layout={layout}

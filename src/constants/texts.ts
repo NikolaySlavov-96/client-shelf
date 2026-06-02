@@ -55,6 +55,10 @@ export const TEXTS = {
     DETAIL_SHARE_BTN: 'View shelf',
     DETAIL_DESC_PLACEHOLDER: 'Description coming soon.',
     DETAIL_YOUR_RATING: 'Your rating',
+    DETAIL_HISTORY_TITLE: 'Status history',
+    DETAIL_HISTORY_SET: 'Set',
+    DETAIL_HISTORY_CHANGED: 'Changed',
+    DETAIL_HISTORY_CURRENT: 'current',
     // Profile / Shelf
     PROFILE_STAT_TOTAL: 'Total books',
     PROFILE_STAT_READ: 'Read',

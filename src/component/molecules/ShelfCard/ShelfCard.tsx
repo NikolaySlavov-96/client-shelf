@@ -2,12 +2,12 @@ import { memo, useCallback } from 'react';
 
 import { Badge, BookCover, Button, List } from '~/component/atoms';
 
-import { getStatusLabel, TEXTS } from '~/constants';
+import { statusLabelWithCount, TEXTS } from '~/constants';
 
 import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
-import { type IAuthor } from '~/Store/Slicers/ProductSlicer.interface';
+import { type IAuthor, type IStatusCount } from '~/Store/Slicers/ProductSlicer.interface';
 import { Toast, ToastWithButton } from '~/Toasts';
 import { ESwalIcon } from '~/Types/Swal';
 
@@ -19,6 +19,7 @@ interface IShelfCardProps {
     authors: IAuthor[];
     authorsSeparator?: string;
     statusId: number;
+    statusCounts?: IStatusCount[];
     fileUrl?: string;
     fileSrc?: string;
     onRemove?: (productId: number) => void;
@@ -32,6 +33,7 @@ function ShelfCard({
     authors,
     authorsSeparator,
     statusId,
+    statusCounts,
     fileUrl,
     fileSrc,
     onRemove,
@@ -60,7 +62,7 @@ function ShelfCard({
 
     const handleStatusClick = useCallback(
         (sid: number) => {
-            if (sid === statusId) return;
+            if (sid === statusId) return; // re-selecting the current status does nothing
             onStatusChange?.(productId, sid);
         },
         [onStatusChange, productId, statusId],
@@ -98,7 +100,7 @@ function ShelfCard({
                         style={styles.actions}
                         renderItem={({ item: s }) => (
                             <Button
-                                label={getStatusLabel(s)}
+                                label={statusLabelWithCount(s, statusCounts, s.id)}
                                 size="sm"
                                 variant={statusId === s.id ? 'primary' : 'outline'}
                                 onClick={() => handleStatusClick(s.id)}

@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 
 import { BookCover, Button, List } from '~/component/atoms';
 
-import { getStatusLabel, ROUT_NAMES, TEXTS } from '~/constants';
+import { ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
 
 import { cx, formatAuthors } from '~/Utils';
 
 import { useStatuses } from '~/hooks';
-import { type IAuthor } from '~/Store/Slicers/ProductSlicer.interface';
+import { type IAuthor, type IStatusCount } from '~/Store/Slicers/ProductSlicer.interface';
 import type { TViewType } from '~/Types/Components';
 
 import styles from './BookCard.module.css';
@@ -22,6 +22,7 @@ interface IBookCardProps {
     fileUrl?: string;
     fileSrc?: string;
     statusId?: number;
+    statusCounts?: IStatusCount[];
     layout?: TViewType;
     isAuthenticated?: boolean;
     onStatusChange?: (productId: number, statusId: number) => void;
@@ -36,6 +37,7 @@ function BookCard({
     fileUrl,
     fileSrc,
     statusId,
+    statusCounts,
     layout = 'grid',
     isAuthenticated = false,
     onStatusChange,
@@ -51,9 +53,10 @@ function BookCard({
     const handleStatusClick = useCallback(
         (e: MouseEvent<HTMLButtonElement>, sid: number) => {
             e.stopPropagation();
+            if (sid === statusId) return; // re-selecting the current status does nothing
             onStatusChange?.(productId, sid);
         },
-        [onStatusChange, productId],
+        [onStatusChange, productId, statusId],
     );
 
     const isList = layout === 'list';
@@ -79,7 +82,7 @@ function BookCard({
                         style={styles.meta__actions}
                         renderItem={({ item: s }) => (
                             <Button
-                                label={getStatusLabel(s)}
+                                label={statusLabelWithCount(s, statusCounts, s.id)}
                                 size="sm"
                                 variant={statusId === s.id ? 'primary' : 'outline'}
                                 onClick={(e) => handleStatusClick(e, s.id)}

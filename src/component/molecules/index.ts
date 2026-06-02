@@ -18,3 +18,4 @@ export { default as SearchModal } from './SearchModal/SearchModal';
 export { default as ShelfCard } from './ShelfCard/ShelfCard';
 export { default as ShelfTabs } from './ShelfTabs/ShelfTabs';
 export { default as StatusCard } from './StatusCard/StatusCard';
+export { default as StatusHistoryPopover } from './StatusHistoryPopover/StatusHistoryPopover';

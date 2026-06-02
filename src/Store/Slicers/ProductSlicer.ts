@@ -1,6 +1,6 @@
 import { type StateCreator } from 'zustand';
 
-import { TEXTS } from '~/constants';
+import { bumpCount, TEXTS } from '~/constants';
 
 import { createLogger } from '~/Utils';
 
@@ -25,6 +25,7 @@ import {
     type IProductWithState,
     type IState,
     type IStatusCount,
+    type IStatusHistoryEntry,
 } from './ProductSlicer.interface';
 
 export interface IProductSlicer {
@@ -54,7 +55,7 @@ export interface IProductSlicer {
     productById: IProduct;
     fetchProductById: (id: string) => void;
 
-    productState: { stateId: number };
+    productState: { stateId: number; statusCounts: IStatusCount[]; statusHistory: IStatusHistoryEntry[] };
     fetchProductState: (id: string) => void;
     addingProductState: (id: string, state: string, activeFilterId?: number | null) => void;
 
@@ -216,12 +217,18 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         }
     },
 
-    productState: { stateId: 0 },
+    productState: { stateId: 0, statusCounts: [], statusHistory: [] },
     fetchProductState: async (id) => {
         set({ isLoadingProductState: true });
         try {
             const result = await productService.getProductStatus(id);
-            set({ productState: { stateId: result.statusId } });
+            set({
+                productState: {
+                    stateId: result.statusId ?? 0,
+                    statusCounts: result.statusCounts ?? [],
+                    statusHistory: result.statusHistory ?? [],
+                },
+            });
         } catch (err) {
             log.error('fetchProductState error --->: ', err);
         } finally {
@@ -232,20 +239,21 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         const productId = Number(id);
         const nextStatusId = Number(state);
 
-        const { products, statusCounts } = get();
+        const { products, statusCounts, productState } = get();
         const currentRow = products.rows.find((p) => p.productId === productId);
         const previousStatusId = currentRow?.statusId ?? null;
 
-        if (previousStatusId === nextStatusId) {
-            set({ productState: { stateId: nextStatusId } });
-            return;
-        }
+        if (previousStatusId === nextStatusId) return; // re-selecting the current status does nothing
 
         const leavesCurrentSection = activeFilterId !== null && activeFilterId !== 0 && nextStatusId !== activeFilterId;
 
         const nextRows = leavesCurrentSection
             ? products.rows.filter((p) => p.productId !== productId)
-            : products.rows.map((p) => (p.productId === productId ? { ...p, statusId: nextStatusId } : p));
+            : products.rows.map((p) =>
+                  p.productId === productId
+                      ? { ...p, statusId: nextStatusId, statusCounts: bumpCount(p.statusCounts, nextStatusId) }
+                      : p,
+              );
 
         const nextCount = leavesCurrentSection ? Math.max(0, products.count - 1) : products.count;
 
@@ -255,7 +263,14 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
             set({
                 products: { count: nextCount, rows: nextRows },
                 statusCounts: recountStatuses(statusCounts, previousStatusId, nextStatusId),
-                productState: { stateId: nextStatusId },
+                productState: {
+                    stateId: nextStatusId,
+                    statusCounts: bumpCount(productState.statusCounts, nextStatusId),
+                    statusHistory: [
+                        ...productState.statusHistory,
+                        { statusId: nextStatusId, createdAt: new Date().toISOString() },
+                    ],
+                },
             });
         } catch (err) {
             log.error('addingProductState error --->: ', err);
@@ -340,7 +355,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
         const currentRow = productCollection.rows.find((p) => p.productId === productId);
         const previousStatusId = currentRow?.productStateId ?? null;
 
-        if (previousStatusId === nextStatusId) return;
+        if (previousStatusId === nextStatusId) return; // re-selecting the current status does nothing
 
         const leavesCurrentSection = activeStatusId !== null && activeStatusId !== 0 && nextStatusId !== activeStatusId;
 
@@ -349,7 +364,11 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
         const nextRows = leavesCurrentSection
             ? previousRows.filter((p) => p.productId !== productId)
-            : previousRows.map((p) => (p.productId === productId ? { ...p, productStateId: nextStatusId } : p));
+            : previousRows.map((p) =>
+                  p.productId === productId
+                      ? { ...p, productStateId: nextStatusId, statusCounts: bumpCount(p.statusCounts, nextStatusId) }
+                      : p,
+              );
         const nextCount = leavesCurrentSection ? Math.max(0, previousCount - 1) : previousCount;
 
         set({
