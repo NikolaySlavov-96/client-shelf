@@ -59,17 +59,19 @@ export const isSameStatus = (
     nextStatusId: number | null | undefined,
 ): boolean => currentStatusId === nextStatusId;
 
-export interface IStatusTimelineEntry {
-    statusId: number;
+export interface IStatusInterval {
     setAt: string;
     changedAt: string | null;
 }
 
-export const getStatusTimeline = (history: IStatusHistoryEntry[] | undefined): IStatusTimelineEntry[] => {
+export const getStatusIntervals = (history: IStatusHistoryEntry[] | undefined, statusId: number): IStatusInterval[] => {
     const sorted = [...(history ?? [])].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-    return sorted.map((entry, index) => ({
-        statusId: entry.statusId,
-        setAt: entry.createdAt,
-        changedAt: sorted[index + 1]?.createdAt ?? null,
-    }));
+    const intervals: IStatusInterval[] = [];
+    for (let index = 0; index < sorted.length; index++) {
+        if (sorted[index].statusId !== statusId) {
+            continue;
+        }
+        intervals.push({ setAt: sorted[index].createdAt, changedAt: sorted[index + 1]?.createdAt ?? null });
+    }
+    return intervals;
 };

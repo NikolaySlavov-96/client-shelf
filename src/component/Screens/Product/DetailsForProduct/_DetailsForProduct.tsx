@@ -5,7 +5,7 @@ import { Badge, BookCover, Button, List, StarRating } from '~/component/atoms';
 
 import { StatusHistoryPopover } from '~/component/molecules';
 
-import { isSameStatus, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
+import { getStatusIntervals, isSameStatus, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
 
 import { formatAuthors } from '~/Utils';
 
@@ -140,7 +140,9 @@ const DetailsForProduct = () => {
                                         keyExtractor={(s) => String(s.id)}
                                         style={styles.actions__btns}
                                         renderItem={({ item: s }) => (
-                                            <StatusHistoryPopover history={productState?.statusHistory}>
+                                            <StatusHistoryPopover
+                                                intervals={getStatusIntervals(productState?.statusHistory, s.id)}
+                                            >
                                                 <Button
                                                     label={statusLabelWithCount(s, productState?.statusHistory, s.id)}
                                                     variant={currentStatusId === s.id ? 'primary' : 'outline'}

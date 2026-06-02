@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { BookCover, Button, List } from '~/component/atoms';
 
-import { isSameStatus, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
+import { getStatusIntervals, isSameStatus, ROUT_NAMES, statusLabelWithCount, TEXTS } from '~/constants';
 
 import { cx, formatAuthors } from '~/Utils';
 
@@ -82,7 +82,7 @@ function BookCard({
                         keyExtractor={(s) => String(s.id)}
                         style={styles.meta__actions}
                         renderItem={({ item: s }) => (
-                            <StatusHistoryPopover history={statusHistory}>
+                            <StatusHistoryPopover intervals={getStatusIntervals(statusHistory, s.id)}>
                                 <Button
                                     label={statusLabelWithCount(s, statusHistory, s.id)}
                                     size="sm"

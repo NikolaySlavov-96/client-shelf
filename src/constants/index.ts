@@ -15,13 +15,13 @@ export { default as ServerError } from './_serverError';
 export { _EReceiveEvents as EReceiveEvents } from './_socketEvents';
 export { _ESendEvents as ESendEvents } from './_socketEvents';
 export { STORAGE_KEYS } from './_storageVariables';
-export type { IStatusStyle, IStatusTimelineEntry } from './statusMap';
+export type { IStatusInterval, IStatusStyle } from './statusMap';
 export {
     countForStatus,
     EStatusId,
+    getStatusIntervals,
     getStatusLabel,
     getStatusStyle,
-    getStatusTimeline,
     isSameStatus,
     statusLabelWithCount,
 } from './statusMap';

@@ -27,10 +27,6 @@
     font-weight: var(--font-weight-bold);
 }
 
-.status {
-    font-weight: var(--font-weight-medium);
-}
-
 .changed {
     color: var(--white-muted);
 }
