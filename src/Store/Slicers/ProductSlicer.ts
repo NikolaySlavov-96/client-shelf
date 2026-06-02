@@ -80,6 +80,8 @@ const mergeProductRows = (existing: IProduct[], incoming: IProduct[]): IProduct[
 };
 
 let latestProductsFetchId = 0;
+let loadedProductsSig: string | null = null;
+const productsSig = (searchContent: string, statusId?: number | null) => `${searchContent}|${statusId ?? ''}`;
 
 const SERVER_MAX_LIMIT = 140;
 
@@ -131,15 +133,18 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
     products: { count: 0, rows: [] },
     fetchProducts: async (data) => {
         const requestId = ++latestProductsFetchId;
+        const sig = productsSig(data.searchContent, data.statusId);
         set({ isLoadingProducts: true });
         try {
             const result = await productService.getProducts(data);
             if (requestId !== latestProductsFetchId) return; // a newer fetch superseded this one
+            if (data.append && loadedProductsSig !== sig) return; // never append onto a different query's rows
             set((state) =>
                 data.append
                     ? { products: { count: result.count, rows: mergeProductRows(state.products.rows, result.rows) } }
                     : { products: result },
             );
+            loadedProductsSig = sig;
         } catch (err) {
             log.error('fetchProducts error --->: ', err);
         } finally {
@@ -149,6 +154,7 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
 
     fetchProductsThrough: async ({ throughPage, limit, searchContent, statusId }) => {
         const requestId = ++latestProductsFetchId;
+        const sig = productsSig(searchContent, statusId);
         set({ isLoadingProducts: true });
         try {
             const targetRows = throughPage * limit;
@@ -165,7 +171,10 @@ const createProductSlicer: StateCreator<IProductSlicer> = (set, get) => ({
                 if (result.rows.length < chunkLimit) break; // reached the end of the catalog
             }
 
-            if (requestId === latestProductsFetchId) set({ products: { count, rows } });
+            if (requestId === latestProductsFetchId) {
+                set({ products: { count, rows } });
+                loadedProductsSig = sig;
+            }
         } catch (err) {
             log.error('fetchProductsThrough error --->: ', err);
         } finally {

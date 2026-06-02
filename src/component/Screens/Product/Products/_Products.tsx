@@ -45,6 +45,7 @@ const Products = () => {
     } = useStoreZ();
 
     const lastQueryKeyRef = useRef<string | null>(null);
+    const renderedQueryKeyRef = useRef<string | null>(null);
     const loadedThroughRef = useRef(0);
     const pendingScrollPageRef = useRef<number | null>(null);
     const wasLoadingRef = useRef(false);
@@ -66,6 +67,11 @@ const Products = () => {
 
     const statusId = isAuthenticated && activeFilter !== ALL_FILTER ? Number(activeFilter) : null;
     const queryKey = `${searchContent}|${statusId}|${isInfinite}`;
+
+    if (renderedQueryKeyRef.current !== queryKey) {
+        renderedQueryKeyRef.current = queryKey;
+        if (loaderArmed) setLoaderArmed(false);
+    }
 
     const pageCount = Math.ceil(products.count / pageLimit) || 0;
     const hasMore = isInfinite && pageCount > 0 && loadedThroughRef.current < pageCount;
