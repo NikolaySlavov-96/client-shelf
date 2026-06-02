@@ -1,13 +1,13 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { List } from '~/component/atoms';
 
 import { getSearchCoverGradient, MODAL_NAMES, ROUT_NAMES, TEXTS } from '~/constants';
 
-import { formatAuthors } from '~/Utils';
+import { cx, formatAuthors } from '~/Utils';
 
-import { useStoreZ } from '~/hooks';
+import { useStatuses, useStoreZ } from '~/hooks';
 import { type IProduct, type IProductEmailType, type IProductWithState } from '~/Store/Slicers/ProductSlicer.interface';
 
 import styles from './SearchModal.module.css';
@@ -26,15 +26,19 @@ function SearchModal() {
         isVisible,
         modalPayload,
         closeModal,
-        products,
+        productSearch,
         productCollection,
         productByEmail,
-        fetchProducts,
+        fetchProductSearch,
+        addingProductState,
+        isAuthenticated,
         pageLimit,
     } = useStoreZ();
+    const { statuses } = useStatuses();
 
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
+    const [pickedStatus, setPickedStatus] = useState<Record<number, number>>({});
     const inputRef = useRef<HTMLInputElement>(null);
 
     const isOpen = isVisible && modalName === MODAL_NAMES.SEARCH;
@@ -48,13 +52,14 @@ function SearchModal() {
                 return productByEmail.rows;
             case 'catalog':
             default:
-                return products.rows;
+                return productSearch.rows;
         }
-    }, [scope, products.rows, productCollection.rows, productByEmail.rows]);
+    }, [scope, productSearch.rows, productCollection.rows, productByEmail.rows]);
 
     useEffect(() => {
         if (isOpen) {
             setQuery('');
+            setPickedStatus({});
             setTimeout(() => inputRef.current?.focus(), 50);
         }
     }, [isOpen]);
@@ -69,14 +74,23 @@ function SearchModal() {
     }, [isOpen, closeModal]);
 
     useEffect(() => {
+        if (!isOpen) return;
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = previousOverflow;
+        };
+    }, [isOpen]);
+
+    useEffect(() => {
         const timer = setTimeout(() => setDebouncedQuery(query.trim()), 300);
         return () => clearTimeout(timer);
     }, [query]);
 
     useEffect(() => {
         if (!isOpen || scope !== 'catalog') return;
-        fetchProducts({ page: 1, limit: pageLimit, searchContent: debouncedQuery, append: false });
-    }, [isOpen, debouncedQuery, scope, fetchProducts, pageLimit]);
+        fetchProductSearch({ page: 1, limit: pageLimit, searchContent: debouncedQuery, append: false });
+    }, [isOpen, debouncedQuery, scope, fetchProductSearch, pageLimit]);
 
     const handleSelect = useCallback(
         (book: TAnyBook) => {
@@ -84,6 +98,15 @@ function SearchModal() {
             closeModal();
         },
         [navigate, closeModal],
+    );
+
+    const handleAddStatus = useCallback(
+        (e: MouseEvent<HTMLButtonElement>, book: TAnyBook, statusId: number) => {
+            e.stopPropagation();
+            setPickedStatus((prev) => ({ ...prev, [book.productId]: statusId }));
+            addingProductState(String(book.productId), String(statusId));
+        },
+        [addingProductState],
     );
 
     if (!isOpen) return null;
@@ -136,26 +159,58 @@ function SearchModal() {
                                 data={filtered}
                                 keyExtractor={(book) => String(book.productId)}
                                 renderItem={({ item: book }) => (
-                                    <button
+                                    <div
                                         className={`flex-align ${styles.resultItem}`}
                                         role="option"
                                         aria-selected={false}
-                                        onClick={() => handleSelect(book)}
-                                        type="button"
                                     >
-                                        <span
-                                            className={styles.bookDot}
-                                            style={{ background: getSearchCoverGradient(book.productId) }}
-                                            aria-hidden="true"
-                                        />
-                                        <span className={`flex-col ${styles.bookInfo}`}>
-                                            <span className={styles.bookTitle}>{book.productTitle}</span>
-                                            <span className={styles.bookAuthor}>
-                                                {formatAuthors(book.authors, book.authorsSeparator)}
+                                        <button
+                                            className={`flex-align ${styles.resultMain}`}
+                                            onClick={() => handleSelect(book)}
+                                            type="button"
+                                        >
+                                            <span
+                                                className={styles.bookDot}
+                                                style={{ background: getSearchCoverGradient(book.productId) }}
+                                                aria-hidden="true"
+                                            />
+                                            <span className={`flex-col ${styles.bookInfo}`}>
+                                                <span className={styles.bookTitle}>{book.productTitle}</span>
+                                                <span className={styles.bookAuthor}>
+                                                    {formatAuthors(book.authors, book.authorsSeparator)}
+                                                </span>
                                             </span>
-                                        </span>
-                                        <span className={styles.addLabel}>{TEXTS.SEARCH_ADD}</span>
-                                    </button>
+                                        </button>
+                                        {isAuthenticated ? (
+                                            <span className={`flex-align ${styles.statusActions}`}>
+                                                {statuses.map((s) => {
+                                                    const activeStatusId =
+                                                        pickedStatus[book.productId] ?? (book as IProduct).statusId;
+                                                    const isActive = activeStatusId === s.id;
+                                                    return (
+                                                        <button
+                                                            key={s.id}
+                                                            type="button"
+                                                            className={cx(
+                                                                styles.statusBtn,
+                                                                isActive ? styles['statusBtn--active'] : '',
+                                                            )}
+                                                            onClick={(e) => handleAddStatus(e, book, s.id)}
+                                                            aria-label={`${TEXTS.DETAIL_ADD_TO_SHELF}: ${s.stateName}`}
+                                                            aria-pressed={isActive}
+                                                        >
+                                                            <span className={styles.statusIcon} aria-hidden="true">
+                                                                {s.symbol || s.stateName.charAt(0)}
+                                                            </span>
+                                                            <span className={styles.statusTooltip} role="tooltip">
+                                                                {s.stateName}
+                                                            </span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </span>
+                                        ) : null}
+                                    </div>
                                 )}
                             />
                         </>
