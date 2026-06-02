@@ -22,7 +22,7 @@ function StatusHistoryPopover({ intervals, children }: IStatusHistoryPopoverProp
             <span className={styles.popover} role="tooltip">
                 <span className={styles.title}>{TEXTS.DETAIL_HISTORY_TITLE}</span>
                 {intervals.map((interval) => (
-                    <span className={styles.row} key={interval.setAt}>
+                    <span className="flex-col" key={interval.setAt}>
                         <span>
                             {TEXTS.DETAIL_HISTORY_SET}: {formatDateTime(interval.setAt)}
                         </span>

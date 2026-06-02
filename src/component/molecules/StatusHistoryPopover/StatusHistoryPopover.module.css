@@ -7,14 +7,15 @@
     position: absolute;
     bottom: calc(100% + var(--spacing-8));
     left: 50%;
-    transform: translateX(-50%) translateY(var(--spacing-4));
-    z-index: 50;
+    transform: translateX(-50%);
+    z-index: var(--z-tooltip);
 
     display: none;
     flex-direction: column;
     gap: var(--spacing-6);
 
-    min-width: max-content;
+    width: max-content;
+    max-width: 260px;
     padding: var(--spacing-10) var(--spacing-12);
 
     background: var(--ink);
@@ -24,18 +25,11 @@
 
     font-size: var(--text-xs);
     line-height: 1.4;
-
-    opacity: 0;
-    transition:
-        opacity 0.12s ease,
-        transform 0.12s ease;
 }
 
 .wrap:hover .popover,
 .wrap:focus-within .popover {
     display: flex;
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
 }
 
 .popover::after {
@@ -49,13 +43,7 @@
 }
 
 .title {
-    font-weight: 600;
-    margin-bottom: var(--spacing-2);
-}
-
-.row {
-    display: flex;
-    flex-direction: column;
+    font-weight: var(--font-weight-bold);
 }
 
 .changed {

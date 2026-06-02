@@ -179,6 +179,7 @@ p {
   --z-nav: 100;
   --z-chat: 200;
   --z-modal: 300;
+  --z-tooltip: 400;
 
   /* --- Border radius --- */
   --radius-xs: var(--spacing-4);
