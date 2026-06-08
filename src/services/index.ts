@@ -7,4 +7,5 @@ export { _ProductService as ProductService };
 export { _FileService as FileService };
 
 export { default as AuthService } from './_AuthService';
+export { default as ConfigService } from './_ConfigService';
 export { default as ProfileService } from './_ProfileService';

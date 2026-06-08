@@ -2,8 +2,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { EStatusId } from '~/constants/statusMap';
-
 import Products from './_Products';
 
 const mockFetchProducts = jest.fn();
@@ -13,6 +11,12 @@ let storeValue: Record<string, unknown>;
 jest.mock('../../../../hooks', () => ({
     useStoreZ: () => storeValue,
 }));
+
+const MOCK_STATES = [
+    { id: 101, stateName: 'Read', symbol: '' },
+    { id: 102, stateName: 'Reading', symbol: '' },
+    { id: 103, stateName: 'To read', symbol: '' },
+];
 
 const renderProducts = () =>
     render(
@@ -31,12 +35,7 @@ describe('Products status filter', () => {
             isLoadingProducts: false,
             isAuthenticated: true,
             addingProductState: jest.fn(),
-            // status filters are data-driven: the list comes from the API/store
-            productStates: [
-                { id: EStatusId.READ, stateName: 'Read', symbol: '' },
-                { id: EStatusId.READING, stateName: 'Reading', symbol: '' },
-                { id: EStatusId.WANT, stateName: 'To read', symbol: '' },
-            ],
+            productStates: MOCK_STATES,
             fetchAllProductStates: jest.fn(),
         };
     });
@@ -50,14 +49,17 @@ describe('Products status filter', () => {
         renderProducts();
         mockFetchProducts.mockClear();
 
-        await userEvent.click(screen.getByRole('button', { name: 'Reading' }));
+        const readingState = MOCK_STATES.find((s) => s.stateName === 'Reading')!;
+        await userEvent.click(screen.getByRole('button', { name: readingState.stateName }));
 
-        expect(mockFetchProducts).toHaveBeenCalledWith(expect.objectContaining({ statusId: EStatusId.READING }));
+        expect(mockFetchProducts).toHaveBeenCalledWith(expect.objectContaining({ statusId: readingState.id }));
     });
 
     it('hides status filters for guests', () => {
         storeValue.isAuthenticated = false;
         renderProducts();
-        expect(screen.queryByRole('button', { name: 'Reading' })).toBeNull();
+        MOCK_STATES.forEach((s) => {
+            expect(screen.queryByRole('button', { name: s.stateName })).toBeNull();
+        });
     });
 });

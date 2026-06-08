@@ -18,11 +18,10 @@ export { STORAGE_KEYS } from './_storageVariables';
 export type { IStatusInterval, IStatusStyle } from './statusMap';
 export {
     countForStatus,
-    EStatusId,
     getStatusIntervals,
     getStatusLabel,
     getStatusStyle,
     isSameStatus,
     statusLabelWithCount,
 } from './statusMap';
-export { TEXTS } from './texts';
+export { t, TEXTS } from './texts';
