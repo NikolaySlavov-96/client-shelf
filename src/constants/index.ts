@@ -18,7 +18,6 @@ export { STORAGE_KEYS } from './_storageVariables';
 export type { IStatusInterval, IStatusStyle } from './statusMap';
 export {
     countForStatus,
-    EStatusId,
     getStatusIntervals,
     getStatusLabel,
     getStatusStyle,

@@ -1,13 +1,5 @@
 import { type IStatusHistoryEntry } from '~/Store/Slicers/ProductSlicer.interface';
 
-export enum EStatusId {
-    READ = 1,
-    READING = 2,
-    WANT = 3,
-    LISTENING = 4,
-    LISTENED = 5,
-}
-
 export interface IStatusStyle {
     readonly solidClass: string;
     readonly lightClass: string;
@@ -20,19 +12,21 @@ export interface IStatusStyle {
  * falls back to a neutral style so unknown / newly-added statuses still render.
  */
 const STATUS_STYLE: Record<number, IStatusStyle> = {
-    [EStatusId.READ]: { solidClass: 'badge--solid-read', lightClass: 'badge--light-read' },
-    [EStatusId.READING]: { solidClass: 'badge--solid-reading', lightClass: 'badge--light-reading' },
-    [EStatusId.WANT]: { solidClass: 'badge--solid-want', lightClass: 'badge--light-want' },
-    [EStatusId.LISTENING]: { solidClass: 'badge--solid-listening', lightClass: 'badge--light-listening' },
-    [EStatusId.LISTENED]: { solidClass: 'badge--solid-listened', lightClass: 'badge--light-listened' },
+    1: { solidClass: 'badge--solid-read', lightClass: 'badge--light-read' },
+    2: { solidClass: 'badge--solid-reading', lightClass: 'badge--light-reading' },
+    3: { solidClass: 'badge--solid-want', lightClass: 'badge--light-want' },
+    4: { solidClass: 'badge--solid-listening', lightClass: 'badge--light-listening' },
+    5: { solidClass: 'badge--solid-listened', lightClass: 'badge--light-listened' },
+    6: { solidClass: 'badge--solid-dropped', lightClass: 'badge--light-dropped' },
 };
 
-const NEUTRAL_STYLE: IStatusStyle = {
-    solidClass: 'badge--solid-neutral',
-    lightClass: 'badge--light-neutral',
+// Visually distinct fallback — signals "this status has no defined colour yet"
+const DEFAULT_STYLE: IStatusStyle = {
+    solidClass: 'badge--solid-default',
+    lightClass: 'badge--light-default',
 };
 
-export const getStatusStyle = (id: number): IStatusStyle => STATUS_STYLE[id] ?? NEUTRAL_STYLE;
+export const getStatusStyle = (id: number): IStatusStyle => STATUS_STYLE[id] ?? DEFAULT_STYLE;
 
 /**
  * The user-facing label for a status: its symbol prefixed to the name when one

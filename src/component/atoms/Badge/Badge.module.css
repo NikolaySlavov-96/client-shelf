@@ -28,9 +28,15 @@
   background: var(--status-listened-bg);
   color: var(--status-listened-text);
 }
-.badge--light-neutral {
+.badge--light-dropped {
+  background: var(--status-dropped-bg);
+  color: var(--status-dropped-text);
+}
+/* Fallback — dashed outline signals "this status has no defined colour yet" */
+.badge--light-default {
   background: var(--color-surface-alt);
   color: var(--color-text-secondary);
+  outline: 1px dashed var(--color-text-secondary);
 }
 
 /* Solid variants — for badges overlaid on book covers */
@@ -54,7 +60,13 @@
   background: var(--status-listened-solid);
   color: var(--white);
 }
-.badge--solid-neutral {
+.badge--solid-dropped {
+  background: var(--status-dropped-solid);
+  color: var(--white);
+}
+/* Fallback — grey signals "this status has no defined colour yet" */
+.badge--solid-default {
   background: var(--color-text-secondary);
   color: var(--white);
+  opacity: 0.6;
 }
