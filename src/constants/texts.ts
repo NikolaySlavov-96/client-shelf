@@ -64,7 +64,7 @@ export const TEXTS = {
     PROFILE_STAT_READ: 'Read',
     PROFILE_STAT_READING: 'Reading',
     PROFILE_STAT_LISTENED: 'Listened',
-    PROFILE_GOAL_LABEL: 'Goal 2026',
+    PROFILE_GOAL_LABEL: 'Goal {{year}}',
     PROFILE_GOAL_EDIT: 'Edit goal',
     PROFILE_GOAL_SAVE: 'Save',
     PROFILE_GOAL_CANCEL: 'Cancel',
@@ -164,4 +164,9 @@ export const TEXTS = {
     AUTH_MAGIC_VERIFYING: 'Signing you in...',
     AUTH_MAGIC_SUCCESS: 'Signed in successfully',
     AUTH_MAGIC_ERROR: 'This sign-in link is invalid or has expired.',
+};
+
+export const t = (text: string, params?: Record<string, string | number>): string => {
+    if (!params) return text;
+    return Object.entries(params).reduce((acc, [k, v]) => acc.replace(`{{${k}}}`, String(v)), text);
 };

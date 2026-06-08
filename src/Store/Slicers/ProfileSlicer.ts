@@ -1,6 +1,6 @@
 import { type StateCreator } from 'zustand';
 
-import { FileService, ProfileService } from '~/services';
+import { ConfigService, FileService, ProfileService } from '~/services';
 import { type IProfile, type IUpdateProfileRequest } from '~/Types/services/ProfileService';
 
 import { type IAuthSlicer } from './AuthSlicer';
@@ -15,6 +15,8 @@ export interface IProfileSlicer {
     updateProfile: (data: IUpdateProfileRequest) => Promise<boolean>;
     updateReadingGoal: (goal: number) => Promise<boolean>;
     uploadAvatar: (file: File, name: string) => Promise<boolean>;
+    goalStatusIds: number[];
+    fetchGoalStatusIds: () => Promise<void>;
 }
 
 type TFullStore = IAuthSlicer & ICommonSlicer & ISupportSlicer & IModalSlicer & IProductSlicer & IProfileSlicer;
@@ -22,8 +24,12 @@ type TFullStore = IAuthSlicer & ICommonSlicer & ISupportSlicer & IModalSlicer & 
 let _profileService: ReturnType<typeof ProfileService> | null = null;
 const getProfileService = () => (_profileService ??= ProfileService());
 
+let _configService: ReturnType<typeof ConfigService> | null = null;
+const getConfigService = () => (_configService ??= ConfigService());
+
 const createProfileSlicer: StateCreator<TFullStore, [], [], IProfileSlicer> = (set, get) => ({
     profile: null,
+    goalStatusIds: [],
 
     fetchProfile: async () => {
         try {
@@ -46,6 +52,15 @@ const createProfileSlicer: StateCreator<TFullStore, [], [], IProfileSlicer> = (s
 
     updateReadingGoal: async (goal: number) => {
         return await get().updateProfile({ readingGoal: goal });
+    },
+
+    fetchGoalStatusIds: async () => {
+        try {
+            const result = await getConfigService().getGoalStatusIds();
+            set({ goalStatusIds: result.statusIds });
+        } catch (_err) {
+            // silent — non-critical
+        }
     },
 
     uploadAvatar: async (file: File, name: string) => {

@@ -25,4 +25,4 @@ export {
     isSameStatus,
     statusLabelWithCount,
 } from './statusMap';
-export { TEXTS } from './texts';
+export { t, TEXTS } from './texts';

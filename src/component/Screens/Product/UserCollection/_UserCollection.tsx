@@ -7,7 +7,7 @@ import { Pagination, ProgressBar, ShelfTabs } from '~/component/molecules';
 
 import { ShelfGrid } from '~/component/organisms';
 
-import { ROUT_NAMES, SEARCH_NAME, TEXTS } from '~/constants';
+import { ROUT_NAMES, SEARCH_NAME, t, TEXTS } from '~/constants';
 import { EStatusId } from '~/constants/statusMap';
 
 import { useStoreZ } from '~/hooks';
@@ -56,6 +56,8 @@ const UserCollection = () => {
     const [isEditingGoal, setIsEditingGoal] = useState(false);
     const [goalDraft, setGoalDraft] = useState('');
 
+    const currentYear = new Date().getFullYear();
+
     const {
         email,
         productStates,
@@ -71,6 +73,8 @@ const UserCollection = () => {
         updateReadingGoal,
         pageLimit,
         isLoadingProductCollection,
+        goalStatusIds,
+        fetchGoalStatusIds,
     } = useStoreZ();
 
     const initials = profile?.displayName || email ? (profile?.displayName ?? email).slice(0, 2).toUpperCase() : '';
@@ -100,6 +104,10 @@ const UserCollection = () => {
     useEffect(() => {
         fetchProfile();
     }, [fetchProfile]);
+
+    useEffect(() => {
+        fetchGoalStatusIds();
+    }, [fetchGoalStatusIds]);
 
     const handleStartEditGoal = useCallback(() => {
         setGoalDraft(String(readingGoal));
@@ -143,6 +151,8 @@ const UserCollection = () => {
     const readCount = countFor(EStatusId.READ);
     const readingCount = countFor(EStatusId.READING);
     const listenedCount = countFor(EStatusId.LISTENED);
+
+    const goalProgress = goalStatusIds.reduce((sum, id) => sum + countFor(id), 0);
 
     const pageCount = Math.ceil(productCollection.count / pageLimit) || 0;
 
@@ -204,7 +214,11 @@ const UserCollection = () => {
             </header>
 
             <div className={`flex-align ${styles.goalRow}`}>
-                <ProgressBar current={readCount + listenedCount} goal={readingGoal} label={TEXTS.PROFILE_GOAL_LABEL} />
+                <ProgressBar
+                    current={goalProgress}
+                    goal={readingGoal}
+                    label={t(TEXTS.PROFILE_GOAL_LABEL, { year: currentYear })}
+                />
                 {isEditingGoal ? (
                     <div className="flex-align">
                         <label className={styles.srOnly} htmlFor="reading-goal">
