@@ -8,25 +8,20 @@ export interface IStatusStyle {
 /**
  * Presentation only. Maps a status id to the colour it wears in the UI.
  * The label and the set of statuses that actually exist come from the API
- * (`GET /status/all`) — never from here. An id we don't have a colour for
- * falls back to a neutral style so unknown / newly-added statuses still render.
+ * (`GET /status/all`) — never from here.
+ * Key 0 is the explicit default: unknown / future ids fall back to it.
  */
 const STATUS_STYLE: Record<number, IStatusStyle> = {
-    1: { solidClass: 'badge--solid-read', lightClass: 'badge--light-read' },
-    2: { solidClass: 'badge--solid-reading', lightClass: 'badge--light-reading' },
-    3: { solidClass: 'badge--solid-want', lightClass: 'badge--light-want' },
-    4: { solidClass: 'badge--solid-listening', lightClass: 'badge--light-listening' },
-    5: { solidClass: 'badge--solid-listened', lightClass: 'badge--light-listened' },
-    6: { solidClass: 'badge--solid-dropped', lightClass: 'badge--light-dropped' },
+    0: { solidClass: 'badge--solid-default', lightClass: 'badge--light-default' },
+    1: { solidClass: 'badge--solid-want',        lightClass: 'badge--light-want' },
+    2: { solidClass: 'badge--solid-reading',     lightClass: 'badge--light-reading' },
+    3: { solidClass: 'badge--solid-read',        lightClass: 'badge--light-read' },
+    4: { solidClass: 'badge--solid-want-listen', lightClass: 'badge--light-want-listen' },
+    5: { solidClass: 'badge--solid-listening',   lightClass: 'badge--light-listening' },
+    6: { solidClass: 'badge--solid-listened',    lightClass: 'badge--light-listened' },
 };
 
-// Visually distinct fallback — signals "this status has no defined colour yet"
-const DEFAULT_STYLE: IStatusStyle = {
-    solidClass: 'badge--solid-default',
-    lightClass: 'badge--light-default',
-};
-
-export const getStatusStyle = (id: number): IStatusStyle => STATUS_STYLE[id] ?? DEFAULT_STYLE;
+export const getStatusStyle = (id: number): IStatusStyle => STATUS_STYLE[id] ?? STATUS_STYLE[0];
 
 /**
  * The user-facing label for a status: its symbol prefixed to the name when one

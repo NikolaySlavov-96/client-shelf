@@ -8,17 +8,21 @@
 }
 
 /* Light variants — for badges in lists and shelf cards */
-.badge--light-read {
-  background: var(--status-read-bg);
-  color: var(--status-read-text);
+.badge--light-want {
+  background: var(--status-want-bg);
+  color: var(--status-want-text);
 }
 .badge--light-reading {
   background: var(--status-reading-bg);
   color: var(--status-reading-text);
 }
-.badge--light-want {
-  background: var(--status-want-bg);
-  color: var(--status-want-text);
+.badge--light-read {
+  background: var(--status-read-bg);
+  color: var(--status-read-text);
+}
+.badge--light-want-listen {
+  background: var(--status-want-listen-bg);
+  color: var(--status-want-listen-text);
 }
 .badge--light-listening {
   background: var(--status-listening-bg);
@@ -28,28 +32,27 @@
   background: var(--status-listened-bg);
   color: var(--status-listened-text);
 }
-.badge--light-dropped {
-  background: var(--status-dropped-bg);
-  color: var(--status-dropped-text);
-}
-/* Fallback — dashed outline signals "this status has no defined colour yet" */
 .badge--light-default {
   background: var(--color-surface-alt);
   color: var(--color-text-secondary);
-  outline: 1px dashed var(--color-text-secondary);
+  border: var(--border-dashed);
 }
 
 /* Solid variants — for badges overlaid on book covers */
-.badge--solid-read {
-  background: var(--status-read-solid);
+.badge--solid-want {
+  background: var(--status-want-solid);
   color: var(--white);
 }
 .badge--solid-reading {
   background: var(--status-reading-solid);
   color: var(--white);
 }
-.badge--solid-want {
-  background: var(--status-want-solid);
+.badge--solid-read {
+  background: var(--status-read-solid);
+  color: var(--white);
+}
+.badge--solid-want-listen {
+  background: var(--status-want-listen-solid);
   color: var(--white);
 }
 .badge--solid-listening {
@@ -60,11 +63,6 @@
   background: var(--status-listened-solid);
   color: var(--white);
 }
-.badge--solid-dropped {
-  background: var(--status-dropped-solid);
-  color: var(--white);
-}
-/* Fallback — grey signals "this status has no defined colour yet" */
 .badge--solid-default {
   background: var(--color-text-secondary);
   color: var(--white);

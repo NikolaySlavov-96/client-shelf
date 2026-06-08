@@ -75,16 +75,16 @@ p {
   --status-listening-text: #9a3412;
   --status-listened-bg: #fef3c7;
   --status-listened-text: #78350f;
-  --status-dropped-bg: #fce7f3;
-  --status-dropped-text: #9d174d;
+  --status-want-listen-bg: #ede9fe;
+  --status-want-listen-text: #5b21b6;
 
   /* Status — solid (for badges on book covers) */
+  --status-want-solid: rgba(92, 107, 192, 0.9);
   --status-reading-solid: rgba(45, 106, 79, 0.9);
   --status-read-solid: rgba(27, 67, 50, 0.9);
-  --status-want-solid: rgba(92, 107, 192, 0.9);
+  --status-want-listen-solid: rgba(91, 33, 182, 0.9);
   --status-listening-solid: rgba(230, 126, 34, 0.9);
   --status-listened-solid: rgba(160, 64, 0, 0.9);
-  --status-dropped-solid: rgba(157, 23, 77, 0.9);
 
   /* --- Typography --- */
   --font-serif: 'Playfair Display', Georgia, serif;
@@ -197,6 +197,7 @@ p {
   /* --- Composite border tokens --- */
   --border-default: 1px solid var(--border);
   --border-med-default: 1px solid var(--border-med);
+  --border-dashed: 1px dashed var(--border-med);
   --border-accent: 1px solid var(--accent);
   --border-accent-2: 1px solid var(--accent-2);
   --border-transparent: 1px solid transparent;
