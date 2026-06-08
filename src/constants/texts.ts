@@ -61,9 +61,6 @@ export const TEXTS = {
     DETAIL_HISTORY_CURRENT: 'current',
     // Profile / Shelf
     PROFILE_STAT_TOTAL: 'Total books',
-    PROFILE_STAT_READ: 'Read',
-    PROFILE_STAT_READING: 'Reading',
-    PROFILE_STAT_LISTENED: 'Listened',
     PROFILE_GOAL_LABEL: 'Goal {{year}}',
     PROFILE_GOAL_EDIT: 'Edit goal',
     PROFILE_GOAL_SAVE: 'Save',

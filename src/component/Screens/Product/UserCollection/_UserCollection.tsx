@@ -7,8 +7,7 @@ import { Pagination, ProgressBar, ShelfTabs } from '~/component/molecules';
 
 import { ShelfGrid } from '~/component/organisms';
 
-import { ROUT_NAMES, SEARCH_NAME, t, TEXTS } from '~/constants';
-import { EStatusId } from '~/constants/statusMap';
+import { getStatusLabel, ROUT_NAMES, SEARCH_NAME, t, TEXTS } from '~/constants';
 
 import { useStoreZ } from '~/hooks';
 
@@ -148,10 +147,6 @@ const UserCollection = () => {
         ];
     }, [productStates, totalCount, countFor]);
 
-    const readCount = countFor(EStatusId.READ);
-    const readingCount = countFor(EStatusId.READING);
-    const listenedCount = countFor(EStatusId.LISTENED);
-
     const goalProgress = goalStatusIds.reduce((sum, id) => sum + countFor(id), 0);
 
     const pageCount = Math.ceil(productCollection.count / pageLimit) || 0;
@@ -197,9 +192,9 @@ const UserCollection = () => {
                     <p className={styles.header__email}>{email}</p>
                     <div className={styles.stats}>
                         <Stat value={totalCount} label={TEXTS.PROFILE_STAT_TOTAL} />
-                        <Stat value={readCount} label={TEXTS.PROFILE_STAT_READ} />
-                        <Stat value={readingCount} label={TEXTS.PROFILE_STAT_READING} />
-                        <Stat value={listenedCount} label={TEXTS.PROFILE_STAT_LISTENED} />
+                        {productStates.map((s) => (
+                            <Stat key={s.id} value={countFor(s.id)} label={getStatusLabel(s)} />
+                        ))}
                     </div>
                 </div>
                 <div className={styles.header__actions}>
