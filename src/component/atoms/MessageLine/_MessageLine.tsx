@@ -19,7 +19,7 @@ const STATUS_LABEL: Record<TMessageStatus, string> = {
     seen: 'Seen',
 };
 
-const _MessageLine = (props: IMessage) => {
+const MessageLine = (props: IMessage) => {
     const { message, senderId, createdAt, status } = props;
 
     const principal = useStoreZ((s) => s.principal);
@@ -55,4 +55,4 @@ const _MessageLine = (props: IMessage) => {
     );
 };
 
-export default memo(_MessageLine);
+export default memo(MessageLine);

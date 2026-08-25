@@ -13,12 +13,12 @@ export interface IStatusStyle {
  */
 const STATUS_STYLE: Record<number, IStatusStyle> = {
     0: { solidClass: 'badge--solid-default', lightClass: 'badge--light-default' },
-    1: { solidClass: 'badge--solid-want',        lightClass: 'badge--light-want' },
-    2: { solidClass: 'badge--solid-reading',     lightClass: 'badge--light-reading' },
-    3: { solidClass: 'badge--solid-read',        lightClass: 'badge--light-read' },
+    1: { solidClass: 'badge--solid-want', lightClass: 'badge--light-want' },
+    2: { solidClass: 'badge--solid-reading', lightClass: 'badge--light-reading' },
+    3: { solidClass: 'badge--solid-read', lightClass: 'badge--light-read' },
     4: { solidClass: 'badge--solid-want-listen', lightClass: 'badge--light-want-listen' },
-    5: { solidClass: 'badge--solid-listening',   lightClass: 'badge--light-listening' },
-    6: { solidClass: 'badge--solid-listened',    lightClass: 'badge--light-listened' },
+    5: { solidClass: 'badge--solid-listening', lightClass: 'badge--light-listening' },
+    6: { solidClass: 'badge--solid-listened', lightClass: 'badge--light-listened' },
 };
 
 export const getStatusStyle = (id: number): IStatusStyle => STATUS_STYLE[id] ?? STATUS_STYLE[0];
